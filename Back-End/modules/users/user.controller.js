@@ -96,6 +96,44 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const updateUserLocation = async (req, res) => {
+  try {
+    const { coordinates } = req.body; // input shape => coordinates: [lng, lat]
+    
+    // Validate coordinates exist and have correct shape
+    if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Coordinates must be an array of [lng, lat]" 
+      });
+    }
+
+    const [lng, lat] = coordinates;
+
+    // Validate coordinate ranges
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return res.status(400).json({ 
+        success: false,
+        message: "Invalid lat/lng values" 
+      });
+    }
+
+    // Update user location
+    const updatedUser = await userService.updateUserLocation(req.user.id, lng, lat);
+
+    res.status(200).json({
+      success: true,
+      message: "Location updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
 // ==================== Password Management ====================
 
 // Change password
@@ -119,7 +157,8 @@ const changePassword = async (req, res) => {
       });
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
     if (!passwordRegex.test(newPassword)) {
       return res.status(400).json({
         success: false,
@@ -129,11 +168,7 @@ const changePassword = async (req, res) => {
     }
 
     // Change password through service
-    await userService.changePassword(
-      req.user.id,
-      currentPassword,
-      newPassword
-    );
+    await userService.changePassword(req.user.id, currentPassword, newPassword);
 
     res.status(200).json({
       success: true,
@@ -155,8 +190,6 @@ const changePassword = async (req, res) => {
   }
 };
 
-
-
 // ==================== Account Management ====================
 
 // Delete account
@@ -174,7 +207,7 @@ const deleteAccount = async (req, res) => {
 
     // Get user with password
     const user = await userService.getUserByEmail(req.user.email);
-    
+
     const { comparePassword } = require("../../utils/hash");
     const isMatch = await comparePassword(password, user.password);
 
@@ -272,13 +305,40 @@ const updateAvailability = async (req, res) => {
 
     const technician = await userService.updateTechnicianAvailability(
       req.user.id,
-      availability_status
+      availability_status,
     );
 
     res.status(200).json({
       success: true,
       message: "Availability updated successfully",
       data: technician,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+// Get nearest 10 available technician for user
+const getNearestTechnicians = async (req, res) => {
+  try {
+    const user = await userService.getUserById(req.user.id);
+    const nearTechnicians = await userService.getNearestTechnicians(user._id);
+    // Check if any technicians were found
+    if (!nearTechnicians || nearTechnicians.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No technicians found nearby",
+        data: [],
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Nearest technicians got successfully successfully",
+      data: nearTechnicians,
     });
   } catch (error) {
     res.status(500).json({
@@ -297,4 +357,6 @@ module.exports = {
   getAllTechnicians,
   getTechnicianById,
   updateAvailability,
+  getNearestTechnicians,
+  updateUserLocation,
 };

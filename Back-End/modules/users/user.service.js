@@ -80,6 +80,25 @@ class UserService {
     return true;
   }
 
+async updateUserLocation(userId, lng, lat) {
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      location: {
+        type: "Point",
+        coordinates: [lng, lat]
+      }
+    },
+    { new: true, runValidators: true }
+  );
+  
+  if (!user) {
+    throw new Error('User not found');
+  }
+  
+  return user;
+}
+
   
   // ==================== Technician Management ====================
 
@@ -140,6 +159,27 @@ class UserService {
     }
 
     return technician;
+  }
+
+  // Get nearest 10 available technician for user 
+  async getNearestTechnicians(userId) {
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const nearTechnicians = await Technician.find({
+    _id: { $ne: user._id }, // يستبعد نفسه
+    location: {
+      $near: {
+        $geometry: user.location,
+        // $maxDistance: 5000 // 5 km
+      }
+      },
+    availability_status :true
+    }).limit(10);
+    
+    return nearTechnicians
   }
 
   // ==================== Validation Helpers ====================

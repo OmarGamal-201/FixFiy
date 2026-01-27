@@ -2,14 +2,14 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { User,Technician,Client, PasswordResetToken } = require("../users/user.model");
 const { sendPasswordResetEmail } = require("../../utils/email");
-const authService=require('./auth.service')
+const AuthService=require('./auth.service')
 
 
 
 // Register
 const register = async (req, res) => {
   try {
-    const result = await authService.register(req.body);
+    const result = await AuthService.register(req.body);
 
     return res.status(201).json({
       success: true,
@@ -26,7 +26,7 @@ const register = async (req, res) => {
 //Login
 const login = async (req, res) => {
   try {
-    const result = await authService.login(req.body);
+    const result = await AuthService.login(req.body);
 
     return res.status(200).json({
       success: true,
@@ -53,7 +53,7 @@ const forgotPassword = async (req, res) => {
     }
 
     // Check if user exists and get reset token
-    const resetToken = await authService.requestPasswordReset(email);
+    const resetToken = await AuthService.requestPasswordReset(email);
 
     // Create reset URL
     const resetUrl = `${req.protocol}://${req.get(
@@ -90,7 +90,7 @@ const forgotPassword = async (req, res) => {
       console.error("Email send error:", emailError);
 
       // If email fails, remove reset token
-      const user = await authService.getUserByEmail(email);
+      const user = await AuthService.getUserByEmail(email);
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
       await user.save({ validateBeforeSave: false });
@@ -149,7 +149,7 @@ const resetPassword = async (req, res) => {
     }
 
     // Reset password
-    await authService.resetPassword(resetToken, password);
+    await AuthService.resetPassword(resetToken, password);
 
     res.status(200).json({
       success: true,
@@ -176,7 +176,7 @@ const verifyResetToken = async (req, res) => {
   try {
     const { resetToken } = req.params;
 
-    const isValid = await authService.verifyResetToken(resetToken);
+    const isValid = await AuthService.verifyResetToken(resetToken);
 
     if (!isValid) {
       return res.status(400).json({

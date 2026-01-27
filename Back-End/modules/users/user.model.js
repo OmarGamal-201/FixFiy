@@ -80,6 +80,17 @@ const userSchema = new mongoose.Schema({
       trim: true,
     },
   },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point"
+    },
+    coordinates: {
+      type: [Number], // [lng, lat]
+      required: true
+    }
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: { 
@@ -89,6 +100,8 @@ const userSchema = new mongoose.Schema({
 }, options);
 
 userSchema.index({ createdAt: -1 });
+userSchema.index({ location: "2dsphere" });
+
 
 // Generate password reset token
 userSchema.methods.getResetPasswordToken = function () {

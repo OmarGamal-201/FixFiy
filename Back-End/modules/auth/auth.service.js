@@ -71,7 +71,8 @@ class AuthService {
       throw new Error("Invalid credentials");
     }
 
-    const token = generateToken(user);
+    // const token = generateToken(user); 
+    const token = generateToken(user._id);
 
     return { user, token };
   }

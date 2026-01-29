@@ -2,6 +2,9 @@ const { Server } = require("socket.io");
 const socketAuth = require("./auth.socket");
 const messagingSocket = require("./messaging.socket");
 
+//  ربط socket بالـ notification helper
+const { setSocketInstance } = require("../utils/emitNotification");
+
 const initSocket = (server) => {
   const io = new Server(server, {
     cors: {
@@ -9,19 +12,25 @@ const initSocket = (server) => {
     },
   });
 
+  // نخزّن io عشان نستخدمه في emitNotification
+  setSocketInstance(io);
+
   io.use(socketAuth);
 
-io.on("connection", (socket) => {
-  console.log(" New socket connection");
-  console.log("User:", socket.user);
+  io.on("connection", (socket) => {
+    console.log("🟢 New socket connection");
+    console.log("User:", socket.user);
 
-  messagingSocket(io, socket);
+    //  user room للإشعارات
+    socket.join(socket.user.id.toString());
 
-  socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected:", socket.user?.id);
+    // Messaging
+    messagingSocket(io, socket);
+
+    socket.on("disconnect", () => {
+      console.log("❌ Socket disconnected:", socket.user?.id);
+    });
   });
-});
-
 };
 
 module.exports = initSocket;

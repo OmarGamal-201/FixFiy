@@ -2,7 +2,7 @@ const { io } = require("socket.io-client");
 console.log("🚀 test-socket file started");
 
 // 🔑 حطي توكن حقيقي (Client أو Technician)
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Nzk5YTc3M2Y5ZTBmMWJhZDEyYWIzMyIsImlhdCI6MTc2OTU4Nzg0OSwiZXhwIjoxNzcwMTkyNjQ5fQ.FeHXddUlMdQ0YdWB3pXZi2krPP3p7tdQAmOy27FNA38"
+const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Nzk5YTc3M2Y5ZTBmMWJhZDEyYWIzMyIsImlhdCI6MTc2OTY2Njk1NywiZXhwIjoxNzcwMjcxNzU3fQ.-uwlQbG54CODoR1_d225L4ER5QvF-UH5DTk7SMXmn5Y"
 const socket = io("http://localhost:3001", {
   auth: {
     token: TOKEN,

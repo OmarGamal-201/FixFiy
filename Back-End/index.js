@@ -23,11 +23,18 @@ app.use(express.urlencoded({ extended: true }));
 const userRoutes = require('./modules/users/user.routes')
 const authRoutes = require("./modules/auth/auth.routes")
 const messagingRoutes = require("./modules/messaging/messaging.routes");
+const notificationRoutes = require("./modules/notifications/notification.routes");
+const adminRoutes = require("./modules/admin/admin.routes");
+
+
 
 app.use("/api/profile",userRoutes );
-app.use("/api/auth", authRoutes );  
-app.use("/api/", messagingRoutes);
+app.use("/api/auth", authRoutes );
 
+app.use("/api/", messagingRoutes);
+app.use("/api/notifications", notificationRoutes);
+
+app.use("/api/admin", adminRoutes);
 const server = http.createServer(app);
 initSocket(server);
 

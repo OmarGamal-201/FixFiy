@@ -6,26 +6,22 @@ const paymentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Job",
       required: true,
-      index: true,
     },
 
     clientId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
 
     workerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
-      index: true,
     },
 
-    method: {
+    type: {
       type: String,
-      enum: ["CASH", "WALLET", "CARD"],
+      enum: ["DEPOSIT", "FINAL"],
       required: true,
     },
 
@@ -35,57 +31,27 @@ const paymentSchema = new mongoose.Schema(
       min: 0,
     },
 
-    platformCommission: {
-      type: Number,
-      required: true,
-      min: 0,
+    heldBy: {
+      type: String,
+      enum: ["PLATFORM", "WORKER"],
+      default: "PLATFORM",
     },
 
-    workerAmount: {
-      type: Number,
+    provider: {
+      type: String,
+      enum: ["MOCK", "PAYPAL"],
       required: true,
-      min: 0,
     },
+
+    transactionId: String,
 
     status: {
       type: String,
-      enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
-      default: "PENDING",
-      index: true,
-    },
-
-    transactionRef: {
-      type: String, // external gateway ref (Stripe, Paymob, etc.)
-    },
-
-    paidAt: {
-      type: Date,
-    },
-
-    refundedAt: {
-      type: Date,
+      enum: ["PAID", "FAILED", "REFUNDED"],
+      default: "PAID",
     },
   },
   { timestamps: true }
 );
-
-/* ================= Indexes ================= */
-
-paymentSchema.index({ createdAt: -1 });
-
-/* ================= Hooks ================= */
-
-// Automatically set paidAt
-paymentSchema.pre("save", function (next) {
-  if (this.isModified("status") && this.status === "PAID") {
-    this.paidAt = new Date();
-  }
-
-  if (this.isModified("status") && this.status === "REFUNDED") {
-    this.refundedAt = new Date();
-  }
-
-  next();
-});
 
 module.exports = mongoose.model("Payment", paymentSchema);

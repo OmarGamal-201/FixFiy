@@ -43,6 +43,7 @@ app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/admin", adminRoutes);
 app.use("/api", withdrawRoutes);
+app.use("/api", require("./modules/reviews/review.routes"));
 
 const server = http.createServer(app);
 initSocket(server);

@@ -1,98 +1,53 @@
 const reviewService = require("./review.service");
 
-/* =========================
-   CREATE REVIEW (CLIENT)
-========================= */
+/* CLIENT */
 exports.createReview = async (req, res) => {
   try {
-    const { jobId, rating, comment } = req.body;
-
-    if (!jobId || !rating) {
-      return res.status(400).json({
-        success: false,
-        message: "jobId and rating are required",
-      });
-    }
-
     const review = await reviewService.createReview({
-      jobId,
+      jobId: req.body.jobId,
       clientId: req.user.id,
-      rating,
-      comment,
+      rating: req.body.rating,
+      comment: req.body.comment,
     });
 
-    res.status(201).json({
-      success: true,
-      data: review,
-    });
+    res.status(201).json({ success: true, data: review });
   } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message,
-    });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
-/* =========================
-   GET WORKER REVIEWS
-========================= */
+/* PUBLIC */
 exports.getWorkerReviews = async (req, res) => {
   try {
     const reviews = await reviewService.getWorkerReviews(
       req.params.workerId
     );
-
-    res.json({
-      success: true,
-      data: reviews,
-    });
+    res.json({ success: true, data: reviews });
   } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message,
-    });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
-/* =========================
-   ADMIN – UPDATE REVIEW
-========================= */
+/* ADMIN */
 exports.adminUpdateReview = async (req, res) => {
   try {
     const review = await reviewService.adminUpdateReview(
       req.params.id,
       req.body
     );
-
-    res.json({
-      success: true,
-      data: review,
-    });
+    res.json({ success: true, data: review });
   } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message,
-    });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
-/* =========================
-   ADMIN – DELETE REVIEW
-========================= */
 exports.adminDeleteReview = async (req, res) => {
   try {
     const result = await reviewService.adminDeleteReview(
       req.params.id
     );
-
-    res.json({
-      success: true,
-      message: result.message,
-    });
+    res.json({ success: true, data: result });
   } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message,
-    });
+    res.status(400).json({ success: false, message: err.message });
   }
 };

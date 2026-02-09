@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema(
   {
+    /* ================= RELATIONS ================= */
     jobId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Job",
       required: true,
-      unique: true, // Review واحدة لكل Job
+      unique: true, // one review per job
     },
 
     clientId: {
@@ -21,6 +22,7 @@ const reviewSchema = new mongoose.Schema(
       required: true,
     },
 
+    /* ================= CONTENT ================= */
     rating: {
       type: Number,
       required: true,
@@ -37,6 +39,6 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-reviewSchema.index({ workerId: 1 });
+reviewSchema.index({ workerId: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Review", reviewSchema);

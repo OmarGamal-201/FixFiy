@@ -3,7 +3,7 @@ const controller = require("./review.controller");
 const { protect } = require("../../middlewares/auth.middleware");
 const { authorize } = require("../../middlewares/role.middleware");
 
-/* ===== Client ===== */
+/* CLIENT */
 router.post(
   "/",
   protect,
@@ -11,13 +11,13 @@ router.post(
   controller.createReview
 );
 
-/* ===== Public ===== */
+/* PUBLIC */
 router.get(
   "/worker/:workerId",
   controller.getWorkerReviews
 );
 
-/* ===== Admin ===== */
+/* ADMIN */
 router.patch(
   "/admin/reviews/:id",
   protect,

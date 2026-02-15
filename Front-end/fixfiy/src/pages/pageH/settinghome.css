@@ -1,0 +1,59 @@
+.settings-overview-container {
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.settings-title {
+  font-size: 2rem;
+  color: #1e293b;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.setting-option-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 25px 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+
+.setting-option-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #0078E5;
+}
+
+.option-info h3 {
+  font-size: 1.3rem;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.option-info p {
+  font-size: 1rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+
+@media (max-width: 600px) {
+  .settings-overview-container {
+    padding: 20px;
+  }
+  
+  .setting-option-card {
+    padding: 20px;
+  }
+}

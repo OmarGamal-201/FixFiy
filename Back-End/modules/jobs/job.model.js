@@ -1,64 +1,130 @@
-// models/job.model.js
 const mongoose = require("mongoose");
 
-const jobSchema = new mongoose.Schema({
+const jobSchema = new mongoose.Schema(
+  {
+    // ================= Core Info =================
     title: {
-        type: String,
-        required: [true, "Title is required"],
-        trim: true,
-        minLength: [3, "Title must be at least 3 characters long"],
-        maxLength: [30, "Title cannot exceed 30 characters"],
-        match: [
-            /^[a-zA-Z0-9\s]+$/,
-            "Title can only contain letters, numbers, and spaces",
-        ],
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 3,
+      maxLength: 30,
     },
+
     description: {
-        type: String,
-        required: [true, 'Description is Required'],
-        trim: true,
-        minLength: [15, "Description must be at least 15 characters long"],
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 15,
     },
+
+    serviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Service",
+      required: true,
+    },
+
+    // ================= Relations =================
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    workerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    reviewId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review",
+    },
+
+    // ================= Status =================
     status: {
-        type: String,
-        enum: ['Pending', 'Canceled', 'Active','Done'],
-        default: 'Pending',
+      type: String,
+      enum: ["PENDING", "ACCEPTED", "ACTIVE", "DONE", "CANCELED"],
+      default: "PENDING",
     },
-    total_price: {
-        type: Number,
-        required: [true, 'Price is Required'],
-        min: [0, "Price cannot be negative"],
-        max: [10000, "Price cannot exceed 10,000"],
-        validate: {
-            validator: function (value) {
-                return Number.isFinite(value) && value >= 0;
-            },
-            message: "Price must be a valid positive number",
+
+    statusHistory: [
+      {
+        status: String,
+        changedAt: {
+          type: Date,
+          default: Date.now,
         },
-        set: (val) => Math.round(val * 100) / 100,
+      },
+    ],
+
+    canceledBy: {
+      type: String,
+      enum: ["CLIENT", "TECHNICIAN", "ADMIN"],
     },
-    // Store commission rate at time of job creation
+
+    cancelReason: String,
+
+    // ================= Pricing =================
+    total_price: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 10000,
+    },
+
     site_commission: {
-        type: Number,
-        required: true,
-        min: [0, "Commission cannot be negative"],
-        max: [100, "Commission cannot exceed 100%"],
-        default: 10, // Default commission
+      type: Number,
+      default: 10,
+      min: 0,
+      max: 100,
     },
-}, { timestamps: true });
 
-// Virtual for commission amount
-jobSchema.virtual('commission_amount').get(function () {
-    return Math.round(this.total_price * (this.site_commission / 100) * 100) / 100;
+    // ================= Payment =================
+    paymentStatus: {
+      type: String,
+      enum: ["UNPAID", "DEPOSIT_PAID", "PAID"],
+      default: "UNPAID",
+    },
+
+    depositAmount: {
+      type: Number,
+      default: 0,
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: ["PAYPAL", "PAYMOB", "CASH"],
+    },
+
+    paymentRef: String,
+  },
+  { timestamps: true }
+);
+
+// ================= Indexes =================
+jobSchema.index({ clientId: 1 });
+jobSchema.index({ workerId: 1 });
+jobSchema.index({ status: 1 });
+
+// ================= Virtuals =================
+jobSchema.virtual("commission_amount").get(function () {
+  return +(this.total_price * (this.site_commission / 100)).toFixed(2);
 });
 
-// Virtual for provider earnings
-jobSchema.virtual('provider_earnings').get(function () {
-    return Math.round((this.total_price - this.commission_amount) * 100) / 100;
+jobSchema.virtual("provider_earnings").get(function () {
+  return +(this.total_price - this.commission_amount).toFixed(2);
+});
+jobSchema.virtual("uiState").get(function () {
+  return {
+    canReview: this.status === "DONE" && !this.reviewId,
+    canChat: ["ACCEPTED", "ACTIVE"].includes(this.status),
+    canAccept: this.status === "PENDING",
+    canPayFinal: this.status === "DONE" && this.paymentStatus !== "PAID",
+  };
 });
 
-// Enable virtuals in JSON output
-jobSchema.set('toJSON', { virtuals: true });
-jobSchema.set('toObject', { virtuals: true });
+jobSchema.set("toJSON", { virtuals: true });
+jobSchema.set("toObject", { virtuals: true });
 
-module.exports = mongoose.model('Job', jobSchema);
+module.exports = mongoose.model("Job", jobSchema);

@@ -1,57 +1,76 @@
-// routes/job.routes.js
-const express = require("express");
-const router = express.Router();
-const {
-    createJob,
-    getJobById,
-    getAllJobs,
-    updatePrice,
-    cancelJob,
-    completeJob,
-    updateStatus,
-    getCommissionRate,
-    updateCommissionRate,
-    getCommissionStats,
-} = require('./job.controller');
+const router = require("express").Router();
+const controller = require("./job.controller");
 const { protect } = require("../../middlewares/auth.middleware");
 const { authorize } = require("../../middlewares/role.middleware");
 
-// ============================================
-// PUBLIC/USER ROUTES
-// ============================================
+/* ========= CLIENT ========= */
+router.post(
+  "/",
+  protect,
+  authorize("client"),
+  controller.createJob
+);
 
-// Get all jobs with filters
-router.get('/jobs', getAllJobs);
+router.patch(
+  "/:id/cancel",
+  protect,
+  authorize("client"),
+  controller.cancelJob
+);
 
-// Create a new job
-router.post('/job', protect,authorize('client'), createJob);
+/* ========= TECHNICIAN ========= */
+router.patch(
+  "/:id/accept",
+  protect,
+  authorize("technician"),
+  controller.acceptJob
+);
 
-// Get a single job by ID
-router.get('/job/:id', protect, getJobById);
+router.patch(
+  "/:id/start",
+  protect,
+  authorize("technician"),
+  controller.startJob
+);
 
-// Update job price
-router.patch('/job/:id/price', protect,authorize('client'), updatePrice);
+router.patch(
+  "/:id/complete",
+  protect,
+  authorize("technician"),
+  controller.completeJob
+);
 
-// Cancel a job
-router.patch('/job/:id/cancel', protect, cancelJob);
+/* ========= SHARED ========= */
+router.get("/:id", protect, controller.getJobById);
+router.get("/", protect, controller.getAllJobs);
 
-// Complete a job
-router.patch('/job/:id/complete', protect,authorize('technician'), completeJob);
+/* ========= ADMIN ========= */
+router.patch(
+  "/:id/status",
+  protect,
+  authorize("admin"),
+  controller.updateStatus
+);
 
-// Update job status
-router.patch('/job/:id/status', protect, updateStatus);
+router.get(
+  "/admin/commission-rate",
+  protect,
+  authorize("admin"),
+  controller.getCommissionRate
+);
 
-// ============================================
-// ADMIN ONLY ROUTES
-// ============================================
+router.put(
+  "/admin/commission-rate",
+  protect,
+  authorize("admin"),
+  controller.updateCommissionRate
+);
 
-// Get current commission rate (ADMIN ONLY)
-router.get('/admin/commission-rate', protect, authorize('admin'), getCommissionRate);
-
-// Update commission rate (ADMIN ONLY)
-router.put('/admin/commission-rate', protect, authorize('admin'), updateCommissionRate);
-
-// Get commission statistics (ADMIN ONLY)
-router.get('/admin/commission-stats', protect, authorize('admin'), getCommissionStats);
+router.get(
+  "/admin/commission-stats",
+  protect,
+  authorize("admin"),
+  controller.getCommissionStats
+);
 
 module.exports = router;

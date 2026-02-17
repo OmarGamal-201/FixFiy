@@ -2,184 +2,230 @@ const mongoose = require("mongoose");
 const { hashPassword, comparePassword } = require("../../utils/hash");
 const disposable = require("disposable-email-domains");
 
-const options = { discriminatorKey: 'role', collection: 'users' };
+const options = {
+  discriminatorKey: "role",
+  collection: "users",
+  timestamps: true,
+};
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Name is required"],
-    trim: true,
-    minLength: [3, "Name must be at least 3 characters long"],
-    maxLength: [30, "Name cannot exceed 30 characters"],
-    match: [
-      /^[a-zA-Z0-9_-]+$/,
-      "Name can only contain letters, numbers, underscores and hyphens",
-    ],
-    validate: {
-      validator: function (v) {
-        const prohibited = ["admin", "root", "system", "moderator"];
-        return !prohibited.includes(v.toLowerCase());
-      },
-      message: "This name is not allowed",
-    },
-  },
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-    unique: true,
-    lowercase: true,
-    trim: true,
-    match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please provide a valid email"],
-    validate: {
-      validator: function (email) {
-        const domain = email.split("@")[1];
-        return !disposable.includes(domain);
-      },
-      message: "Disposable email addresses are not allowed",
-    },
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-    minLength: [8, "Password must be at least 8 characters long"],
-    validate: {
-      validator: function (v) {
-        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
-          v,
-        );
-      },
-      message:
-        "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character",
-    },
-  },
-  phone: {
-    type: String,
-    required: [true, "Phone is required"],
-    trim: true,
-    validate: {
-      validator: function (v) {
-        return /^(\+20|0)?1[0-2,5]\d{8}$/.test(v);
-      },
-      message: "Invalid phone number",
-    },
-  },
-  address: {
-    street: {
+/* =======================
+   Base User Schema
+======================= */
+const userSchema = new mongoose.Schema(
+  {
+    name: {
       type: String,
       required: true,
       trim: true,
+      minLength: 3,
+      maxLength: 30,
+      match: /^[a-zA-Z0-9_-]+$/,
+      validate: {
+        validator: (v) =>
+          !["admin", "root", "system", "moderator"].includes(v.toLowerCase()),
+        message: "This name is not allowed",
+      },
     },
-    city: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    governorate: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-  },
-  location: {
-    type: {
-      type: String,
-      enum: ["Point"],
-      default: "Point"
-    },
-    coordinates: {
-      type: [Number], // [lng, lat]
-      required: true
-    }
-  },
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
-  },
-}, options);
 
-userSchema.index({ createdAt: -1 });
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      validate: {
+        validator: (email) =>
+          !disposable.includes(email.split("@")[1]),
+        message: "Disposable email addresses are not allowed",
+      },
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minLength: 8,
+      validate: {
+        validator: (v) =>
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(v),
+        message:
+          "Password must include uppercase, lowercase, number and special char",
+      },
+    },
+
+    phone: {
+      type: String,
+      required: true,
+      validate: {
+        validator: (v) =>
+          /^(\+20|0)?1[0-2,5]\d{8}$/.test(v),
+        message: "Invalid phone number",
+      },
+    },
+
+    address: {
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+      governorate: { type: String, required: true },
+    },
+
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number], // [lng, lat]
+        required: true,
+      },
+    },
+
+    profileImage: {
+      type: String,
+      default: null,
+    },
+
+    bio: {
+      type: String,
+      maxLength: 300,
+      default: "",
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
+    settings: {
+      language: {
+        type: String,
+        enum: ["en", "ar"],
+        default: "en",
+      },
+      notifications: {
+        email: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+        calls: { type: Boolean, default: true },
+      },
+    },
+
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+  },
+  options,
+);
+
+/* =======================
+   Indexes
+======================= */
 userSchema.index({ location: "2dsphere" });
+userSchema.index({ createdAt: -1 });
 
+/* =======================
+   Password Logic
+======================= */
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await hashPassword(this.password);
+  next();
+});
 
-// Generate password reset token
+userSchema.methods.matchPassword = function (enteredPassword) {
+  return comparePassword(enteredPassword, this.password);
+};
+
 userSchema.methods.getResetPasswordToken = function () {
   const crypto = require("crypto");
-  
-  // Generate token
   const resetToken = crypto.randomBytes(32).toString("hex");
 
-  // Hash token and set to resetPasswordToken field
   this.resetPasswordToken = crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
 
-  // Set expire (10 minutes)
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
-
   return resetToken;
 };
 
-// Hash password before save if modified/new
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  try {
-    this.password = await hashPassword(this.password);
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
+const User = mongoose.model("User", userSchema);
 
-// Compare password method
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return comparePassword(enteredPassword, this.password);
-};
+/* =======================
+   Client Schema
+======================= */
+const Client = User.discriminator(
+  "client",
+  new mongoose.Schema({
+    client_rate: {
+      type: Number,
+      min: 0,
+      max: 5,
+      default: 0,
+    },
+  }),
+);
 
-const User = mongoose.model('User', userSchema);
+/* =======================
+   Technician (Worker)
+======================= */
+const Technician = User.discriminator(
+  "technician",
+  new mongoose.Schema({
+    specialties: [
+      {
+        type: String,
+        enum: [
+          "plumbing",
+          "electrical",
+          "carpentry",
+          "painting",
+          "hvac",
+          "appliance_repair",
+          "general",
+        ],
+      },
+    ],
 
-// Client Model
-const Client = User.discriminator('client', new mongoose.Schema({
-  client_rate: {
-    type: Number,
-    min: [0, "Rating cannot be negative"],
-    max: [5, "Rating cannot exceed 5"],
-    default: 0,
-  },
-}));
+    experience_years: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 50,
+    },
 
-// Technician Model
-const Technician = User.discriminator('technician', new mongoose.Schema({
-  experience_years: {
-    type: Number,
-    required: [true, "Experience years is required for technicians"],
-    min: [0, "Experience cannot be negative"],
-    max: [50, "Experience years seems unrealistic"],
-  },
-  specialty: {
-    type: String,
-    required: [true, "Specialty is required for technicians"],
-    trim: true,
-    enum: {
-      values: ['plumbing', 'electrical', 'carpentry', 'painting', 'hvac', 'appliance_repair', 'general'],
-      message: '{VALUE} is not a valid specialty'
-    }
-  },
-  availability_status: {
-    type: Boolean,
-    default: true,
-  },
-  technician_rate: {
-    type: Number,
-    min: [0, "Rating cannot be negative"],
-    max: [5, "Rating cannot exceed 5"],
-    default: 0,
-  },
-}));
+    availability: {
+      isAvailable: {
+        type: Boolean,
+        default: true,
+      },
+      lastUpdated: {
+        type: Date,
+        default: Date.now,
+      },
+    },
 
-// Admin Model
-const Admin = User.discriminator('admin', new mongoose.Schema({}));
+    technician_rate: {
+      type: Number,
+      min: 0,
+      max: 5,
+      default: 0,
+    },
+
+    ratingCount: {
+      type: Number,
+      default: 0,
+    },
+
+    totalEarnings: {
+      type: Number,
+      default: 0,
+    },
+  }),
+);
+
+/* =======================
+   Admin Schema
+======================= */
+const Admin = User.discriminator("admin", new mongoose.Schema({}));
 
 module.exports = { User, Client, Technician, Admin };

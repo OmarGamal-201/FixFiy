@@ -1,0 +1,69 @@
+.booking-page{
+    display: flex;
+    height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f6f7fb;
+}
+
+.booking-card{
+    background-color: #fff;
+    width: 400px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    margin: 0 auto;
+   
+}
+
+.booking-card h2{
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.booking-card form{
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.booking-card label{
+    margin-bottom: 6px;
+    font-size: 17px;
+    color: #444;
+}
+
+.booking-card input,
+.booking-card select{
+    padding: 10px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    font-weight: 500;
+    outline: none;
+}
+
+.date-row{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.date-row select{
+    flex: 1;
+}
+
+.booking-card button{
+    margin-top: 10px;
+    padding: 12px;
+    background-color: #1e88e5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.booking-card button:hover{
+    background-color: #1565c0;
+}

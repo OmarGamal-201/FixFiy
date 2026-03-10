@@ -1,0 +1,129 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.payments-page{
+    display: flex;
+    min-height: 100vh;
+    background: #f5f7fb;
+}
+
+
+.payments-card{
+    max-width: 500px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    margin: auto;
+}
+
+.payments-card h2{
+    margin-bottom: 20px;
+}
+
+.payments-card label{
+    display: block;
+    margin: 15px 0 5px;
+    font-size: 17px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.payments-card input[type="text"]{
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.payments-card .status-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 13px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin: 15px 0 25px 0;
+
+}
+
+.payments-card .status-row>label{
+    display: block;
+    font-weight: 500;
+    font-size: 17px;
+    margin-bottom: 5px;
+}
+.payments-card .status-row span{
+    font-size: 13px;
+    color: #aaa;
+}
+
+.payments-card .switch{
+    position: relative;
+    flex-shrink: 0;
+    width: 40px;
+    height: 20px;
+    display: inline-block;
+}
+
+.payments-card .switch input{
+    display: none;
+}
+
+.payments-card .slider{
+    position: absolute;
+    inset: 0;
+    background-color: gray;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.payments-card .slider::before{
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 2px;
+    top: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.payments-card .switch input:checked + .slider{
+    background-color: #1e88e5;
+}
+
+.payments-card .switch input:checked + .slider::before{
+    transform: translateX(20px);
+}
+
+.payments-card button{
+    width: 400px;
+    margin: 25px auto 0;
+    display: block;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #1e88e5;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.payments-card button{
+    background: #1565c0;
+}
+
+.center-search{
+    width: 300px;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}

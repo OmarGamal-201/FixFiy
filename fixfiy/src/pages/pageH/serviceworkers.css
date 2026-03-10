@@ -1,0 +1,85 @@
+.workers-gallery-container {
+  padding: 20px;
+}
+
+.service-title {
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: #1a1a1a;
+}
+
+
+.workers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.worker-card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.worker-card:hover {
+  transform: translateY(-5px);
+}
+
+.placeholder-img {
+  width: 60px;
+  height: 60px;
+  background: #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  font-size: 24px;
+}
+
+.worker-info h4 { margin: 5px 0; color: #333; }
+.worker-job { color: #888; font-size: 14px; margin-bottom: 10px; }
+
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 20px;
+}
+
+.rating-num { margin-left: 5px; font-weight: bold; color: #444; }
+
+.worker-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.view-profile-btn, .contact-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.view-profile-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.contact-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.view-profile-btn:hover, .contact-btn:hover {
+  opacity: 0.8;
+}

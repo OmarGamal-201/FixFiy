@@ -1,0 +1,145 @@
+
+.settings-main-content {
+  padding: 20px;
+  background-color: #f8fafc;
+  width: 100%;
+}
+
+.settings-card {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  max-width: 900px;
+}
+
+.settings-group {
+  margin-bottom: 35px;
+}
+
+.group-label {
+  font-size: 1.2rem;
+  color: #1e293b;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+
+.theme-box {
+  background-color: #e2f0ff;
+  border-radius: 10px;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.primary-color-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.color-square {
+  width: 45px;
+  height: 45px;
+  background-color: #0078E5;
+  border-radius: 6px;
+}
+
+.color-text .main-p { font-weight: bold; margin: 0; }
+.color-text .sub-p { color: #64748b; margin: 0; font-size: 0.9rem; }
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  margin-left: 15px;
+}
+
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #cbd5e1;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px; width: 18px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider { background-color: #0078E5; }
+input:checked + .toggle-slider:before { transform: translateX(26px); }
+
+
+.language-selector {
+  display: flex;
+  gap: 12px;
+}
+
+.lang-option {
+  padding: 8px 25px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  cursor: pointer;
+}
+
+.lang-option.active {
+  background-color: #0078E5;
+  color: white;
+  border-color: #0078E5;
+}
+
+
+.logo-upload-box {
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 40px;
+  text-align: center;
+}
+
+.upload-hint { color: #94a3b8; margin-bottom: 15px; }
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 8px 20px;
+  cursor: pointer;
+  background: #f1f5f9;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.custom-file-upload input[type="file"] { display: none; }
+
+
+
+.lang-option {
+  padding: 8px 25px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #334155; 
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.lang-option.active {
+  background-color: #0078E5;
+  color: white; 
+  border-color: #0078E5;
+}
+
+

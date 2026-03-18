@@ -11,7 +11,12 @@ const { protect } = require("./middlewares/auth.middleware");
 const { authorize } = require("./middlewares/role.middleware");
 
 const app = express();
+const cors = require("cors");
 
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 /* ========================
    BASIC MIDDLEWARES
 ======================== */

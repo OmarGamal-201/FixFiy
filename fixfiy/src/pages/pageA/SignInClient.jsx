@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom'; 
+import API from "../../services/api";
 import "./SignInClient.css";
 
-function SignInClient() {
+function SignInClient({ onLogin }) {
   const navigate = useNavigate();
   
   const [form, setForm] = useState({
@@ -13,6 +13,9 @@ function SignInClient() {
     phone: "",
     password: "",
     confirmPassword: "",
+    street: "",
+    city: "",
+    governorate: "",
   });
 
   const handleChange = (e) => {
@@ -20,55 +23,80 @@ function SignInClient() {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // 🔥 مهم جدا
+
+    console.log("🔥 CLIENT SUBMIT", form);
+
     if (form.password !== form.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
-    
-    localStorage.setItem('userRole', 'client');
-    
-    alert("Sign up successful!");
-    
-    
-    navigate('/home');
-    window.location.reload();
+    try {
+      const res = await API.post("/auth/register", {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        phone: form.phone,
+        role: "client",
+        address: {
+          street: form.street,
+          city: form.city,
+          governorate: form.governorate,
+        },
+        location: {
+          coordinates: [31.2, 30.1],
+        },
+      });
+
+      console.log("✅ SUCCESS:", res.data);
+
+      // حفظ البيانات
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("userRole", "client");
+
+      // تحديث state
+      onLogin("client");
+
+      // 🔥 ندي فرصة للـ state يتحدث
+      setTimeout(() => {
+        navigate("/home");
+      }, 100);
+
+    } catch (error) {
+      console.log("❌ ERROR FULL:", error);
+
+      alert(
+        error.response?.data?.message ||
+        "Registration failed"
+      );
+    }
   };
 
   return (
     <div className="container">
       <form className="form" onSubmit={handleSubmit}>
-        <h2 className="form-title">Create Client Account</h2>
 
-        <label>Name
-          <input name="name" value={form.name} onChange={handleChange} required />
-        </label>
+        <h2>Create Client Account</h2>
 
-        <label>Email
-          <input name="email" type="email" value={form.email} onChange={handleChange} required />
-        </label>
+        <input name="name" placeholder="Name" onChange={handleChange} required />
+        <input name="email" placeholder="Email" onChange={handleChange} required />
+        <input name="phone" placeholder="Phone" onChange={handleChange} required />
 
-        <label>Phone Number
-          <input name="phone" value={form.phone} onChange={handleChange} required />
-        </label>
+        <input name="street" placeholder="Street" onChange={handleChange} />
+        <input name="city" placeholder="City" onChange={handleChange} />
+        <input name="governorate" placeholder="Governorate" onChange={handleChange} />
 
-        <label>Create Password
-          <input name="password" type="password" value={form.password} onChange={handleChange} required />
-        </label>
+        <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
+        <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} required />
 
-        <label>Confirm Password
-          <input name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} required />
-        </label>
-        
-        <button type="submit" className="signin-btn">Sign up</button>
+        <button type="submit">
+          Sign up
+        </button>
 
-        <div className="login-link-container">
-          <span>Already have an account? </span>
-          <Link to="/login-client" style={{ color: '#007bff', fontWeight: 'bold' }}>Log in</Link>
-        </div>
+        <Link to="/login-client">Login</Link>
+
       </form>
     </div>
   );

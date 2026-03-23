@@ -11,10 +11,10 @@ import WorkerPage from './pages/pageS/Workerpage';
 import Client from './pages/pageS/Client';
 import Booking from './pages/pageA/Booking';
 import Contact from './pages/pageA/Contact';
-import LogIn from './pages/pageA/LogIn';
+import Login from "./pages/pageA/Login";
 import Payments from './pages/pageA/Payments';
 import RestNewPassword from './pages/pageA/ResetNewPassword';
-import ForgotPassword from './pages/pageA/ForgotPassword'; // ✅ جديد
+import ForgotPassword from './pages/pageA/ForgotPassword';
 import SignInAdmin from './pages/pageA/SignInAdmin';
 import SignInClient from './pages/pageA/SignInClient';
 import SignInWorker from './pages/pageA/SignInWorker';
@@ -28,11 +28,19 @@ import SystemSetting from './pages/pageH/SystemSetting';
 import SettingHome from './pages/pageH/SettingHome';
 import WelcomePage from './pages/pageH/WelcomPage';
 import ServiceWorkersPage from './pages/pageH/ServiceWorkers';
-import LogInClient from './pages/pageA/LogInClient';
-import LogInWorker from './pages/pageA/LogInWorker';
+import MyBookings from './pages/pageA/MyBookings';
 
 function AppContent() {
-  const [currentUser, setCurrentUser] = useState({ role: "", name: "", email: "" });
+
+  // ✅ نخلي role في state (مش localStorage بس)
+  const [role, setRole] = useState(localStorage.getItem("userRole"));
+
+  const [currentUser, setCurrentUser] = useState({
+    role: "",
+    name: "",
+    email: ""
+  });
+
   const location = useLocation();
 
   const updateUserData = (role) => {
@@ -43,26 +51,24 @@ function AppContent() {
     });
   };
 
-  // load from localStorage
+  // ✅ لما role يتغير → يحدث البيانات
   useEffect(() => {
-    const savedRole = localStorage.getItem('userRole');
-    if (savedRole) {
-      updateUserData(savedRole);
+    if (role) {
+      updateUserData(role);
     }
-  }, []);
+  }, [role]);
 
+  // ✅ عند login
   const handleLogin = (userType) => {
     localStorage.setItem('userRole', userType);
-    updateUserData(userType);
+    setRole(userType); // 🔥 أهم سطر
   };
 
-  // ✅ auth pages
+  // صفحات بدون Navbar / Sidebar
   const authPaths = [
     '/',
     '/welcome',
     '/login',
-    '/login-worker',
-    '/login-client',
     '/signin-client',
     '/signin-worker',
     '/signin-admin',
@@ -75,17 +81,25 @@ function AppContent() {
 
   return (
     <div className="app-container" style={{ display: 'flex' }}>
-      {!isAuthPage && currentUser.role && <Sidebar userRole={currentUser.role} />}
+      
+      {/* Sidebar */}
+      {!isAuthPage && role && (
+        <Sidebar userRole={role} />
+      )}
 
       <div
         className="main-wrapper"
         style={{
           flex: 1,
-          marginLeft: (!isAuthPage && currentUser.role) ? '260px' : '0px',
+          marginLeft: (!isAuthPage && role) ? '260px' : '0px',
           transition: 'margin 0.3s'
         }}
       >
-        {!isAuthPage && currentUser.role && <Navbar user={currentUser} />}
+        
+        {/* Navbar */}
+        {!isAuthPage && role && (
+          <Navbar user={currentUser} />
+        )}
 
         <main className="main-content">
           <Routes>
@@ -95,36 +109,33 @@ function AppContent() {
             <Route path='/welcome' element={<WelcomePage />} />
 
             {/* Sign up */}
-            <Route path="/signin-client" element={<SignInClient onLogin={(role) => handleLogin(role)} />} />
-            <Route path="/signin-worker" element={<SignInWorker onLogin={(role) => handleLogin(role)} />} />
+            <Route path="/signin-client" element={<SignInClient onLogin={handleLogin} />} />
+            <Route path="/signin-worker" element={<SignInWorker onLogin={handleLogin} />} />
             <Route path="/signin-admin" element={<SignInAdmin onLogin={() => handleLogin('admin')} />} />
 
             {/* Login */}
-            <Route path="/login" element={<LogIn onLogin={() => handleLogin('admin')} />} />
-            <Route path="/login-client" element={<LogInClient onLogin={() => handleLogin('client')} />} />
-            <Route path="/login-worker" element={<LogInWorker onLogin={() => handleLogin('worker')} />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
-            {/* ✅ Forgot + Reset */}
+            {/* Forgot + Reset */}
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<RestNewPassword />} />
 
-            {/* Home */}
+            {/* ✅ Home FIXED */}
             <Route
               path="/home"
               element={
-                currentUser.role || localStorage.getItem("userRole") ? (
-                  currentUser.role === "admin" ? <AdminHomePage /> :
-                  currentUser.role === "worker" ? <WorkerHomePage /> :
-                  <ClientHomePage />
-                ) : <Navigate to="/welcome" />
+                role === "admin" ? <AdminHomePage /> :
+                role === "technician" ? <WorkerHomePage /> :
+                role === "client" ? <ClientHomePage /> :
+                <Navigate to="/welcome" />
               }
             />
 
             {/* Admin */}
-            <Route path="/admin/workers" element={currentUser.role === 'admin' ? <WorkerManagement /> : <Navigate to="/home" />} />
-            <Route path="/admin/clients" element={currentUser.role === 'admin' ? <ClientManagementPage /> : <Navigate to="/home" />} />
-            <Route path="/admin/service-management" element={currentUser.role === 'admin' ? <ServicesManagementPage /> : <Navigate to="/home" />} />
-            <Route path="/system-setting" element={currentUser.role === 'admin' ? <SystemSetting /> : <Navigate to="/home" />} />
+            <Route path="/admin/workers" element={role === 'admin' ? <WorkerManagement /> : <Navigate to="/home" />} />
+            <Route path="/admin/clients" element={role === 'admin' ? <ClientManagementPage /> : <Navigate to="/home" />} />
+            <Route path="/admin/service-management" element={role === 'admin' ? <ServicesManagementPage /> : <Navigate to="/home" />} />
+            <Route path="/system-setting" element={role === 'admin' ? <SystemSetting /> : <Navigate to="/home" />} />
 
             {/* Profiles */}
             <Route path='/client-profile' element={<Client />} />
@@ -134,6 +145,7 @@ function AppContent() {
             <Route path="/profile" element={<ProfilePage userData={currentUser} />} />
             <Route path="/edit-profile" element={<EditProfilePage userData={currentUser} />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/setting-home" element={<SettingHome />} />

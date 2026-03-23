@@ -100,7 +100,7 @@ function SignInWorker({ onLogin }) {
           Sign up as Worker
         </button>
 
-        <Link to="/login-worker">Login</Link>
+        <Link to="/login">Login</Link>
 
       </form>
     </div>

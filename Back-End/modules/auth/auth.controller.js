@@ -12,10 +12,15 @@ const register = async (req, res) => {
     const result = await AuthService.register(req.body);
 
     return res.status(201).json({
-      success: true,
-      token: result.token,
-      data: result.user,
-    });
+  success: true,
+  token: result.token,
+  user: {
+    id: result.user._id,
+    name: result.user.name,
+    role: result.user.role,
+    email: result.user.email
+  }
+});
   } catch (error) {
     return res.status(400).json({
       message: error.message,
@@ -29,10 +34,15 @@ const login = async (req, res) => {
     const result = await AuthService.login(req.body);
 
     return res.status(200).json({
-      success: true,
-      token: result.token,
-      data: result.user,
-    });
+  success: true,
+  token: result.token,
+  user: {
+    id: result.user._id,
+    name: result.user.name,
+    role: result.user.role, //  أهم حاجة
+    email: result.user.email
+  }
+});
   } catch (error) {
     return res.status(400).json({
       message: error.message,

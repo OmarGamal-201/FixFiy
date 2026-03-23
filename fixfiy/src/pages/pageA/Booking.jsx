@@ -1,57 +1,119 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Booking.css";
-import { useState } from 'react';
-import {Home,User,FileText,CreditCard,Settings,LogOut,Bell,Search,ShieldCheck,UserCircle} from "lucide-react";
+import API from "../../services/api";
 
-const Booking =() => {
-    return (
-        <div className="booking-page">
-          
-            <main className="content">
-                  
-               <h2>Booking</h2>
-                <div className="booking-card">
-                    
-                    <form>
-                        <label>Date</label>
-                        <div className="date-row">
-                            <select>
-                                <option>Day</option>
-                                <option>1</option>
-                                <option>2</option>
-                            </select>
-                            <select>
-                                <option>Month</option>
-                                <option>January</option>
-                                <option>February</option>
-                            </select>
-                            <select>
-                                <option>Year</option>
-                                <option>2024</option>
-                                <option>2025</option>
-                            </select>
-                        </div>
-                        <label>Service</label>
-                        <select>
-                            <option>Service</option>
-                            <option>Electricity</option>
-                            <option>plumer</option>
-                        </select>
-                        <label>Payments</label>
-                        <select>
-                            <option>Payments</option>
-                            <option>Fawry</option>
-                            <option>Vodavon Cash</option>
-                            <option>Visa</option>
-                            <option>Instapay</option>
-                        </select>
-                        <button type="submit">Send</button>
-                    </form>
-                </div>
-               
-            </main>
+const Booking = () => {
+
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    serviceId: ""
+  });
+
+  const [services, setServices] = useState([]);
+
+  // ✅ تحميل الخدمات
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await API.get("/services"); // لازم يكون عندك endpoint
+        setServices(res.data.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  // ✅ تغيير القيم
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // ✅ إرسال الحجز
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.title || !form.description || !form.serviceId) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      const res = await API.post("/jobs", form);
+
+      console.log("✅ JOB CREATED:", res.data);
+
+      alert("Booking created successfully 🎉");
+
+      // reset
+      setForm({
+        title: "",
+        description: "",
+        serviceId: ""
+      });
+
+    } catch (error) {
+      console.log("❌ ERROR:", error.response?.data);
+      alert(error.response?.data?.message || "Error creating booking");
+    }
+  };
+
+  return (
+    <div className="booking-page">
+      <main className="content">
+        <h2>Book a Service</h2>
+
+        <div className="booking-card">
+          <form onSubmit={handleSubmit}>
+
+            {/* Title */}
+            <label>Title</label>
+            <input
+              type="text"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              placeholder="Fix electricity issue"
+            />
+
+            {/* Description */}
+            <label>Description</label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="Describe your problem..."
+            />
+
+            {/* Service */}
+            <label>Service</label>
+            <select
+              name="serviceId"
+              value={form.serviceId}
+              onChange={handleChange}
+            >
+              <option value="">Select Service</option>
+
+              {services.map((service) => (
+                <option key={service._id} value={service._id}>
+                  {service.name} - {service.base_price} EGP
+                </option>
+              ))}
+            </select>
+
+            {/* Submit */}
+            <button type="submit">Book Now</button>
+
+          </form>
         </div>
-    )
-}
+      </main>
+    </div>
+  );
+};
 
 export default Booking;

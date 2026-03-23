@@ -95,7 +95,7 @@ function SignInClient({ onLogin }) {
           Sign up
         </button>
 
-        <Link to="/login-client">Login</Link>
+        <Link to="/login">Login</Link>
 
       </form>
     </div>

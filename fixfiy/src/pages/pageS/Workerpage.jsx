@@ -1,46 +1,44 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Worker.css';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Phone, MapPin, Paintbrush, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
+import API from "../../services/api";
 
-const WorkerPage = ({ userData }) => {
+const WorkerPage = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-  const defaultUser = {
-    name: "",
-    role: "",
-    email: "",
-    phone: "",
-    location: "R",
-    job: "",
-    experience: "",
-    rating: 4,
-    stats: [
-      { label: "Completed requests", value: "" },
-      { label: "Active requests", value: "" },
-      { label: "Waiting requests", value: "" }
-    ]
-  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await API.get("/profile/me");
+      setUser(res.data.data);
+    };
+    fetchUser();
+  }, []);
 
-  const user = userData || defaultUser;
+  if (!user) return <h2>Loading...</h2>;
 
   return (
     <div className="worker-profile-container">
 
-      {/* ===== HEADER ===== */}
+      {/* HEADER */}
       <div className="profile-header-section">
         <div className="blue-cover"></div>
 
         <div className="profile-avatar-wrapper">
-          {/* Avatar */}
           <div className="avatar-circle">
-            {user.role !== 'admin' && <span className="online-status"></span>}
+            <span className="online-status"></span>
           </div>
 
-          {/* Name + Edit Button */}
           <div className="profile-name-info">
-            <h2>{user.name}</h2>
+            <div>
+              <h2>{user.name}</h2>
+
+              <p style={{ color: "#64748b", marginTop: "5px" }}>
+                {user.specialties?.[0]} • {user.experience_years} yrs exp
+              </p>
+            </div>
+
             <button
               className="edit-profile-btn"
               onClick={() => navigate('/edit-profile')}
@@ -51,62 +49,53 @@ const WorkerPage = ({ userData }) => {
         </div>
       </div>
 
-      {/* ===== CONTENT GRID ===== */}
+      {/* CONTENT */}
       <div className="profile-content-grid">
 
-        {/* LEFT: Info Card */}
+        {/* Rating */}
         <div className="info-card">
-          <h4>Info</h4>
+          <h4>Reputation</h4>
 
           <div className="info-item">
-            <Mail size={18} />
-            <span>{user.email}</span>
-          </div>
+            <strong>{user.technician_rate || 4.5}</strong>
 
-          <div className="info-item">
-            <Phone size={18} />
-            <span>{user.phone}</span>
-          </div>
-
-          <div className="info-item">
-            <MapPin size={18} />
-            <span>{user.location}</span>
-          </div>
-
-          <div className="info-item">
-            <Paintbrush size={18} />
-            <span>{user.job || "Service Provider"}</span>
-          </div>
-
-          <div className="info-item">
-            <span>{user.experience || "Available for hire"}</span>
-          </div>
-
-          <div className="info-item">
-            <span className="rating-num">{user.rating || 5}</span>
             <div className="stars-row">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  size={14}
-                  fill={i < (user.rating || 5) ? "#ffc107" : "none"}
-                  color={i < (user.rating || 5) ? "#ffc107" : "#ccc"}
+                  size={16}
+                  fill={i < (user.technician_rate || 4) ? "#ffc107" : "none"}
+                  color="#ffc107"
                 />
               ))}
             </div>
           </div>
+
+          <div className="info-item">
+            <span>Availability</span>
+            <strong style={{ color: "#22c55e" }}>Available</strong>
+          </div>
         </div>
 
-        {/* RIGHT: Stats Card */}
+        {/* Stats */}
         <div className="services-card">
-          <h4>Quick Stats</h4>
+          <h4>Work Stats</h4>
+
           <div className="stats-row">
-            {(user.stats || defaultUser.stats).map((stat, index) => (
-              <div key={index} className="stat-box">
-                <h2 className="stat-value">{stat.value}</h2>
-                <p className="stat-label">{stat.label}</p>
-              </div>
-            ))}
+            <div className="stat-box">
+              <h2 className="stat-value">120</h2>
+              <p className="stat-label">Completed</p>
+            </div>
+
+            <div className="stat-box">
+              <h2 className="stat-value">5</h2>
+              <p className="stat-label">Active</p>
+            </div>
+
+            <div className="stat-box">
+              <h2 className="stat-value">3</h2>
+              <p className="stat-label">Pending</p>
+            </div>
           </div>
         </div>
 

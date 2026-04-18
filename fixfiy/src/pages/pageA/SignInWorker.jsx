@@ -25,9 +25,9 @@ function SignInWorker({ onLogin }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // 🔥 مهم جدا
+    e.preventDefault(); 
 
-    console.log("🔥 WORKER SUBMIT", form);
+    console.log(" WORKER SUBMIT", form);
 
     if (form.password !== form.confirmPassword) {
       alert("Passwords do not match!");
@@ -55,20 +55,19 @@ function SignInWorker({ onLogin }) {
 
       console.log("✅ SUCCESS:", res.data);
 
-      // حفظ البيانات
+      // data save 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userRole", "worker");
 
-      // تحديث state
-      onLogin("worker");
+      // update state
+      onLogin("technician");
 
-      // 🔥 تأخير بسيط عشان نضمن تحديث الـ state
       setTimeout(() => {
         navigate("/home");
       }, 100);
 
     } catch (error) {
-      console.log("❌ ERROR FULL:", error);
+      console.log(" ERROR FULL:", error);
 
       alert(
         error.response?.data?.message ||

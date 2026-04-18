@@ -120,3 +120,16 @@
 .action-btn.delete { color: #ef4444; }
 
 .action-btn:hover { transform: scale(1.1); }
+
+
+.view-toggle {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end; /* 👉 يخليه على اليمين */
+}
+
+.view-toggle span {
+  cursor: pointer;
+  color: #0078E5; /* 👉 أزرق */
+  font-weight: 500;
+}

@@ -5,7 +5,7 @@ import API from "../../services/api";
 import "./ResetNewPassword.css";
 
 function ResetNewPassword() {
-  const { token } = useParams(); // 🔥 مهم
+  const { token } = useParams(); 
   const navigate = useNavigate();
 
   const [form, setForm] = useState({

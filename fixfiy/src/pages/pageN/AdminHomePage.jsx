@@ -8,7 +8,7 @@ function AdminHomePage() {
   const [jobs, setJobs] = useState([]);
   const [showAll, setShowAll] = useState(false);
 
-  // ✅ تحميل الداتا من الباك
+  // تحميل الداتا من الباك
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
@@ -18,7 +18,7 @@ function AdminHomePage() {
 
         console.log("DASHBOARD:", data);
 
-        // ✅ stats
+        //  stats
         setStats([
           { label: "Clients", value: data.users.clients },
           { label: "Technicians", value: data.users.technicians },
@@ -50,7 +50,7 @@ function AdminHomePage() {
     <div className="page">
       <div className="content">
 
-        {/* ✅ Stats */}
+        {/*  Stats */}
         <div className="cards">
           {stats.map((item, index) => (
             <div className="card" key={index}>
@@ -60,7 +60,7 @@ function AdminHomePage() {
           ))}
         </div>
 
-        {/* ✅ Jobs Table */}
+        {/*  Jobs Table */}
         <div className="table-box">
           <div className="table-header">
             <h3>Recent Jobs</h3>

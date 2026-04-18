@@ -20,7 +20,7 @@ const Sidebar = ({ userRole }) => {
   const isActive = (path) =>
     location.pathname === path ? 'active' : '';
 
-  // 🔥 logout function
+  //  logout function
   const handleLogout = () => {
     localStorage.removeItem('userRole');
     localStorage.removeItem('token');
@@ -30,16 +30,16 @@ const Sidebar = ({ userRole }) => {
   return (
     <div className="sidebar-container">
 
-      {/* 🔵 Logo */}
+      {/*  Logo */}
       <div className="sidebar-logo" onClick={() => navigate('/home')} style={{ cursor: "pointer" }}>
         <ShieldCheck size={50} color="#2563eb" />
         <span className="logo-text">fixfiy</span>
       </div>
 
-      {/* 🔹 MENU */}
+      {/*  MENU */}
       <div className="sidebar-menu">
 
-        {/* 🏠 Home */}
+        {/*  Home */}
         <div className={`menu-item ${isActive('/home')}`} onClick={() => navigate('/home')}>
           <Home size={20} />
           <span>Home</span>
@@ -62,13 +62,17 @@ const Sidebar = ({ userRole }) => {
               <User size={20} />
               <span>Profile</span>
             </div>
+            <div className={`menu-item ${isActive('/payments')}`} onClick={() => navigate('/payments')}>
+              <CreditCard size={20} />
+              <span>Payments</span>
+            </div>
           </>
         )}
 
         {/* ================= WORKER ================= */}
         {userRole === 'technician' && (
           <>
-            <div className={`menu-item ${isActive('/home')}`} onClick={() => navigate('/home')}>
+            <div className={`menu-item ${isActive('/my-bookings')}`} onClick={() => navigate('/my-bookings')}>
               <ClipboardList size={20} />
               <span>My Jobs</span>
             </div>
@@ -78,9 +82,13 @@ const Sidebar = ({ userRole }) => {
               <span>Profile</span>
             </div>
 
-            <div className={`menu-item ${isActive('/payments')}`} onClick={() => navigate('/payments')}>
+            <div className={`menu-item ${isActive('/withdraw-worker')}`} onClick={() => navigate('/withdraw-worker')}>
               <CreditCard size={20} />
               <span>Earnings</span>
+            </div>
+            <div className={`menu-item ${isActive('/wallet')}`} onClick={() => navigate('/wallet')}>
+              <CreditCard size={20} />
+              <span>Wallet</span>
             </div>
           </>
         )}
@@ -88,10 +96,10 @@ const Sidebar = ({ userRole }) => {
         {/* ================= ADMIN ================= */}
         {userRole === 'admin' && (
           <>
-            <div className={`menu-item ${isActive('/profile')}`} onClick={() => navigate('/profile')}>
+            {/* <div className={`menu-item ${isActive('/profile')}`} onClick={() => navigate('/profile')}>
               <User size={20} />
               <span>Profile</span>
-            </div>
+            </div> */}
 
             <div className={`menu-item ${isActive('/admin/clients')}`} onClick={() => navigate('/admin/clients')}>
               <Users size={20} />
@@ -108,22 +116,22 @@ const Sidebar = ({ userRole }) => {
               <span>Services</span>
             </div>
 
-            <div className={`menu-item ${isActive('/payments')}`} onClick={() => navigate('/payments')}>
+            <div className={`menu-item ${isActive('/withdraw-admin')}`} onClick={() => navigate('/withdraw-admin')}>
               <CreditCard size={20} />
-              <span>Payments</span>
+              <span>Wallet</span>
             </div>
           </>
         )}
       </div>
 
-      {/* 🔻 FOOTER */}
+      {/*  FOOTER */}
       <div className="sidebar-footer">
-
+{/* 
         <div className={`menu-item ${isActive('/setting-home')}`} onClick={() => navigate('/setting-home')}>
           <Settings size={20} />
           <span>Settings</span>
         </div>
-
+*/}
         <div className="menu-item logout" onClick={handleLogout}>
           <LogOut size={20} />
           <span>Log out</span>

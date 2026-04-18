@@ -28,24 +28,24 @@ function Login({ onLogin }) {
     try {
       const res = await API.post("/auth/login", form);
 
-      console.log("✅ LOGIN SUCCESS:", res.data);
+      console.log(" LOGIN SUCCESS:", res.data);
 
       const { token, user } = res.data;
 
-      // ✅ أهم خطوة (الأول)
+      
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", user.role);
 
-      // ✅ navigate قبل أي state
+      
       navigate("/home");
 
-      // ✅ بعد كدا update state (اختياري)
+      
       if (onLogin) {
         onLogin(user.role);
       }
 
     } catch (error) {
-      console.log("❌ LOGIN ERROR:", error.response?.data);
+      console.log(" LOGIN ERROR:", error.response?.data);
       alert(error.response?.data?.message || "Login failed");
     }
   };

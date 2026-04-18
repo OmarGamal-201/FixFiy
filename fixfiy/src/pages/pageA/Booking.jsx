@@ -12,11 +12,11 @@ const Booking = () => {
 
   const [services, setServices] = useState([]);
 
-  // ✅ تحميل الخدمات
+  //  Loading services
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await API.get("/services"); // لازم يكون عندك endpoint
+        const res = await API.get("/services"); // endpoint
         setServices(res.data.data);
       } catch (err) {
         console.log(err);
@@ -26,7 +26,7 @@ const Booking = () => {
     fetchServices();
   }, []);
 
-  // ✅ تغيير القيم
+  //  values changes
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -34,7 +34,7 @@ const Booking = () => {
     });
   };
 
-  // ✅ إرسال الحجز
+  //  send booking
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -46,9 +46,9 @@ const Booking = () => {
     try {
       const res = await API.post("/jobs", form);
 
-      console.log("✅ JOB CREATED:", res.data);
+      console.log(" JOB CREATED:", res.data);
 
-      alert("Booking created successfully 🎉");
+      alert("Booking created successfully ");
 
       // reset
       setForm({
@@ -58,15 +58,15 @@ const Booking = () => {
       });
 
     } catch (error) {
-      console.log("❌ ERROR:", error.response?.data);
+      console.log(" ERROR:", error.response?.data);
       alert(error.response?.data?.message || "Error creating booking");
     }
   };
 
   return (
     <div className="booking-page">
-      <main className="content">
-        <h2>Book a Service</h2>
+      {/* <main className="content"> */}
+        {/* <h2>Book a Service</h2> */}
 
         <div className="booking-card">
           <form onSubmit={handleSubmit}>
@@ -111,7 +111,7 @@ const Booking = () => {
 
           </form>
         </div>
-      </main>
+      {/* </main> */}
     </div>
   );
 };

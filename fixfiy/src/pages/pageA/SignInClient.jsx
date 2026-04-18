@@ -24,9 +24,9 @@ function SignInClient({ onLogin }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // 🔥 مهم جدا
+    e.preventDefault(); 
 
-    console.log("🔥 CLIENT SUBMIT", form);
+    console.log(" CLIENT SUBMIT", form);
 
     if (form.password !== form.confirmPassword) {
       alert("Passwords do not match!");
@@ -50,22 +50,22 @@ function SignInClient({ onLogin }) {
         },
       });
 
-      console.log("✅ SUCCESS:", res.data);
+      console.log(" SUCCESS:", res.data);
 
-      // حفظ البيانات
+      // data save
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userRole", "client");
 
-      // تحديث state
+      // update state
       onLogin("client");
 
-      // 🔥 ندي فرصة للـ state يتحدث
+      
       setTimeout(() => {
         navigate("/home");
       }, 100);
 
     } catch (error) {
-      console.log("❌ ERROR FULL:", error);
+      console.log(" ERROR FULL:", error);
 
       alert(
         error.response?.data?.message ||

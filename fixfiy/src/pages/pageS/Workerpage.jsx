@@ -34,9 +34,9 @@ const WorkerPage = () => {
             <div>
               <h2>{user.name}</h2>
 
-              <p style={{ color: "#64748b", marginTop: "5px" }}>
+              {/* <p style={{ color: "#64748b", marginTop: "5px" }}>
                 {user.specialties?.[0]} • {user.experience_years} yrs exp
-              </p>
+              </p> */}
             </div>
 
             <button
@@ -51,6 +51,31 @@ const WorkerPage = () => {
 
       {/* CONTENT */}
       <div className="profile-content-grid">
+      <div className="info-card2">
+  <h4>My Info</h4>
+
+  <div className="info-item">
+    <span>Name</span>
+    <strong>{user.name}</strong>
+  </div>
+
+  <div className="info-item">
+    <span>Email</span>
+    <strong>{user.email}</strong>
+  </div>
+
+  <div className="info-item">
+    <span>Phone</span>
+    <strong>{user.phone || "Not added"}</strong>
+  </div>
+
+  <div className="info-item">
+    <span>Address</span>
+    <strong>
+      {user.address?.city}, {user.address?.governorate}
+    </strong>
+  </div>
+</div>
 
         {/* Rating */}
         <div className="info-card">
@@ -72,6 +97,7 @@ const WorkerPage = () => {
           </div>
 
           <div className="info-item">
+            
             <span>Availability</span>
             <strong style={{ color: "#22c55e" }}>Available</strong>
           </div>
@@ -105,3 +131,4 @@ const WorkerPage = () => {
 };
 
 export default WorkerPage;
+

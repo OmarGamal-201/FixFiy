@@ -6,7 +6,7 @@ const MyBookings = () => {
 
   const [jobs, setJobs] = useState([]);
 
-  // ✅ تحميل البيانات
+  // data loading
   useEffect(() => {
     fetchJobs();
   }, []);
@@ -20,14 +20,14 @@ const MyBookings = () => {
     }
   };
 
-  // ✅ cancel job
+  //  cancel job
   const handleCancel = async (id) => {
     try {
       await API.patch(`/jobs/${id}/cancel`, {
         reason: "User canceled"
       });
 
-      alert("Job canceled ❌");
+      alert("Job canceled ");
 
       fetchJobs(); // refresh
 
@@ -37,7 +37,7 @@ const MyBookings = () => {
     }
   };
 
-  // 🎨 status colors
+  //  status colors
   const getStatusClass = (status) => {
     switch (status) {
       case "PENDING":

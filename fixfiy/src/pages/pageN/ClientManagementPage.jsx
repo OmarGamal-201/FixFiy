@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 import API from "../../services/api";
@@ -8,7 +10,6 @@ const ClientManagementPage = () => {
   const [clients, setClients] = useState([]);
   const [showAll, setShowAll] = useState(false);
 
-  // ✅ fetch clients
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -22,7 +23,6 @@ const ClientManagementPage = () => {
     fetchClients();
   }, []);
 
-  // ✅ suspend
   const suspendUser = async (id) => {
     await API.patch(`/admin/users/${id}/suspend`);
     setClients(prev =>
@@ -30,7 +30,6 @@ const ClientManagementPage = () => {
     );
   };
 
-  // ✅ restore
   const restoreUser = async (id) => {
     await API.patch(`/admin/users/${id}/restore`);
     setClients(prev =>
@@ -43,19 +42,44 @@ const ClientManagementPage = () => {
   return (
     <div className="management-container">
 
-      <div className="header">
-        <h2>Client Management</h2>
+      {/* <h2 className="management-title">Client Management</h2>
+
+      {/* 🔍 Search + Button */}
+      {/* <div className="table-controls">
+        <div className="search-wrapper">
+          <span className="search-icon">🔍</span>
+          <input
+            className="table-search-input"
+            placeholder="Search clients..."
+          />
+        </div>
+
+        <button className="add-new-btn">
+          + Add New
+        </button>
+      </div> */} 
+
+
+{/* 🔽 Show more */}
+      {/* <div style={{ marginTop: "15px", cursor: "pointer" }}>
         <span onClick={() => setShowAll(!showAll)}>
           {showAll ? "Show less" : "View all"}
         </span>
-      </div>
+      </div> */}
+<div className="view-toggle">
+  <span onClick={() => setShowAll(!showAll)}>
+    {showAll ? "Show less" : "View all"}
+  </span>
+</div>
 
+      {/* 📊 TABLE */}
       <div className="management-table-card">
-        <table>
+        <table className="management-table">
           <thead>
             <tr>
               <th>Name</th>
               <th>Email</th>
+              <th>Address</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -65,26 +89,69 @@ const ClientManagementPage = () => {
             {displayedClients.map((client) => (
               <tr key={client._id}>
                 <td>{client.name}</td>
-                <td>{client.email}</td>
-                <td>{client.status || "ACTIVE"}</td>
 
-                <td>
-                  {client.status === "SUSPENDED" ? (
-                    <button onClick={() => restoreUser(client._id)}>
-                      Restore
-                    </button>
-                  ) : (
-                    <button onClick={() => suspendUser(client._id)}>
-                      Suspend
-                    </button>
-                  )}
+                <td className="email-cell">
+                  {client.email}
                 </td>
+
+              <td className="address-cell">
+{client.address?.city}, {client.address?.governorate}
+              </td>
+                
+
+                {/*  Status Badge */}
+                <td>
+                  <span
+                    className={`status-badge ${
+                      client.status === "SUSPENDED"
+                        ? "not-active"
+                        : "active"
+                    }`}
+                  >
+                    {client.status || "ACTIVE"}
+                  </span>
+                </td>
+
+                {/*  Actions */}
+                <td>
+                  <div className="action-cells">
+
+                    {client.status === "SUSPENDED" ? (
+                      <button
+                        className="action-btn edit"
+                        onClick={() => restoreUser(client._id)}
+                      >
+                        Restore
+                      </button>
+                    ) : (
+                      <button
+                        className="action-btn delete"
+                        onClick={() => suspendUser(client._id)}
+                      >
+                        Suspend
+                      </button>
+                    )}
+
+                    {/* Icons لو حابة */}
+                    {/* <button className="action-btn edit">
+                      <Edit size={16} />
+                    </button>
+
+                    <button className="action-btn delete">
+                      <Trash2 size={16} />
+                    </button> */}
+
+                  </div>
+                </td>
+
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
+
+      
+
     </div>
   );
 };

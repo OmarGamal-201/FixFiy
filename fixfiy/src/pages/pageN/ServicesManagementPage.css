@@ -1,61 +1,77 @@
+
 .services-management-container {
   padding: 40px;
-  background-color: #fcfcfc;
+  background-color: #f8fafc;
   min-height: 100vh;
 }
 
+/*  العنوان */
 .page-main-title {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #1e293b;
   margin-bottom: 30px;
+  text-align: center;
 }
 
+/*  الكارد */
 .service-form-card {
   background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 40px;
-  max-width: 800px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 900px;
   margin: 0 auto;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
+/*  الفورم */
 .form-group {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .form-group label {
-  font-size: 18px;
-  color: #333;
+  font-size: 15px;
+  color: #334155;
   font-weight: 500;
 }
 
 .form-group input, 
 .form-group textarea, 
 .form-group select {
-  padding: 12px 15px;
-  border: 1px solid #f0f0f0;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  font-size: 16px;
-  color: #666;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1e293b;
   outline: none;
+  transition: 0.2s;
 }
 
+/*  focus */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #0078E5;
+  background-color: #fff;
+}
+
+/*  row */
 .form-row {
   display: flex;
-  gap: 30px;
-  margin-bottom: 30px;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .form-group.small {
   flex: 1;
 }
 
-
+/*  price */
 .price-input-wrapper {
   position: relative;
   display: flex;
@@ -65,48 +81,107 @@
 .currency-prefix {
   position: absolute;
   left: 12px;
-  font-size: 14px;
-  color: #999;
+  font-size: 13px;
+  color: #94a3b8;
 }
 
 .price-input-wrapper input {
-  padding-left: 40px;
+  padding-left: 45px;
   width: 100%;
 }
 
-
+/*  الأزرار */
 .form-actions-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
+  gap: 15px;
+  margin-top: 25px;
+  
 }
-
+/* 
 .btn-action {
-  padding: 10px 35px;
-  border-radius: 8px;
-  font-size: 18px;
+  padding: 10px 25px;
+  border-radius: 10px;
+  font-size: 15px;
   font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: 0.2s;
+} */
+
+/* ✨ hover */
+/* .btn-action:hover {
+  transform: scale(1.05);
+} */
+
+/* ✅ add */
+/* .add-btn {
+  background-color: #22c55e;
+  color: white;
+} */
+
+/* ✏️ edit */
+/* .edit-btn {
+  background-color: #0078E5;
+  color: white;
+} */
+
+/* ❌ delete */
+/* .delete-btn{
+  background-color: #ef4444;
+  color: white;
+} */
+
+/*  TABLE */
+.services-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
 }
 
-.btn-action:hover {
-  opacity: 0.9;
+/* header */
+.services-table th {
+  text-align: left;
+  padding: 14px;
+  background-color: #f1f5f9;
+  color: #64748b;
+  font-weight: 500;
 }
 
-.add-btn {
-  background-color: #2ecc71;
+/* cells */
+.services-table td {
+  padding: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+/*  hover row */
+/* .services-table tr:hover {
+  background-color: #f8fafc;
+} */
+
+/*  actions */
+.actions-cell {
+  display: flex;
+  gap: 10px;
+}
+
+
+.btn-action.add-btn {
+  background-color: #22c55e;
+  color: white;
+  
+}
+/* .button.btn-action.add-btn:hover{
+  background-color: #16a34a;
+} */
+
+.btn-action.edit-btn {
+  background-color: #0078E5;
   color: white;
 }
 
-.edit-btn {
-  background-color: #007bff;
-  color: white;
-}
-
-.delete-btn {
-  background-color: #ff0000;
+.btn-action.delete-btn {
+  background-color: #ef4444 !important;
   color: white;
 }

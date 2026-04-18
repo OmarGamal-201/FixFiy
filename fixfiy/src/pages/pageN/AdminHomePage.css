@@ -11,7 +11,7 @@
 
 .cards {
   display: flex;
-  gap: 15px;
+  gap: 80px;
   margin-bottom: 25px;
 }
 

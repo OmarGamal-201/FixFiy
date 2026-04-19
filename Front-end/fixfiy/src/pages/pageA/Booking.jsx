@@ -1,17 +1,25 @@
 import React from "react";
 import "./Booking.css";
-import { useState } from 'react';
-import {Home,User,FileText,CreditCard,Settings,LogOut,Bell,Search,ShieldCheck,UserCircle} from "lucide-react";
+import { useState } from "react";
+import {
+    Home,
+    User,
+    FileText,
+    CreditCard,
+    Settings,
+    LogOut,
+    Bell,
+    Search,
+    ShieldCheck,
+    UserCircle,
+} from "lucide-react";
 
-const Booking =() => {
+const Booking = () => {
     return (
         <div className="booking-page">
-          
             <main className="content">
-                  
-               <h2>Booking</h2>
+                <h2>Booking</h2>
                 <div className="booking-card">
-                    
                     <form>
                         <label>Date</label>
                         <div className="date-row">
@@ -48,10 +56,9 @@ const Booking =() => {
                         <button type="submit">Send</button>
                     </form>
                 </div>
-               
             </main>
         </div>
-    )
-}
+    );
+};
 
 export default Booking;

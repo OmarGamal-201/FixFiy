@@ -4,16 +4,15 @@ const jobService = require("./job.service");
 
 exports.createJob = async (req, res) => {
   try {
-    const { title, description, total_price, serviceId } =
+    const { title, description, serviceId } =
       req.body;
 
-    if (!title || !description || !total_price || !serviceId)
+    if (!title || !description || !serviceId)
       throw new Error("Missing required fields");
 
     const job = await jobService.createJob({
       title,
       description,
-      total_price,
       serviceId,
       clientId: req.user.id,
     });
@@ -81,7 +80,8 @@ exports.getJobById = async (req, res) => {
 
 exports.getAllJobs = async (req, res) => {
   try {
-    const jobs = await jobService.getAllJobs();
+    const jobs = await jobService.getAllJobs(req.user.id); 
+
     res.json({ success: true, data: jobs });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });

@@ -1,69 +1,120 @@
-.booking-page{
-    display: flex;
-    height: 100vh;
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #f6f7fb;
+
+.booking-page {
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #f6f7fb, #eef2f7);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* important*/
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
-.booking-card{
-    background-color: #fff;
-    width: 400px;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    margin: 0 auto;
-   
+/* .booking-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); 
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #f6f7fb, #eef2f7);
+  
+} */
+
+/* ===== CARD ===== */
+.booking-card {
+  background-color: #fff;
+  width: 420px;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  animation: fadeIn 0.4s ease;
+  /* position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); */
+  
 }
 
-.booking-card h2{
-    margin-bottom: 25px;
-    text-align: center;
+/* ===== TITLE ===== */
+.booking-card h2 {
+  margin-bottom: 25px;
+  text-align: center;
+  color: #1e293b;
+
 }
 
-.booking-card form{
-    display: flex;
-    flex-direction: column;
-    
+/* ===== FORM ===== */
+.booking-card form {
+  display: flex;
+  flex-direction: column;
 }
 
-.booking-card label{
-    margin-bottom: 6px;
-    font-size: 17px;
-    color: #444;
+/* ===== LABEL ===== */
+.booking-card label {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #475569;
+  font-weight: 600;
 }
 
+/* ===== INPUTS ===== */
 .booking-card input,
-.booking-card select{
-    padding: 10px;
-    margin-bottom: 18px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    font-weight: 500;
-    outline: none;
+.booking-card select,
+.booking-card textarea {
+  padding: 12px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  font-weight: 500;
+  outline: none;
+  transition: 0.2s;
 }
 
-.date-row{
-    display: flex;
-    gap: 10px;
-    margin-bottom: 18px;
+/*  focus effect */
+.booking-card input:focus,
+.booking-card select:focus,
+.booking-card textarea:focus {
+  border-color: #1e88e5;
+  background-color: #fff;
 }
 
-.date-row select{
-    flex: 1;
+/* ===== TEXTAREA ===== */
+.booking-card textarea {
+  min-height: 100px;
+  resize: none;
 }
 
-.booking-card button{
-    margin-top: 10px;
-    padding: 12px;
-    background-color: #1e88e5;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
+/* ===== BUTTON ===== */
+.booking-card button {
+  margin-top: 10px;
+  padding: 12px;
+  background: linear-gradient(135deg, #1e88e5, #1565c0);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.booking-card button:hover{
-    background-color: #1565c0;
+.booking-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(30,136,229,0.3);
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

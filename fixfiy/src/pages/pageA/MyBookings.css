@@ -1,0 +1,34 @@
+.my-bookings-container {
+  padding: 20px;
+}
+
+.bookings-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bookings-table th, td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.pending { background: #fff3cd; }
+.accepted { background: #d1e7dd; }
+.active { background: #cfe2ff; }
+.done { background: #d4edda; }
+.canceled { background: #f8d7da; }
+
+.cancel-btn {
+  background: red;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}

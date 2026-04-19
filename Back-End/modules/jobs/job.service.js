@@ -145,11 +145,12 @@ await job.save();
     return job;
   }
 
-  async getAllJobs() {
-    return Job.find()
-      .populate("serviceId", "name category")
-      .sort({ createdAt: -1 });
-  }
+  async getAllJobs(clientId) {
+  return Job.find({ clientId })
+    .populate("serviceId", "name base_price")
+    .populate("workerId", "name")
+    .sort({ createdAt: -1 });
+}
 
   /* ================= ADMIN ================= */
   async updateStatus(jobId, status) {

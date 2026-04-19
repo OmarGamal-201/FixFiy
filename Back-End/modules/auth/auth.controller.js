@@ -12,10 +12,15 @@ const register = async (req, res) => {
     const result = await AuthService.register(req.body);
 
     return res.status(201).json({
-      success: true,
-      token: result.token,
-      data: result.user,
-    });
+  success: true,
+  token: result.token,
+  user: {
+    id: result.user._id,
+    name: result.user.name,
+    role: result.user.role,
+    email: result.user.email
+  }
+});
   } catch (error) {
     return res.status(400).json({
       message: error.message,
@@ -29,10 +34,15 @@ const login = async (req, res) => {
     const result = await AuthService.login(req.body);
 
     return res.status(200).json({
-      success: true,
-      token: result.token,
-      data: result.user,
-    });
+  success: true,
+  token: result.token,
+  user: {
+    id: result.user._id,
+    name: result.user.name,
+    role: result.user.role, //  أهم حاجة
+    email: result.user.email
+  }
+});
   } catch (error) {
     return res.status(400).json({
       message: error.message,
@@ -83,11 +93,11 @@ const forgotPassword = async (req, res) => {
     // Check if user exists and get reset token
     const resetToken = await AuthService.requestPasswordReset(email);
 
-    // Create reset URL
-    const resetUrl = `${req.protocol}://${req.get(
-      "host",
-    )}/api/auth/reset-password/${resetToken}`;
-
+    // Create reset URL للباك اند
+    // const resetUrl = `${req.protocol}://${req.get(
+    //   "host",
+    // )}/api/auth/reset-password/${resetToken}`; 
+const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
     // Email message
     const message = `
       You are receiving this email because you (or someone else) has requested the reset of a password.
@@ -101,7 +111,7 @@ const forgotPassword = async (req, res) => {
     `;
 
     try {
-      const sendEmail = require("../../utils/sendEmail");
+      const sendEmail = require("../../utils/email");
 
       // Send email
       await sendEmail({

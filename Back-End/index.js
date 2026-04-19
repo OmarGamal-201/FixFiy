@@ -11,7 +11,12 @@ const { protect } = require("./middlewares/auth.middleware");
 const { authorize } = require("./middlewares/role.middleware");
 
 const app = express();
+const cors = require("cors");
 
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 /* ========================
    BASIC MIDDLEWARES
 ======================== */
@@ -73,7 +78,7 @@ app.use(
 const server = http.createServer(app);
 initSocket(server);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

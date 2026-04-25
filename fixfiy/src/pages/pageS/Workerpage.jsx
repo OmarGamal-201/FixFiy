@@ -17,6 +17,7 @@ const WorkerPage = () => {
   }, []);
 
   if (!user) return <h2>Loading...</h2>;
+  const rating = user.technician_rate || 0;
 
   return (
     <div className="worker-profile-container">
@@ -82,7 +83,7 @@ const WorkerPage = () => {
           <h4>Reputation</h4>
 
           <div className="info-item">
-            <strong>{user.technician_rate || 4.5}</strong>
+            {/* <strong>{user.technician_rate || 4.5}</strong>
 
             <div className="stars-row">
               {[...Array(5)].map((_, i) => (
@@ -93,7 +94,21 @@ const WorkerPage = () => {
                   color="#ffc107"
                 />
               ))}
-            </div>
+            </div> */}
+            
+
+<strong>{rating.toFixed(1)}</strong>
+
+<div className="stars-row">
+  {[...Array(5)].map((_, i) => (
+    <Star
+      key={i}
+      size={16}
+      fill={i < Math.round(rating) ? "#ffc107" : "none"}
+      color="#ffc107"
+    />
+  ))}
+</div>
           </div>
 
           <div className="info-item">
@@ -107,7 +122,7 @@ const WorkerPage = () => {
         <div className="services-card">
           <h4>Work Stats</h4>
 
-          <div className="stats-row">
+          {/* <div className="stats-row">
             <div className="stat-box">
               <h2 className="stat-value">120</h2>
               <p className="stat-label">Completed</p>
@@ -122,7 +137,31 @@ const WorkerPage = () => {
               <h2 className="stat-value">3</h2>
               <p className="stat-label">Pending</p>
             </div>
-          </div>
+          </div> */}
+          <div className="stats-row">
+
+  <div className="stat-box">
+    <h2 className="stat-value">
+      {user.completedJobs || 0}
+    </h2>
+    <p className="stat-label">Completed</p>
+  </div>
+
+  <div className="stat-box">
+    <h2 className="stat-value">
+      {user.activeJobs || 0}
+    </h2>
+    <p className="stat-label">Active</p>
+  </div>
+
+  <div className="stat-box">
+    <h2 className="stat-value">
+      {user.pendingJobs || 0}
+    </h2>
+    <p className="stat-label">Pending</p>
+  </div>
+
+</div>
         </div>
 
       </div>

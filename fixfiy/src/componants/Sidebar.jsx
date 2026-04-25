@@ -82,10 +82,10 @@ const Sidebar = ({ userRole }) => {
               <span>Profile</span>
             </div>
 
-            <div className={`menu-item ${isActive('/withdraw-worker')}`} onClick={() => navigate('/withdraw-worker')}>
+            {/* <div className={`menu-item ${isActive('/withdraw-worker')}`} onClick={() => navigate('/withdraw-worker')}>
               <CreditCard size={20} />
               <span>Earnings</span>
-            </div>
+            </div> */}
             <div className={`menu-item ${isActive('/wallet')}`} onClick={() => navigate('/wallet')}>
               <CreditCard size={20} />
               <span>Wallet</span>

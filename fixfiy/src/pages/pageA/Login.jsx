@@ -84,7 +84,7 @@ function Login({ onLogin }) {
 
         <div className="signup-link">
           <span>Don't have an account? </span>
-          <Link to="/welcome">Create Account</Link>
+          <Link to="/signin">Create Account</Link>
         </div>
       </form>
     </div>

@@ -155,7 +155,7 @@ function AppContent() {
             <Route path="/withdraw-worker" element={<Withdrawworker />} />
             <Route path="/contact" element={<Contact />} />
             {/* <Route path="/setting-home" element={<SettingHome />} /> */}
-            <Route path="/workers/:serviceName" element={<ServiceWorkersPage />} />
+            <Route path="/workers/:serviceId" element={<ServiceWorkersPage />} />
             <Route path="/worker-profile/:id" element={<WorkerPage userData={currentUser} />} />
             <Route path="/client-profile/:id" element={<Client userData={currentUser} />} />
 

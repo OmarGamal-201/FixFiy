@@ -24,7 +24,11 @@
 .hero-content h3 { font-size: 1.5rem; margin-bottom: 15px; }
 .hero-content p { max-width: 600px; margin: 0 auto 30px; line-height: 1.6; }
 
-.get-start-btn {
+.buttons{
+  display: flex;
+  justify-content: center;
+}
+.get-start-btn,.get-start-btn-2 {
   background-color: #007bff;
   color: white;
   padding: 12px 40px;
@@ -33,8 +37,19 @@
   font-size: 1.2rem;
   cursor: pointer;
   transition: 0.3s;
+  
 }
-
+/* .get-start-btn-2 {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 40px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.3s;
+  
+} */
 
 .selection-modal-overlay {
   position: fixed;

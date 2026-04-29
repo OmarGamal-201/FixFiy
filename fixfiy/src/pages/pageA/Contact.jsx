@@ -1,6 +1,5 @@
 import React from "react";
 import "./Contact.css";
-import { useState } from 'react';
 import {Home,User,FileText,CreditCard,Settings,LogOut,Bell,Search,ShieldCheck,UserCircle} from "lucide-react";
  
 const Contact=()=> {

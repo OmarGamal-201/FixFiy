@@ -1,119 +1,126 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./Booking.css";
 import API from "../../services/api";
 
 const Booking = () => {
-
-  const [form, setForm] = useState({
+  const [jobData, setJobData] = useState({
     title: "",
     description: "",
-    serviceId: ""
+    category: ""
   });
 
-  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({ type: "", text: "" });
 
-  //  Loading services
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const res = await API.get("/services"); // endpoint
-        setServices(res.data.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
+  const categories = [
+    "Electricity",
+    "Plumbing",
+    "Painting",
+    "Carpentry",
+    "Cleaning"
+  ];
 
-    fetchServices();
-  }, []);
+  // const handleSelectCategory = (category) => {
+  //   setJobData({
+  //     ...jobData,
+  //     category
+  //   });
+  // };
 
-  //  values changes
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setJobData({
+      ...jobData,
       [e.target.name]: e.target.value
     });
   };
 
-  //  send booking
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.title || !form.description || !form.serviceId) {
-      alert("Please fill all fields");
+    const title = jobData.title.trim();
+    const description = jobData.description.trim();
+    const category = jobData.category.trim();
+
+    if (!title || !description || !category) {
+      setStatus({ type: "error", text: "Please fill all fields." });
       return;
     }
 
+    setLoading(true);
+    setStatus({ type: "", text: "" });
+
     try {
-      const res = await API.post("/jobs", form);
-
-      console.log(" JOB CREATED:", res.data);
-
-      alert("Booking created successfully ");
-
-      // reset
-      setForm({
-        title: "",
-        description: "",
-        serviceId: ""
-      });
-
+      const res = await API.post("/jobs", { title, description, category });
+      console.log("JOB CREATED:", res.data);
+      setStatus({ type: "success", text: "Booking created successfully." });
+      setJobData({ title: "", description: "", category: "" });
     } catch (error) {
-      console.log(" ERROR:", error.response?.data);
-      alert(error.response?.data?.message || "Error creating booking");
+      const message = error.response?.data?.message || "Error creating booking.";
+      console.log("ERROR:", error.response?.data);
+      setStatus({ type: "error", text: message });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="booking-page">
-      {/* <main className="content"> */}
-        {/* <h2>Book a Service</h2> */}
-
+      <div className="booking-container">
         <div className="booking-card">
-          <form onSubmit={handleSubmit}>
+          <h2>Booking request</h2>
 
-            {/* Title */}
-            <label>Title</label>
+          {status.text && (
+            <div className={`message-box ${status.type}`}>
+              {status.text}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <label htmlFor="title">Title</label>
             <input
+              id="title"
               type="text"
               name="title"
-              value={form.title}
+              value={jobData.title}
               onChange={handleChange}
               placeholder="Fix electricity issue"
             />
 
-            {/* Description */}
-            <label>Description</label>
+            <label htmlFor="description">Description</label>
             <textarea
+              id="description"
               name="description"
-              value={form.description}
+              value={jobData.description}
               onChange={handleChange}
               placeholder="Describe your problem..."
             />
 
-            {/* Service */}
-            <label>Service</label>
+            <label htmlFor="category">Category</label>
             <select
-              name="serviceId"
-              value={form.serviceId}
+              id="category"
+              name="category"
+              value={jobData.category}
               onChange={handleChange}
             >
-              <option value="">Select Service</option>
-
-              {services.map((service) => (
-                <option key={service._id} value={service._id}>
-                  {service.name} - {service.base_price} EGP
+              <option value="">Select Category</option>
+              {categories.map((cat, index) => (
+                <option key={index} value={cat}>
+                  {cat}
                 </option>
               ))}
             </select>
 
-            {/* Submit */}
-            <button type="submit">Book Now</button>
-
+            <button type="submit" disabled={loading}>
+              {loading ? "Booking..." : "Book Now"}
+            </button>
           </form>
         </div>
-      {/* </main> */}
+      </div>
     </div>
   );
 };
 
 export default Booking;
+
+
+

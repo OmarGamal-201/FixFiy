@@ -1,5 +1,6 @@
 const { User } = require("../users/user.model");
 const Job = require("../jobs/job.model");
+const Service = require("../services/service.model");
 const Payment = require("../payments/payment.model");
 const AuditLog = require("./auditLog.model");
 const SystemSettings = require("./systemSettings.model");
@@ -219,6 +220,71 @@ const getAllUsers = async (query = {}) => {
   };
 };
 
+/* ================= GLOBAL SEARCH ================= */
+const globalSearch = async (query) => {
+  const searchRegex = new RegExp(query, "i");
+
+  // Search users (technicians and clients)
+  const users = await User.find({
+    $or: [
+      { name: searchRegex },
+      { email: searchRegex }
+    ]
+  })
+  .select("name email role specialty")
+  .limit(10);
+
+  // Search services
+  const services = await Service.find({
+    $or: [
+      { name: searchRegex },
+      { description: searchRegex }
+    ]
+  })
+  .select("name description base_price")
+  .limit(10);
+
+  // Search jobs
+  const jobs = await Job.find({
+    $or: [
+      { title: searchRegex },
+      { description: searchRegex }
+    ]
+  })
+  .populate("clientId", "name")
+  .populate("workerId", "name")
+  .populate("serviceId", "name")
+  .select("title description status total_price clientId workerId serviceId")
+  .limit(10);
+
+  // Format results with type indicators
+  const results = [
+    ...users.map(user => ({
+      _id: user._id,
+      name: user.name,
+      type: user.role === 'technician' ? 'Technician' : 'Client',
+      details: user.role === 'technician' ? `Specialty: ${user.specialty || 'Not specified'}` : user.email,
+      url: user.role === 'technician' ? `/worker/${user._id}` : `/client/${user._id}`
+    })),
+    ...services.map(service => ({
+      _id: service._id,
+      name: service.name,
+      type: 'Service',
+      details: `Price: ${service.base_price} EGP`,
+      url: `/service/${service._id}`
+    })),
+    ...jobs.map(job => ({
+      _id: job._id,
+      name: job.title,
+      type: 'Job',
+      details: `Status: ${job.status} | Price: ${job.total_price} EGP`,
+      url: `/job/${job._id}`
+    }))
+  ];
+
+  return results;
+};
+
 module.exports = {
   getDashboardStats,
   getAnalytics,
@@ -230,4 +296,5 @@ module.exports = {
   updateSystemSettings,
   getAuditLogs,
   getAllUsers,
+  globalSearch,
 };

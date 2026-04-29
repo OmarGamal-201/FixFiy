@@ -52,4 +52,11 @@ export const adminSearch = (query) => {
   return API.get(`/admin/search?q=${query}`);
 };
 
+// ======================
+// USER
+// ======================
+export const getUserProfile = () => {
+  return API.get("/users/me");
+};
+
 export default API;

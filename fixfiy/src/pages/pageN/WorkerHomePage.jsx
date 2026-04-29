@@ -1,76 +1,94 @@
 
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Star, CheckCircle, Clock, DollarSign } from "lucide-react";
 import "./WorkerHomePage.css";
 import API from "../../services/api";
 
 function WorkerHomePage() {
   const [showAll, setShowAll] = useState(false);
-  const [stats, setStats] = useState([]);
   const [requests, setRequests] = useState([]);
-  const [latestReview, setLatestReview] = useState(null);
   const [workerName, setWorkerName] = useState("");
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
+    const fetchData = async () => {
       try {
-        const res = await API.get("/worker/dashboard");
-        const data = res.data.data;
+        const profileRes = await API.get("/profile/me");
+        const profileData = profileRes.data.data;
+        setWorkerName(profileData.name || "Worker");
+        setProfile(profileData);
 
-        console.log("WORKER DASHBOARD:", data);
-
-        setWorkerName(data.name || "Worker");
-
-        setStats([
-          {
-            label: "Completed",
-            value: data.jobs?.completed ?? "0",
-            icon: <CheckCircle size={20} />,
-            color: "#4caf50",
-          },
-          {
-            label: "Active",
-            value: data.jobs?.active ?? "0",
-            icon: <Clock size={20} />,
-            color: "#2196f3",
-          },
-          {
-            label: "Rating",
-            value: data.rating ?? "0",
-            icon: <Star size={20} />,
-            color: "#ffc107",
-          },
-          {
-            label: "Earnings",
-            value: `${data.earnings ?? "0"} EGP`,
-            icon: <DollarSign size={20} />,
-            color: "#9c27b0",
-          },
-        ]);
-
-        if (data.latestReview) {
-          setLatestReview(data.latestReview);
-        }
+        const requestsRes = await API.get("/jobs");
+        setRequests(requestsRes.data.data || []);
       } catch (err) {
-        console.log("Dashboard fetch error:", err);
+        console.log("Fetch error:", err);
       }
     };
 
-    const fetchRequests = async () => {
-      try {
-        const res = await API.get("/worker/jobs");
-        setRequests(res.data.data);
-      } catch (err) {
-        console.log("Jobs fetch error:", err);
-      }
-    };
-
-    fetchDashboard();
-    fetchRequests();
+    fetchData();
   }, []);
 
+  const fetchRequests = async () => {
+    try {
+      const res = await API.get("/jobs");
+      setRequests(res.data.data || []);
+    } catch (err) {
+      console.log("Jobs fetch error:", err);
+    }
+  };
+
   const displayedRequests = showAll ? requests : requests.slice(0, 3);
+
+  const stats = useMemo(() => {
+    const completed = requests.filter((req) => req.status === "DONE").length;
+    const active = requests.filter((req) => ["ACCEPTED", "ACTIVE"].includes(req.status)).length;
+
+    return [
+      {
+        label: "Completed",
+        value: completed,
+        icon: <CheckCircle size={20} />,
+        color: "#4caf50",
+      },
+      {
+        label: "Active",
+        value: active,
+        icon: <Clock size={20} />,
+        color: "#2196f3",
+      },
+      {
+        label: "Rating",
+        value: profile?.technician_rate ?? "0",
+        icon: <Star size={20} />,
+        color: "#ffc107",
+      },
+      {
+        label: "Earnings",
+        value: `${profile?.totalEarnings ?? 0} EGP`,
+        icon: <DollarSign size={20} />,
+        color: "#9c27b0",
+      },
+    ];
+  }, [requests, profile]);
+
+  const handleAccept = async (jobId) => {
+    try {
+      await API.patch(`/jobs/${jobId}/accept`);
+      fetchRequests();
+    } catch (err) {
+      console.log("Accept request error:", err);
+    }
+  };
+
+  const handleReject = async (jobId) => {
+    try {
+      await API.patch(`/jobs/${jobId}/reject`);
+      fetchRequests();
+    } catch (err) {
+      console.log("Reject request error:", err);
+    }
+  };
 
   return (
     <div className="worker-home-container">
@@ -119,6 +137,7 @@ function WorkerHomePage() {
                 <th>Location</th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -136,11 +155,35 @@ function WorkerHomePage() {
                   <td>
                     <span
                       className={
-                        request.status === "completed" ? "complete" : "pending"
+                        request.status === "DONE"
+                          ? "complete"
+                          : request.status === "CANCELED"
+                          ? "rejected"
+                          : "pending"
                       }
                     >
                       {request.status}
                     </span>
+                  </td>
+                  <td>
+                    {request.status === "PENDING" ? (
+                      <div className="request-actions">
+                        <button
+                          className="accept-button"
+                          onClick={() => handleAccept(request._id)}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className="reject-button"
+                          onClick={() => handleReject(request._id)}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <span style={{ color: "#555" }}>No action</span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -150,31 +193,7 @@ function WorkerHomePage() {
 
         <div className="latest-review-card">
           <h4>Latest Review</h4>
-          {latestReview ? (
-            <div className="review-content">
-              <div className="review-user">
-                <div className="user-avatar-small"></div>
-                <div>
-                  <p className="user-name">
-                    {latestReview.clientId?.name || "Client"}
-                  </p>
-                  <div className="user-rating">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={14}
-                        fill={i < latestReview.rating ? "#ffc107" : "none"}
-                        color="#ffc107"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <p className="review-text">"{latestReview.comment}"</p>
-            </div>
-          ) : (
-            <p style={{ color: "#888", fontSize: "14px" }}>No reviews yet.</p>
-          )}
+          <p style={{ color: "#888", fontSize: "14px" }}>No reviews yet.</p>
         </div>
 
       </div>

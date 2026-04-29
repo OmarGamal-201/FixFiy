@@ -20,4 +20,6 @@ router.patch("/settings", controller.updateSettings);
 
 router.get("/audit-logs", controller.auditLogs);
 
+router.get("/search", controller.search);
+
 module.exports = router;

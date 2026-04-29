@@ -21,25 +21,18 @@ const WelcomePage = () => {
    
       <div className="hero-overlay">
         <div className="hero-content">
-          {/* <h1>WELCOME TO FIXFIY</h1>
+          <h1>WELCOME TO FIXFIY</h1>
           <h3>Best Home Services</h3>
           <p>
             Home maintenance and repairs made simple. We connect you with 
             top-tier professionals to keep your living space running perfectly
-            مرحبًا بكم في FIXFIY
-أفضل خدمات المنزل
-صيانة المنزل وإصلاحه بكل بساطة. نقوم بربطك بأفضل المحترفين للحفاظ على منزلك يعمل بشكل مثالي
-          </p> */}
-          <h1> FIXFIY مرحبا بكم فى </h1>
-          <h3> أفضل خدمات المنزل</h3>
-          <p>صيانة المنزل وإصلاحه بكل بساطة. نقوم بربطك بأفضل المحترفين للحفاظ على منزلك يعمل بشكل مثالي
-</p>
+           </p>
           <div className='buttons'>
           <button className="get-start-btn" onClick={() => setShowModal(true)}>
-          إنشاء حساب
+          Sign in
           </button>
           <button className="get-start-btn-2" onClick={() => navigate("/login")}>
-        تسجيل دخول
+        Log in
           </button>
           </div>
         </div>

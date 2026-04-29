@@ -1,8 +1,10 @@
 const { User, Client, Technician, Admin } = require("../users/user.model");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken"); // ADD THIS
+const jwt = require("jsonwebtoken");
 const generateToken = require("../../utils/jwt");
-const redisClient = require("../../config/redis"); // Import from config
+const redisClient = require("../../config/redis");
+const { createNotification } = require("../notifications/notification.service");
+const { emitNotification } = require("../../utils/emitNotification");
 
 class AuthService {
   async register(data) {
@@ -54,6 +56,27 @@ class AuthService {
         role: "client",
       });
     }
+
+    const admins = await User.find({ role: "admin" }).select("_id");
+    await Promise.all(
+      admins.map((admin) =>
+        createNotification({
+          userId: admin._id,
+          type: "ADMIN_ALERT",
+          title: "New user signed up",
+          message: `${user.name} signed up as a ${user.role}`,
+          referenceId: user._id,
+        })
+      )
+    );
+
+    admins.forEach((admin) => {
+      emitNotification(admin._id, {
+        type: "ADMIN_ALERT",
+        title: "New signup",
+        message: `${user.name} joined as ${user.role}`,
+      });
+    });
 
     const token = generateToken(user._id);
 

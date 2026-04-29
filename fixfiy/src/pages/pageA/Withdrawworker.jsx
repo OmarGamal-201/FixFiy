@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import API from "../../services/api";
 import "./withdrawworker.css";
 
-const withdrawworker = () => {
+const Withdrawworker = () => {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -64,4 +64,4 @@ const withdrawworker = () => {
   );
 };
 
-export default withdrawworker;
+export default Withdrawworker;

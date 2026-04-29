@@ -74,3 +74,28 @@ exports.auditLogs = async (req, res) =>
     success: true,
     data: await service.getAuditLogs(),
   });
+
+exports.search = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim().length < 2) {
+      return res.json({
+        success: true,
+        data: [],
+        message: "Search query must be at least 2 characters"
+      });
+    }
+
+    const results = await service.globalSearch(q.trim());
+    res.json({
+      success: true,
+      data: results
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Search failed",
+      error: error.message
+    });
+  }
+};

@@ -147,6 +147,18 @@ const ServiceWorkersPage = () => {
 
   if (loading) return <h2>Loading workers...</h2>;
 
+  const handleBook = (technician) => {
+    navigate(`/booking?workerId=${technician._id}`, {
+      state: { workerName: technician.name },
+    });
+  };
+
+  const handleContact = (technician) => {
+    navigate(`/chat?workerId=${technician._id}`, {
+      state: { workerName: technician.name },
+    });
+  };
+
   return (
     <div className="workers-gallery-container">
       <h2 className="service-title">{serviceId || "Our Workers"}</h2>
@@ -163,7 +175,13 @@ const ServiceWorkersPage = () => {
               </div>
 
               <div className="worker-info">
-                <h4>{technician.name}</h4>
+                <h4
+                  className="worker-name-link"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/worker-profile/${technician._id}`)}
+                >
+                  {technician.name}
+                </h4>
                 <p className="worker-job">{technician.specialty}</p>
 
                 <div className="rating-stars">
@@ -182,11 +200,16 @@ const ServiceWorkersPage = () => {
               <div className="worker-actions">
                 <button
                   className="view-profile-btn"
-                  onClick={() => navigate(`/worker/${technician._id}`)}
+                  onClick={() => handleBook(technician)}
                 >
-                  View Profile
+                  Book
                 </button>
-                <button className="contact-btn">Contact</button>
+                <button
+                  className="contact-btn"
+                  onClick={() => handleContact(technician)}
+                >
+                  Contact
+                </button>
               </div>
 
             </div>

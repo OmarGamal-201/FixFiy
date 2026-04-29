@@ -135,21 +135,57 @@
 
 // export default TopNavbar;
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Search, Bell } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 //import API from "../../services/api";
 import {
   getMyNotifications,
   markNotificationRead,
   adminSearch,
+  getUserProfile,
 } from "../services/api";
 
+// ======================
+// DEBOUNCE UTILITY
+// ======================
+const debounce = (func, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(null, args), delay);
+  };
+};
+
 const TopNavbar = ({ user }) => {
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [searchError, setSearchError] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+
+  // ======================
+  // FETCH USER DATA
+  // ======================
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await getUserProfile();
+        setCurrentUser(res.data.data);
+      } catch (err) {
+        console.log("Error fetching user data:", err);
+        // Fallback to prop if API fails
+        setCurrentUser(user);
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
 
   // ======================
   // FETCH NOTIFICATIONS
@@ -188,23 +224,62 @@ const TopNavbar = ({ user }) => {
   };
 
   // ======================
+  // DEBOUNCE SEARCH
+  // ======================
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      setSearchError("");
+
+      if (value.trim() === "") {
+        setSearchResults([]);
+        return;
+      }
+
+      adminSearch(value)
+        .then((res) => {
+          setSearchResults(res.data.data || []);
+        })
+        .catch((err) => {
+          console.log("Search error:", err);
+          setSearchResults([]);
+          setSearchError(err.response?.data?.message || "Search failed. You may not have admin access.");
+        });
+    }, 300),
+    []
+  );
+
+  // ======================
   // SEARCH
   // ======================
-  const handleSearch = async (value) => {
+  const handleSearch = (value) => {
     setQuery(value);
-
-    if (value.trim() === "") {
-      setSearchResults([]);
-      return;
-    }
-
-    try {
-      const res = await adminSearch(value);
-      setSearchResults(res.data.data || []);
-    } catch (err) {
-      console.log(err);
-    }console.log(res.data);
+    debouncedSearch(value);
   };
+
+  // ======================
+  // SEARCH RESULT CLICK
+  // ======================
+  const handleSearchResultClick = (result) => {
+    // Clear search
+    setQuery("");
+    setSearchResults([]);
+    setSearchError("");
+
+    // Navigate based on result type
+    if (result.type === "Technician") {
+      navigate(`/worker/${result._id}`);
+    } else if (result.type === "Client") {
+      navigate(`/client/${result._id}`);
+    } else if (result.type === "Service") {
+      navigate(`/service/${result._id}`);
+    } else if (result.type === "Job") {
+      navigate(`/job/${result._id}`);
+    }
+  };
+
+
+
+
 
   return (
     <nav className="top-navbar">
@@ -223,11 +298,33 @@ const TopNavbar = ({ user }) => {
 
         {searchResults.length > 0 && (
           <div className="search-dropdown">
-            {searchResults.map((item) => (
-              <div key={item._id} className="search-item">
-                {item.name}
+            {searchResults.map((result) => (
+              <div
+                key={result._id}
+                className="search-item"
+                onClick={() => handleSearchResultClick(result)}
+                style={{ cursor: "pointer" }}
+              >
+                <div style={{ fontWeight: "bold", marginBottom: "2px" }}>
+                  {result.name}
+                </div>
+                <div style={{
+                  fontSize: "12px",
+                  color: "#666",
+                  display: "flex",
+                  justifyContent: "space-between"
+                }}>
+                  <span>{result.type}</span>
+                  <span>{result.details}</span>
+                </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {searchError && (
+          <div className="search-error" style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
+            {searchError}
           </div>
         )}
       </div>
@@ -298,16 +395,18 @@ const TopNavbar = ({ user }) => {
 
         {/* USER */}
         <div className="user-info">
-          {user?.role !== "admin" ? (
+          {loadingUser ? (
+            <span className="user-name">Loading...</span>
+          ) : currentUser?.role !== "admin" ? (
             <Link
               to="/profile"
               className="user-name-link"
               style={{ textDecoration: "none", color: "inherit" }}
             >
-              <span className="user-name">{user?.name}</span>
+              <span className="user-name">{currentUser?.name || "User"}</span>
             </Link>
           ) : (
-            <span className="user-name">{user?.name}</span>
+            <span className="user-name">{currentUser?.name || "Admin"}</span>
           )}
 
           <div className="user-avatar-mini"></div>

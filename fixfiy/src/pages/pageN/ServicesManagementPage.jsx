@@ -17,23 +17,19 @@ const ServicesManagementPage = () => {
     category: ""
   });
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
   const fetchServices = async () => {
     try {
       const res = await API.get("/services");
       setServices(res.data.data);
-    } 
-    // catch (err) {
-    //   console.log(err);
-    // }
-    catch (err) {
-  console.log(err.response?.data);
-  alert("Error");
-}
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchServices();
+  }, []);
 
   const handleChange = (e) => {
     setForm({

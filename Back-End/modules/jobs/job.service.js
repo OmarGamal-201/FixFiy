@@ -16,6 +16,7 @@ class JobService {
     description,
     serviceId,
     clientId,
+    workerId,
   }) {
     // ✅ validate service & get base price
     const service =
@@ -27,11 +28,23 @@ class JobService {
       (total_price * DEPOSIT_PERCENT) / 100
     ).toFixed(2);
 
-    return Job.create({
+    if (workerId) {
+      const requestedWorker = await User.findOne({
+        _id: workerId,
+        role: "technician",
+      });
+
+      if (!requestedWorker) {
+        throw new Error("Assigned worker not found or invalid");
+      }
+    }
+
+    const job = await Job.create({
       title,
       description,
       serviceId,
       clientId,
+      workerId: workerId || undefined,
       total_price,
       depositAmount,
       site_commission: GLOBAL_COMMISSION_RATE,
@@ -39,6 +52,45 @@ class JobService {
       paymentStatus: "UNPAID",
       statusHistory: [{ status: "PENDING" }],
     });
+
+    const admins = await User.find({ role: "admin" }).select("_id");
+    await Promise.all(
+      admins.map((admin) =>
+        createNotification({
+          userId: admin._id,
+          type: "ADMIN_ALERT",
+          title: "New booking request",
+          message: `${job.title} was created by a client`,
+          referenceId: job._id,
+        })
+      )
+    );
+
+    admins.forEach((admin) => {
+      emitNotification(admin._id, {
+        type: "ADMIN_ALERT",
+        title: "New booking request",
+        message: `${job.title} was created by a client`,
+      });
+    });
+
+    if (workerId) {
+      await createNotification({
+        userId: workerId,
+        type: "JOB_CREATED",
+        title: "New booking assigned",
+        message: "A client booked you for a job",
+        referenceId: job._id,
+      });
+
+      emitNotification(workerId, {
+        type: "JOB_CREATED",
+        title: "New booking assigned",
+        message: "A client booked you for a job",
+      });
+    }
+
+    return job;
   }
 
   /* ================= ACCEPT JOB ================= */
@@ -46,13 +98,19 @@ class JobService {
     const job = await Job.findById(jobId);
     if (!job) throw new Error("Job not found");
 
-    if (job.workerId)
-      throw new Error("Job already accepted");
+    if (job.workerId && job.workerId.toString() !== workerId)
+      throw new Error("Job already assigned to another technician");
+
+    if (job.status !== "PENDING")
+      throw new Error("Job must be pending to accept");
 
     if (job.paymentStatus !== "DEPOSIT_PAID")
       throw new Error("Deposit not paid");
 
-    job.workerId = workerId;
+    if (!job.workerId) {
+      job.workerId = workerId;
+    }
+
     job.status = "ACCEPTED";
     job.statusHistory.push({ status: "ACCEPTED" });
     await job.save();
@@ -72,6 +130,40 @@ class JobService {
       type: "JOB_ACCEPTED",
       title: "Job Accepted",
       message: "Technician assigned",
+    });
+
+    return job;
+  }
+
+  /* ================= REJECT JOB ================= */
+  async rejectJob(jobId, workerId) {
+    const job = await Job.findById(jobId);
+    if (!job) throw new Error("Job not found");
+
+    if (!job.workerId || job.workerId.toString() !== workerId)
+      throw new Error("You can only reject jobs assigned to you");
+
+    if (job.status !== "PENDING")
+      throw new Error("Only pending jobs can be rejected");
+
+    job.status = "CANCELED";
+    job.canceledBy = "TECHNICIAN";
+    job.cancelReason = "Rejected by technician";
+    job.statusHistory.push({ status: "CANCELED" });
+    await job.save();
+
+    await createNotification({
+      userId: job.clientId,
+      type: "JOB_REJECTED",
+      title: "Job Rejected",
+      message: "The technician rejected your booking request",
+      referenceId: job._id,
+    });
+
+    emitNotification(job.clientId, {
+      type: "JOB_REJECTED",
+      title: "Job Rejected",
+      message: "Your booking request was rejected",
     });
 
     return job;
@@ -145,12 +237,18 @@ await job.save();
     return job;
   }
 
-  async getAllJobs(clientId) {
-  return Job.find({ clientId })
-    .populate("serviceId", "name base_price")
-    .populate("workerId", "name")
-    .sort({ createdAt: -1 });
-}
+  async getAllJobs(user) {
+    const filter =
+      user.role === "technician"
+        ? { workerId: user.id }
+        : { clientId: user.id };
+
+    return Job.find(filter)
+      .populate("serviceId", "name base_price")
+      .populate("workerId", "name")
+      .populate("clientId", "name")
+      .sort({ createdAt: -1 });
+  }
 
   /* ================= ADMIN ================= */
   async updateStatus(jobId, status) {

@@ -3,41 +3,49 @@ import API from "../../services/api";
 import './WorkerManagement.css';
 
 const WorkerManagement = () => {
-
   const [workers, setWorkers] = useState([]);
- const [showAll, setShowAll] = useState(false);
-  useEffect(() => {
-    const fetchWorkers = async () => {
+  const [showAll, setShowAll] = useState(false);
+  const [verifyingId, setVerifyingId] = useState(null);
+  const [error, setError] = useState(null);
+
+  const fetchWorkers = async () => {
+    try {
       const res = await API.get("/admin/users?role=technician");
       setWorkers(res.data.data);
-    };
+    } catch (err) {
+      setError("Unable to load workers");
+      console.error(err);
+    }
+  };
 
+  useEffect(() => {
     fetchWorkers();
   }, []);
 
-  // const verifyWorker = async (id) => {
-  //   await API.patch(`/admin/workers/${id}/verify`);
-  //   alert("Worker verified ✅");
-  //   setWorkers(prev =>
-  //   prev.map(worker =>
-  //     worker._id === id
-  //       ? { ...worker, isVerified: true }
-  //       : worker
-  //   )
-  // );
-  // };
   const verifyWorker = async (id) => {
-  await API.patch(`/admin/workers/${id}/verify`);
+    try {
+      setError(null);
+      setVerifyingId(id);
 
-  setWorkers(prev =>
-    prev.map(worker =>
-      worker._id === id
-        ? { ...worker, isVerified: true }
-        : worker
-    )
-  );
-};
-const displayedWorkerss = showAll ? workers : workers.slice(0, 5);
+      const res = await API.patch(`/admin/workers/${id}/verify`);
+      const verifiedWorker = res.data.data;
+
+      setWorkers((prev) =>
+        prev.map((worker) =>
+          worker._id === id
+            ? { ...worker, isVerified: verifiedWorker?.isVerified ?? true }
+            : worker
+        )
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || "Verification failed");
+      console.error(err);
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
+  const displayedWorkerss = showAll ? workers : workers.slice(0, 5);
 
   return (
     <div className="management-container">
@@ -47,6 +55,7 @@ const displayedWorkerss = showAll ? workers : workers.slice(0, 5);
     {showAll ? "Show less" : "View all"}
   </span>
 </div>
+      {error && <div className="error-message">{error}</div>}
       <table>
         <thead>
           <tr>
@@ -60,7 +69,7 @@ const displayedWorkerss = showAll ? workers : workers.slice(0, 5);
         </thead>
 
         <tbody>
-          {workers.map(worker => (
+          {displayedWorkerss.map(worker => (
             <tr key={worker._id}>
               <td>{worker.name}</td>
               <td>{worker.email}</td>
@@ -72,17 +81,16 @@ const displayedWorkerss = showAll ? workers : workers.slice(0, 5);
 
               <td>
                 {worker.isVerified ? (
-    <button className="delete-btn">
-      Delete
-    </button>
-  ) : (
-    <button
-      className="verify-btn"
-      onClick={() => verifyWorker(worker._id)}
-    >
-      Verify
-    </button>
-  )}
+                  <button className="delete-btn">Delete</button>
+                ) : (
+                  <button
+                    className="verify-btn"
+                    onClick={() => verifyWorker(worker._id)}
+                    disabled={verifyingId === worker._id}
+                  >
+                    {verifyingId === worker._id ? "Verifying..." : "Verify"}
+                  </button>
+                )}
               </td>
             </tr>
           ))}

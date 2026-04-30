@@ -133,3 +133,45 @@
 .delete-btn:hover {
   opacity: 0.9;
 }
+
+
+
+/* Unique additions for Worker side */
+.worker-avatar {
+  background-color: #3b82f6 !important; /* Blue for workers vs purple for clients */
+}
+
+.specialty-tag {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.email-subtext {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* Ensure these standard buttons match ClientManagementPage.css */
+.btn-restore {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-suspend {
+  background-color: #ef4444;
+  color: white;
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

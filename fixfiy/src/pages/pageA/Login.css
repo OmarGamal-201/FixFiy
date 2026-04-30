@@ -52,3 +52,42 @@ input{
   cursor: pointer;
   text-align: left;
 }
+
+.role-toggle-container {
+  display: flex;
+  justify-content: center;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.toggle-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  color: #64748b;
+}
+
+.toggle-btn.active {
+  background: white;
+  color: #2563eb; /* Primary Blue */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.signup-link a {
+  color: #2563eb;
+  font-weight: bold;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}

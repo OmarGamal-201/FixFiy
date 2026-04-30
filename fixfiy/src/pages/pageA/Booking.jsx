@@ -20,12 +20,12 @@ const Booking = () => {
     "Cleaning"
   ];
 
-  // const handleSelectCategory = (category) => {
-  //   setJobData({
-  //     ...jobData,
-  //     category
-  //   });
-  // };
+  const handleSelectCategory = (category) => {
+    setJobData({
+      ...jobData,
+      category
+    });
+  };
 
   const handleChange = (e) => {
     setJobData({

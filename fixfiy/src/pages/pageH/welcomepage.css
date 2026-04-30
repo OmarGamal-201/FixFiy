@@ -27,6 +27,7 @@
 .buttons{
   display: flex;
   justify-content: center;
+  gap: 50px;
 }
 .get-start-btn,.get-start-btn-2 {
   background-color: #007bff;
@@ -39,17 +40,6 @@
   transition: 0.3s;
   
 }
-/* .get-start-btn-2 {
-  background-color: #007bff;
-  color: white;
-  padding: 12px 40px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: 0.3s;
-  
-} */
 
 .selection-modal-overlay {
   position: fixed;

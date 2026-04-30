@@ -1,74 +1,98 @@
-.page {
-  display: flex;
-  font-family: Arial, sans-serif;
+
+/* Ensure compatibility with your existing Management theme */
+
+.id-cell {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.85rem;
 }
 
-.content {
-  padding: 20px;
-  width: 100%;
+.worker-name {
+    color: #0f172a;
+    font-weight: 500;
 }
 
-
-.cards {
-  display: flex;
-  gap: 80px;
-  margin-bottom: 25px;
+.unassigned {
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 0.9rem;
 }
 
-.card {
-  background: white;
-  padding: 20px;
-  width: 150px;
-  border-radius: 10px;
-  
-  
-
+/* Status Badge Variations for Jobs */
+.status-badge.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
 }
 
-.card h2 {
-  color: #2563eb;;
-  margin: 0;
-  font-weight: bold;
+.status-badge.status-completed {
+    background-color: #dcfce7;
+    color: #166534;
 }
 
-
-.table-box {
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
+.status-badge.status-cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
 }
 
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
+.status-badge.status-accepted {
+    background-color: #e0f2fe;
+    color: #075985;
 }
 
-.view {
-  color: #1976d2;
-  font-size: 14px;
+.status-badge.status-ongoing {
+    background-color: #e0e7ff;
+    color: #3730a3;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Stat Box Icons */
+.stat-icon-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
 }
 
-th, td {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+.stat-icon-small.blue { background: #eff6ff; color: #3b82f6; }
+.stat-icon-small.orange { background: #fff7ed; color: #f97316; }
+.stat-icon-small.green { background: #f0fdf4; color: #22c55e; }
+.stat-icon-small.purple { background: #faf5ff; color: #a855f7; }
+
+.toggle-btn-secondary {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-
-.complete {
-  background: #b9f6ca;
-  padding: 4px 8px;
-  border-radius: 10px;
+.toggle-btn-secondary:hover {
+    background: #f8fafc;
+    color: #0f172a;
 }
 
-.pending {
-  background: #ffe0b2;
-  padding: 4px 8px;
-  border-radius: 10px;
+.table-title h2 {
+    margin-bottom: 4px;
+}
+
+/* Spinner Animation if not already in your global CSS */
+.spinner-large {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

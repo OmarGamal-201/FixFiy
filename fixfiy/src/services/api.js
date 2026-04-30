@@ -56,7 +56,7 @@ export const adminSearch = (query) => {
 // USER
 // ======================
 export const getUserProfile = () => {
-  return API.get("/users/me");
+  return API.get("/profile/me");
 };
 
 export default API;

@@ -1,106 +1,169 @@
+
+
+
 import React, { useState, useEffect } from "react";
-import "./AdminHomePage.css";
+import { Briefcase, Users, HardHat, TrendingUp, ChevronRight, Layout } from "lucide-react";
 import API from "../../services/api";
+import "./AdminHomePage.css";
 
 function AdminHomePage() {
-
-  const [stats, setStats] = useState([]);
+  const [stats, setStats] = useState({
+    clients: 0,
+    technicians: 0,
+    totalJobs: 0,
+    revenue: 0
+  });
   const [jobs, setJobs] = useState([]);
   const [showAll, setShowAll] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // تحميل الداتا من الباك
   useEffect(() => {
-    const fetchDashboard = async () => {
+    const fetchData = async () => {
       try {
-        const res = await API.get("/admin/dashboard");
-
-        const data = res.data.data;
-
-        console.log("DASHBOARD:", data);
-
-        //  stats
-        setStats([
-          { label: "Clients", value: data.users.clients },
-          { label: "Technicians", value: data.users.technicians },
-          { label: "Total Jobs", value: data.jobs.total },
-          { label: "Revenue", value: data.revenue + " EGP" },
+        setLoading(true);
+        const [dashRes, jobsRes] = await Promise.all([
+          API.get("/admin/dashboard"),
+          API.get("/jobs")
         ]);
 
+        const dashData = dashRes.data.data;
+        setStats({
+          clients: dashData.users.clients,
+          technicians: dashData.users.technicians,
+          totalJobs: dashData.jobs.total,
+          revenue: dashData.revenue
+        });
+
+        setJobs(jobsRes.data.data || []);
       } catch (err) {
-        console.log(err);
+        console.error("Dashboard error:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchJobs = async () => {
-      try {
-        const res = await API.get("/jobs");
-        setJobs(res.data.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchDashboard();
-    fetchJobs();
+    fetchData();
   }, []);
 
   const displayedRequests = showAll ? jobs : jobs.slice(0, 5);
 
-  return (
-    <div className="page">
-      <div className="content">
+  if (loading) {
+    return (
+      <div className="management-page">
+        <div className="loading-container"><div className="spinner-large"></div></div>
+      </div>
+    );
+  }
 
-        {/*  Stats */}
-        <div className="cards">
-          {stats.map((item, index) => (
-            <div className="card" key={index}>
-              <h2>{item.value}</h2>
-              <p>{item.label}</p>
+  return (
+    <div className="management-page">
+      <div className="management-content">
+        
+        {/* Header Section - Matching Worker Management Design */}
+        <div className="management-header">
+          <div className="header-top">
+            <div className="header-icon">📊</div>
+            <div className="header-info">
+              <h1>Admin Dashboard</h1>
+              <p>Overview of system performance and recent activities</p>
             </div>
-          ))}
+          </div>
+          
+          <div className="header-stats">
+            <div className="stat-box">
+              <div className="stat-icon-small blue"><Users size={16} /></div>
+              <span className="stat-value">{stats.clients}</span>
+              <span className="stat-label">Clients</span>
+            </div>
+            <div className="stat-box">
+              <div className="stat-icon-small orange"><HardHat size={16} /></div>
+              <span className="stat-value">{stats.technicians}</span>
+              <span className="stat-label">Technicians</span>
+            </div>
+            <div className="stat-box">
+              <div className="stat-icon-small green"><Briefcase size={16} /></div>
+              <span className="stat-value">{stats.totalJobs}</span>
+              <span className="stat-label">Total Jobs</span>
+            </div>
+            <div className="stat-box">
+              <div className="stat-icon-small purple"><TrendingUp size={16} /></div>
+              <span className="stat-value">{stats.revenue.toLocaleString()} EGP</span>
+              <span className="stat-label">Revenue</span>
+            </div>
+          </div>
         </div>
 
-        {/*  Jobs Table */}
-        <div className="table-box">
+        {/* Main Content: Recent Jobs Table */}
+        <div className="table-card">
           <div className="table-header">
-            <h3>Recent Jobs</h3>
-            <span
-              className="view"
+            <div className="table-title">
+              <h2>Recent Service Requests</h2>
+              <span className="record-count">Showing {displayedRequests.length} latest jobs</span>
+            </div>
+            <button 
+              className="toggle-btn-secondary" 
               onClick={() => setShowAll(!showAll)}
             >
-              {showAll ? "Show less" : "View all"}
-            </span>
+              {showAll ? "Show Recent" : "View All"}
+            </button>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Client</th>
-                <th>Worker</th>
-                <th>Service</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {displayedRequests.map((job) => (
-                <tr key={job._id}>
-                  <td>{job._id.slice(-5)}</td>
-                  <td>{job.clientId?.name || "-"}</td>
-                  <td>{job.workerId?.name || "Not Assigned"}</td>
-                  <td>{job.serviceId?.name || "-"}</td>
-                  <td>
-                    <span className={job.status.toLowerCase()}>
-                      {job.status}
-                    </span>
-                  </td>
+          <div className="table-wrapper">
+            <table className="clients-table">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Client</th>
+                  <th>Technician</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-
-          </table>
+              </thead>
+              <tbody>
+                {displayedRequests.map((job) => (
+                  <tr key={job._id}>
+                    <td className="id-cell">#{job._id.slice(-6).toUpperCase()}</td>
+                    <td className="name-cell">
+                        <div className="name-text">{job.clientId?.name || "Guest"}</div>
+                        <div className="email-subtext">Client</div>
+                    </td>
+                    <td>
+                      <div className="worker-info-cell">
+                        <span className={job.workerId ? "worker-name" : "unassigned"}>
+                          {job.workerId?.name || "Pending Assignment"}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                        <span className="specialty-tag">
+                            {job.serviceId?.name || "Standard Service"}
+                        </span>
+                    </td>
+                    <td>
+                      <span className={`status-badge status-${job.status.toLowerCase()}`}>
+                        {job.status}
+                      </span>
+                    </td>
+                    <td>
+                        <button className="action-btn btn-edit">
+                            <ChevronRight size={14} /> Details
+                        </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        {jobs.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-icon">📁</div>
+            <h3>No Jobs Found</h3>
+            <p>There are no active or past service requests in the system.</p>
+          </div>
+        )}
 
       </div>
     </div>

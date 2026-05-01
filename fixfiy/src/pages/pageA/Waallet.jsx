@@ -1,11 +1,15 @@
 
-
 import React, { useEffect, useState } from "react";
 import API from "../../services/api";
 import "./wallett.css";
 
 const Wallet = () => {
   const [wallet, setWallet] = useState(null);
+  const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  
+  // FETCH WALLET
 
   useEffect(() => {
     fetchWallet();
@@ -20,12 +24,42 @@ const Wallet = () => {
     }
   };
 
+ 
+  // WITHDRAW REQUEST
+ 
+  const requestWithdraw = async () => {
+    if (!amount || amount <= 0) {
+      alert("Enter valid amount");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await API.post("/withdraw/request", {
+        amount: Number(amount),
+      });
+
+      alert("Withdraw request sent successfully");
+
+      setAmount("");
+
+      // refresh wallet after request
+      fetchWallet();
+    } catch (err) {
+      console.log(err.response?.data);
+      alert("Error sending request");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="wallet-page">
 
-      <h2 className="title"> My Wallet</h2>
+      <h2 className="title">My Wallet</h2>
 
-      {/* Balance Card */}
+      {/* ================= BALANCE ================= */}
       <div className="balance-card">
         <p className="label">Current Balance</p>
         <h1 className="balance">
@@ -33,10 +67,37 @@ const Wallet = () => {
         </h1>
       </div>
 
-      {/* Transactions */}
+      {/* ================= WITHDRAW =================  */}
+       <div className="withdraw-card">
+
+        <h3>Withdraw Money</h3>
+
+        <p className="subtitle">
+          Enter amount you want to withdraw
+        </p>
+
+        <input
+          type="number"
+          placeholder="Enter amount (EGP)"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="input"
+        />
+
+        <button
+          onClick={requestWithdraw}
+          className="btn"
+          disabled={loading}
+        >
+          {loading ? "Processing..." : "Request Withdraw"}
+        </button>
+
+      </div>
+
+      {/* ================= TRANSACTIONS ================= */}
       <div className="transactions-card">
 
-        <h3> Transactions</h3>
+        <h3>Transactions</h3>
 
         {!wallet?.transactions?.length ? (
           <p className="empty">No transactions yet</p>

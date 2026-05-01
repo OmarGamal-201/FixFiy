@@ -27,6 +27,13 @@ router.patch(
 );
 
 router.patch(
+  "/:id/reject",
+  protect,
+  authorize("technician"),
+  controller.rejectJob
+);
+
+router.patch(
   "/:id/start",
   protect,
   authorize("technician"),

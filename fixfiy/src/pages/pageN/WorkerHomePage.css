@@ -7,7 +7,7 @@
 
 
 .welcome-banner {
-  background: linear-gradient(135deg, #1e88e5, #42a5f5);
+   background: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%); /* Worker theme */
   color: white;
   padding: 40px;
   border-radius: 20px;

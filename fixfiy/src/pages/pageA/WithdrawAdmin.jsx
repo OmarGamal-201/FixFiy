@@ -6,10 +6,6 @@ import "./withdrawadmin.css";
 const WithdrawAdmin = () => {
   const [requests, setRequests] = useState([]);
 
-  useEffect(() => {
-    fetchRequests();
-  }, []);
-
   const fetchRequests = async () => {
     try {
       const res = await API.get("/withdraw/admin/withdraws");
@@ -18,6 +14,11 @@ const WithdrawAdmin = () => {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchRequests();
+  }, []);
 
   const approve = async (id) => {
     try {

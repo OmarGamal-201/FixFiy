@@ -6,7 +6,7 @@ import API from "../../services/api";
 
 function Login({ onLogin }) {
   const navigate = useNavigate();
-
+const [selectedRole, setSelectedRole] = useState("client");
   const [form, setForm] = useState({
     email: "",
     password: ""
@@ -84,7 +84,7 @@ function Login({ onLogin }) {
 
         <div className="signup-link">
           <span>Don't have an account? </span>
-          <Link to="/welcome">Create Account</Link>
+          <Link to={selectedRole === "client" ? "/signin-client" : "/signin-worker"}>Create Account</Link>
         </div>
       </form>
     </div>

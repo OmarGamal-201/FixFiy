@@ -82,10 +82,6 @@ const Sidebar = ({ userRole }) => {
               <span>Profile</span>
             </div>
 
-            <div className={`menu-item ${isActive('/withdraw-worker')}`} onClick={() => navigate('/withdraw-worker')}>
-              <CreditCard size={20} />
-              <span>Earnings</span>
-            </div>
             <div className={`menu-item ${isActive('/wallet')}`} onClick={() => navigate('/wallet')}>
               <CreditCard size={20} />
               <span>Wallet</span>
@@ -96,10 +92,6 @@ const Sidebar = ({ userRole }) => {
         {/* ================= ADMIN ================= */}
         {userRole === 'admin' && (
           <>
-            {/* <div className={`menu-item ${isActive('/profile')}`} onClick={() => navigate('/profile')}>
-              <User size={20} />
-              <span>Profile</span>
-            </div> */}
 
             <div className={`menu-item ${isActive('/admin/clients')}`} onClick={() => navigate('/admin/clients')}>
               <Users size={20} />
@@ -126,12 +118,6 @@ const Sidebar = ({ userRole }) => {
 
       {/*  FOOTER */}
       <div className="sidebar-footer">
-{/* 
-        <div className={`menu-item ${isActive('/setting-home')}`} onClick={() => navigate('/setting-home')}>
-          <Settings size={20} />
-          <span>Settings</span>
-        </div>
-*/}
         <div className="menu-item logout" onClick={handleLogout}>
           <LogOut size={20} />
           <span>Log out</span>

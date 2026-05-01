@@ -93,7 +93,54 @@ const getMessages = async (req, res) => {
   }
 };
 
+const sendMessage = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: user not authenticated",
+      });
+    }
+
+    const { conversationId } = req.params;
+    const { content } = req.body;
+
+    if (!conversationId) {
+      return res.status(400).json({
+        success: false,
+        message: "conversationId is required",
+      });
+    }
+
+    if (!content || !content.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Message content is required",
+      });
+    }
+
+    const message = await messagingService.sendMessage(
+      conversationId,
+      req.user.id,
+      content
+    );
+
+    return res.status(201).json({
+      success: true,
+      data: message,
+    });
+  } catch (err) {
+    console.error("Send Message Error:", err.message);
+
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   createConversation,
   getMessages,
+  sendMessage,
 };

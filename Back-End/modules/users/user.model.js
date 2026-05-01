@@ -171,20 +171,19 @@ const Client = User.discriminator(
 const Technician = User.discriminator(
   "technician",
   new mongoose.Schema({
-    specialties: [
-      {
-        type: String,
-        enum: [
-          "plumbing",
-          "electrical",
-          "carpentry",
-          "painting",
-          "hvac",
-          "appliance_repair",
-          "general",
-        ],
-      },
-    ],
+    specialty: {
+      type: String,
+      enum: [
+        "Plumber",
+        "Electricity",
+        "Painter",
+        "Carpinter",
+        "hvac",
+        "appliance_repair",
+        "general",
+      ],
+      required: true,
+    },
 
     experience_years: {
       type: Number,

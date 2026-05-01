@@ -1,7 +1,10 @@
+
+
 import { useState } from 'react';
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom'; 
 import API from "../../services/api";
+import { Eye, EyeOff } from "lucide-react";
 import "./SignInClient.css";
 
 function SignInClient({ onLogin }) {
@@ -18,18 +21,25 @@ function SignInClient({ onLogin }) {
     governorate: "",
   });
 
+  // 👇 حالات إظهار/إخفاء الباسورد
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  // 👇 state للـ error
+  const [errorMsg, setErrorMsg] = useState("");
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+
+    setErrorMsg(""); // 👈 يمسح الرسالة أول ما يكتب
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
 
-    console.log(" CLIENT SUBMIT", form);
-
     if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match!");
+      setErrorMsg("Passwords do not match!");
       return;
     }
 
@@ -50,33 +60,26 @@ function SignInClient({ onLogin }) {
         },
       });
 
-      console.log(" SUCCESS:", res.data);
-
-      // data save
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userRole", "client");
 
-      // update state
       onLogin("client");
 
-      
       setTimeout(() => {
         navigate("/home");
       }, 100);
 
     } catch (error) {
-      console.log(" ERROR FULL:", error);
-
-      alert(
-        error.response?.data?.message ||
-        "Registration failed"
-      );
+      setErrorMsg(error.response?.data?.message || "Registration failed");
     }
   };
 
   return (
     <div className="container">
       <form className="form" onSubmit={handleSubmit}>
+
+        {/* 👇 رسالة الخطأ */}
+        {errorMsg && <div className="error-box">{errorMsg}</div>}
 
         <h2>Create Client Account</h2>
 
@@ -88,14 +91,37 @@ function SignInClient({ onLogin }) {
         <input name="city" placeholder="City" onChange={handleChange} />
         <input name="governorate" placeholder="Governorate" onChange={handleChange} />
 
-        <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
-        <input name="confirmPassword" type="password" placeholder="Confirm Password" onChange={handleChange} required />
+        {/* 🔐 Password */}
+        <div className="password-field">
+          <input
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            onChange={handleChange}
+            required
+          />
+          <span onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </span>
+        </div>
+
+        {/* 🔐 Confirm Password */}
+        <div className="password-field">
+          <input
+            name="confirmPassword"
+            type={showConfirm ? "text" : "password"}
+            placeholder="Confirm Password"
+            onChange={handleChange}
+            required
+          />
+          <span onClick={() => setShowConfirm(!showConfirm)}>
+            {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+          </span>
+        </div>
 
         <button type="submit">
           Sign up
         </button>
-
-        <Link to="/login">Login</Link>
 
       </form>
     </div>

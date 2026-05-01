@@ -26,11 +26,15 @@ const WelcomePage = () => {
           <p>
             Home maintenance and repairs made simple. We connect you with 
             top-tier professionals to keep your living space running perfectly
-          </p>
-          
+           </p>
+          <div className='buttons'>
           <button className="get-start-btn" onClick={() => setShowModal(true)}>
-            Get Start
+          Sign in
           </button>
+          <button className="get-start-btn-2" onClick={() => navigate("/login")}>
+        Log in
+          </button>
+          </div>
         </div>
       </div>
 

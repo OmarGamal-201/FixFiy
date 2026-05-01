@@ -4,7 +4,7 @@ const jobService = require("./job.service");
 
 exports.createJob = async (req, res) => {
   try {
-    const { title, description, serviceId } =
+    const { title, description, serviceId, workerId } =
       req.body;
 
     if (!title || !description || !serviceId)
@@ -15,6 +15,7 @@ exports.createJob = async (req, res) => {
       description,
       serviceId,
       clientId: req.user.id,
+      workerId,
     });
 
     res.status(201).json({ success: true, data: job });
@@ -80,9 +81,18 @@ exports.getJobById = async (req, res) => {
 
 exports.getAllJobs = async (req, res) => {
   try {
-    const jobs = await jobService.getAllJobs(req.user.id); 
+    const jobs = await jobService.getAllJobs(req.user);
 
     res.json({ success: true, data: jobs });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+exports.rejectJob = async (req, res) => {
+  try {
+    const job = await jobService.rejectJob(req.params.id, req.user.id);
+    res.json({ success: true, data: job });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }

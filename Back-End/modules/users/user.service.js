@@ -169,15 +169,15 @@ async updateUserLocation(userId, lng, lat) {
       throw new Error("User not found");
     }
     const nearTechnicians = await Technician.find({
-    _id: { $ne: user._id }, // يستبعد نفسه
+    _id: { $ne: user._id },
     location: {
       $near: {
         $geometry: user.location,
-        // $maxDistance: 5000 // 5 km
+        $maxDistance: 20000, // 20km
       }
       },
     availability_status :true
-    }).limit(10);
+    }).limit(20);
     
     return nearTechnicians
   }

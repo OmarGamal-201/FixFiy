@@ -1,3 +1,7 @@
+.withdraw-page-container {
+  background: whitesmoke;
+  
+}
 .withdraw-page {
   height: 100vh;
   display: flex;
@@ -8,12 +12,15 @@
 }
 
 .withdraw-card {
+  display: flex;
+  flex-direction: column;
   background: white;
   padding: 30px;
   border-radius: 16px;
   width: 820px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.08);
   text-align: center;
+  gap: 20px;
 }
 
 .title {

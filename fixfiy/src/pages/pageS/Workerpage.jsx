@@ -34,7 +34,7 @@ const getProfileImageUrl = (image) => {
   const rating = user.technician_rate || 0;
 const profileImageUrl = getProfileImageUrl(user?.profileImage);
   return (
-    <div className="client-profile-container"> {/* Reusing container class for consistent padding */}
+    <div className="worker-profile-container"> {/* Reusing container class for consistent padding */}
       
       {/* HEADER SECTION */}
       <div className="profile-header-section">
@@ -154,10 +154,10 @@ const profileImageUrl = getProfileImageUrl(user?.profileImage);
              </p>
           </div>
           
-          <div className="info-item" style={{ marginTop: '20px' }}>
+          {/* <div className="info-item" style={{ marginTop: '20px' }}>
             <label>Member Since</label>
             <span className="info-value">2024</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

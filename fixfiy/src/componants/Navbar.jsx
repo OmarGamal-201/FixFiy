@@ -140,7 +140,7 @@ const TopNavbar = ({ user }) => {
             <span>Loading...</span>
           ) : (
             <Link
-              to={currentUser?.role === "worker" ? "/worker-profile" : "/client-profile"}
+              to={currentUser?.role === "technician" ? "/worker-profile" : "/client-profile"}
               style={{ 
                 display: 'flex', 
                 alignItems: 'center', 

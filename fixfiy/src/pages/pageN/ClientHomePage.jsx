@@ -232,7 +232,7 @@ export default function ClientHomePage() {
                     <div className="worker-meta">
                       <StarRating rating={tech.technician_rate} />
                     </div>
-                    <div className="worker-arrow">
+                    <div className="worker-arrow" onClick={() => navigate(`/worker-profile/${tech._id}`)}>
                       <ChevronRight size={15} />
                     </div>
                   </div>
@@ -288,7 +288,7 @@ export default function ClientHomePage() {
                 New clients get a complimentary diagnostic with their first
                 service appointment.
               </p>
-              <button className="promo-btn">
+              <button className="promo-btn" onClick={() => navigate("/booking")}>
                 Book now <ArrowRight size={14} />
               </button>
             </div>

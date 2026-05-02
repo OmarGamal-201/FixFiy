@@ -25,6 +25,7 @@ const serviceSchema = new mongoose.Schema(
       min: 0,
       max: 10000,
       set: (val) => Math.round(val * 100) / 100,
+      default:50,
     },
 
     category: {
@@ -32,7 +33,7 @@ const serviceSchema = new mongoose.Schema(
       required: true,
       enum: [
         "plumbing",
-        "electrical",
+        "Electricity",
         "carpentry",
         "painting",
         "hvac",

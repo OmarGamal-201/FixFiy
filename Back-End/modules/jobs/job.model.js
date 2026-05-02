@@ -18,11 +18,28 @@ const jobSchema = new mongoose.Schema(
       minLength: 15,
     },
 
-    serviceId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Service",
+    category: {
+      type: String,
       required: true,
+      enum: [
+        "plumbing",
+        "Electricity",
+        "carpentry",
+        "painting",
+        "hvac",
+        "appliance_repair",
+        "cleaning",
+        "landscaping",
+        "pest_control",
+        "general",
+      ],
+      index: true,
     },
+    // serviceId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Service",
+    //   required: true,
+    // },
 
     // ================= Relations =================
     clientId: {
@@ -71,6 +88,7 @@ const jobSchema = new mongoose.Schema(
       required: true,
       min: 0,
       max: 10000,
+      default:500,
     },
 
     site_commission: {

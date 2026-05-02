@@ -14,19 +14,20 @@ class JobService {
   async createJob({
     title,
     description,
-    serviceId,
+    // serviceId,
+    category,
     clientId,
     workerId,
   }) {
     // ✅ validate service & get base price
-    const service =
-      await serviceService.validateServiceForJob(serviceId);
+    // const service =
+    //   await serviceService.validateServiceForJob(serviceId);
 
-    const total_price = service.base_price;
+    // const total_price = service.base_price;
 
-    const depositAmount = +(
-      (total_price * DEPOSIT_PERCENT) / 100
-    ).toFixed(2);
+    // const depositAmount = +(
+    //   (total_price * DEPOSIT_PERCENT) / 100
+    // ).toFixed(2);
 
     if (workerId) {
       const requestedWorker = await User.findOne({
@@ -42,12 +43,13 @@ class JobService {
     const job = await Job.create({
       title,
       description,
-      serviceId,
-      clientId,
+      // serviceId,
+      clientId:clientId || undefined,
       workerId: workerId || undefined,
-      total_price,
-      depositAmount,
+      // total_price,
+      // depositAmount,
       site_commission: GLOBAL_COMMISSION_RATE,
+      category,
       status: "PENDING",
       paymentStatus: "UNPAID",
       statusHistory: [{ status: "PENDING" }],
@@ -242,12 +244,12 @@ await job.save();
       user.role === "technician"
         ? { workerId: user.id }
         : { clientId: user.id };
-
-    return Job.find(filter)
-      .populate("serviceId", "name base_price")
-      .populate("workerId", "name")
-      .populate("clientId", "name")
-      .sort({ createdAt: -1 });
+    // Error in Filter return Job.find(filter)
+    return Job.find()
+    .populate("workerId", "name")
+    .populate("clientId", "name")
+    .sort({ createdAt: -1 });
+    // .populate("serviceId", "name base_price")
   }
 
   /* ================= ADMIN ================= */

@@ -22,7 +22,7 @@ const ClientManagementPage = () => {
       try {
         setLoading(true);
         setError("");
-        const res = await API.get("/admin/users?role=client");
+        const res = await API.get(`/admin/users?role=client&t=${Date.now()}`);
         setClients(res.data.data || []);
       } catch (err) {
         const errorMsg = err.response?.data?.message || "Failed to load clients";
@@ -44,8 +44,11 @@ const ClientManagementPage = () => {
       );
       showNotification("success", "Client suspended successfully");
     } catch (err) {
-      showNotification("error", "Failed to suspend client");
+      // showNotification("error", "Failed to suspend client");
+      console.error("Full Error:", err.response?.data || err.message);
+    showNotification("error", err.response?.data?.message || "Failed to suspend client");
     }
+
   };
 
   const restoreUser = async (id) => {

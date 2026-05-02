@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../../services/api";
 import "./MyBookings.css";
 
@@ -62,7 +63,12 @@ const MyBookings = () => {
         return "";
     }
   };
+const navigate = useNavigate();
 
+const handleChat = (jobId) => {
+  // التوجه لصفحة الدردشة مع إرسال معرف الطلب كـ Query Parameter
+  navigate(`/chat?jobId=${jobId}`);
+};
   return (
     <div className="my-bookings-container">
 
@@ -86,6 +92,7 @@ const MyBookings = () => {
                 <th>Price</th>
                 <th>Status</th>
                 <th>Action</th>
+                <th>Chat</th>
               </tr>
             </thead>
 
@@ -122,7 +129,18 @@ const MyBookings = () => {
                         Cancel
                       </button>
                     )}
-                  </td>
+                    </td>
+                    <td>
+                    {(job.status === "ACCEPTED" || job.status === "ACTIVE") && (
+      <button
+        className="chat-btn"
+        onClick={() => handleChat(job._id)}
+      >
+        <MessageSquare size={16} className="me-1" />
+        Chat
+      </button>
+    )}
+               </td>   
 
                 </tr>
               ))}

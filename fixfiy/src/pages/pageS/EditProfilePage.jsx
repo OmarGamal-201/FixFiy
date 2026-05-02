@@ -15,6 +15,13 @@ const EditProfilePage = () => {
     email: "",
     currentPassword: "",
     newPassword: "",
+    governorate: "",
+    city: "",
+    street: "", 
+    experience_years: "",
+    specialty: "",
+    availability_status: "", 
+
   });
 
   // GET USER DATA
@@ -22,17 +29,25 @@ const EditProfilePage = () => {
     const fetchUser = async () => {
       try {
         const res = await API.get("/profile/me");
+        const profileData = res.data.data || res.data;
 
         setFormData((prev) => ({
           ...prev,
-          name: res.data.name || "",
-          email: res.data.email || "",
+          name: profileData.name || "",
+          email: profileData.email || "",
+          governorate: profileData.address?.governorate || "",
+          city: profileData.address?.city || "",
+          street: profileData.address?.street || "",
+          experience_years: profileData.experience_years || "",
+          specialty: profileData.specialty || "",
+          availability_status: profileData.availability_status || "",
+          role: profileData.role || "",
         }));
 
-        if (res.data.profileImage) {
-          const imageUrl = res.data.profileImage.startsWith("http")
-            ? res.data.profileImage
-            : `${API.defaults.baseURL}${res.data.profileImage}`;
+        if (profileData.profileImage) {
+          const imageUrl = profileData.profileImage.startsWith("http")
+            ? profileData.profileImage
+            : `${API.defaults.baseURL}${profileData.profileImage}`;
           setImagePreview(imageUrl);
         }
       } catch (err) {
@@ -65,23 +80,43 @@ const EditProfilePage = () => {
 
 
   // SUBMIT FORM
-
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const data = new FormData();
+      // 1. تحضير البيانات الأساسية
+      const profileData = {
+        name: formData.name,
+        email: formData.email,
+        governorate: formData.governorate,
+        city: formData.city,
+        street: formData.street,
+      };
 
-      data.append("name", formData.name);
-      data.append("email", formData.email);
-
-      if (imageFile) {
-        data.append("image", imageFile);
+      // 2. إضافة بيانات الفني (Technician) إذا كان الدور فني
+      if (formData.role === "technician") {
+        profileData.experience_years = Number(formData.experience_years);
+        profileData.specialty = formData.specialty;
+        // تحويل القيمة النصية إلى Boolean ليقبلها السيرفر
+        profileData.availability_status = formData.availability_status === "true" || formData.availability_status === true;
       }
 
-      await API.put("/profile/me", data);
+      // 3. التعامل مع إرسال الصورة أو البيانات العادية
+      if (imageFile) {
+        const data = new FormData();
+        // إلحاق كافة البيانات داخل FormData
+        Object.keys(profileData).forEach((key) => {
+          data.append(key, profileData[key]);
+        });
+        data.append("image", imageFile); // تأكدي أن السيرفر يتوقع اسم الحقل "image"
+        
+        await API.put("/profile/me", data);
+      } else {
+        // إرسال كائن JSON عادي في حال عدم وجود صورة
+        await API.put("/profile/me", profileData);
+      }
 
-      // change password if provided
+      // 4. تغيير كلمة المرور إذا تم إدخالها
       if (formData.currentPassword && formData.newPassword) {
         await API.put("/profile/change-password", {
           currentPassword: formData.currentPassword,
@@ -92,10 +127,43 @@ const EditProfilePage = () => {
       alert("Profile updated successfully");
       navigate("/profile");
     } catch (err) {
-      console.log(err);
-      alert("Error updating profile");
+      console.error("Update Error:", err.response?.data || err.message);
+      const errorMsg = err.response?.data?.message || "Error updating profile";
+      alert(errorMsg);
     }
   };
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     if (imageFile) {
+  //       const data = new FormData();
+  //       data.append("name", formData.name);
+  //       data.append("email", formData.email);
+  //       data.append("image", imageFile);
+  //       await API.put("/profile/me", data);
+  //     } else {
+  //       await API.put("/profile/me", {
+  //         name: formData.name,
+  //         email: formData.email,
+  //       });
+  //     }
+
+  //     // change password if provided
+  //     if (formData.currentPassword && formData.newPassword) {
+  //       await API.put("/profile/change-password", {
+  //         currentPassword: formData.currentPassword,
+  //         newPassword: formData.newPassword,
+  //       });
+  //     }
+
+  //     alert("Profile updated successfully");
+  //     navigate("/profile");
+  //   } catch (err) {
+  //     console.error(err.response.data);
+  //     alert("Error updating profile");
+  //   }
+  // };
 
   return (
     <div className="account-card">
@@ -155,6 +223,91 @@ const EditProfilePage = () => {
             placeholder="email@example.com"
           />
         </div>
+         <div className="input-group">
+          <label>Governorate</label>
+          <input
+            type="text"
+            name="governorate"
+            value={formData.governorate}
+            onChange={handleChange}
+            placeholder="Enter your governorate"
+          />
+        </div>
+         <div className="input-group">
+          <label>City</label>
+          <input
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+            placeholder="Enter your city"
+          />
+        </div>
+         <div className="input-group">
+          <label>Street</label>
+          <input
+            type="text"
+            name="street"
+            value={formData.street}
+            onChange={handleChange}
+            placeholder="Enter your street"
+          />
+        </div>
+         {/* <div className="input-group">
+          <label>Email</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.street}
+            onChange={handleChange}
+            placeholder="email@example.com"
+          />
+        </div> */}
+{formData.role === "technician" && (
+  <>
+         <div className="input-group">
+          <label>Experience Years</label>
+          <input
+            type="number"
+            name="experience_years"
+            value={formData.experience_years}
+            onChange={handleChange}
+            placeholder="Enter your experience years"
+          />
+        </div>
+         <div className="input-group">
+          <label>Specialty</label>
+          <input
+            type="text"
+            name="specialty"
+            value={formData.specialty}
+            onChange={handleChange}
+            placeholder="Enter your specialty"
+          />
+        </div>
+         {/* <div className="input-group">
+          <label>Availability Status</label>
+          <input
+            type="text"
+            name="availability_status"
+            value={formData.availability_status}
+            onChange={handleChange}
+            placeholder="Enter your availability status"
+          />
+        </div> */}
+        <div className="input-group">
+  <label>Availability Status</label>
+  <select
+    name="availability_status"
+    value={formData.availability_status}
+    onChange={handleChange}
+    className="form-control"
+  >
+    <option value="true">Available</option>
+    <option value="false">Busy / Not Available</option>
+  </select>
+</div>
+        </>)}
 
         <div className="input-group">
           <label>Current Password</label>
@@ -194,8 +347,14 @@ const EditProfilePage = () => {
             type="button"
             className="btn-cancel"
            onClick={() => {
-  console.log("cancel clicked");
-  navigate("/profile");
+  // console.log("cancel clicked");
+ const role = formData.role || localStorage.getItem("userRole");
+    
+    if (role === "technician") {
+      navigate("/worker-profile"); 
+    } else {
+      navigate("/client-profile"); 
+    }
 }}
           >
             Cancel

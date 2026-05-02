@@ -10,11 +10,17 @@ const ClientProfilePage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const getProfileImageUrl = (image) => {
+    if (!image) return null;
+    return image.startsWith("http") ? image : `${API.defaults.baseURL}${image}`;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userRes = await API.get("/profile/me");
-        setUser(userRes.data.data);
+        const profileData = userRes.data.data || userRes.data;
+        setUser(profileData);
         const bookingRes = await API.get("/bookings/my");
         setBookings(bookingRes.data);
       } catch (err) {
@@ -28,6 +34,8 @@ const ClientProfilePage = () => {
 
   if (loading) return <div className="loading-state">Loading profile...</div>;
 
+  const profileImageUrl = getProfileImageUrl(user?.profileImage);
+
   //  حساب الإحصائيات
   const completed = bookings.filter(b => b.status === "completed").length;
   const pending = bookings.filter(b => b.status === "pending").length;
@@ -40,7 +48,17 @@ const ClientProfilePage = () => {
         <div className="header-background"></div>
         <div className="header-content">
           <div className="avatar-section">
-            <div className="avatar-circle">
+            <div
+              className="avatar-circle"
+              style={{
+                backgroundImage: profileImageUrl ? `url(${profileImageUrl})` : "none",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              {!profileImageUrl && (
+                <span className="avatar-initials">{user.name?.charAt(0)}</span>
+              )}
               <span className="online-indicator"></span>
             </div>
           </div>

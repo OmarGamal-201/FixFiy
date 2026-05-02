@@ -420,6 +420,65 @@
 }
 
 /* ===== RESPONSIVE ===== */
+
+@media (max-width: 1024px) {
+  .management-page {
+    padding: 20px 24px ;
+  }
+
+  .management-header {
+    padding: 24px;
+    margin-top: 24px;
+  }
+
+  .header-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .header-info h1 {
+    font-size: 1.5rem;
+    letter-spacing: -0.5em;
+  }
+
+  .header-icon {
+    font-size: 1.8rem;
+  }
+
+  .table-header {
+    padding: 16px 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .table-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .clients-table thead th,
+  .clients-table td {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+  }
+
+  .action-btn {
+padding: 6px 10px;
+    font-size: 0.8rem;
+    min-width: 70px;
+  }
+
+  .name-cell {
+    gap: 10px;
+  }
+
+  .client-avatar {
+   width: 36px; 
+    height: 36px;
+    font-size: 0.85rem;
+  }
+}
+
+
 @media (max-width: 768px) {
   .management-page {
     padding: 24px 16px 40px;

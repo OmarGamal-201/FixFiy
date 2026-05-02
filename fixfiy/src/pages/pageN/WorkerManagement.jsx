@@ -149,7 +149,7 @@ const WorkerManagement = () => {
                           </div>
                         </td>
                         <td className="service-cell">
-                           <span className="specialty-tag">{worker.specialties || "General"}</span>
+                           <span className="specialty-tag">{worker.specialty || "General"}</span>
                         </td>
                         <td className="location-cell">
                           {worker.address?.city ? `${worker.address.city}, ${worker.address.governorate}` : "N/A"}
@@ -172,7 +172,7 @@ const WorkerManagement = () => {
                             ) : (
                               <button
                                 className="action-btn btn-suspend" // Reusing red color
-                                onClick={() => {/* handle delete logic */}}
+                                onClick={() => handleDeleteWorker(worker._id)}
                               >
                                 <Trash2 size={14} /> Delete
                               </button>

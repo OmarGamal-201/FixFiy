@@ -10,7 +10,10 @@ const WorkerPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+const getProfileImageUrl = (image) => {
+    if (!image) return null;
+    return image.startsWith("http") ? image : `${API.defaults.baseURL}${image}`;
+  };
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -29,7 +32,7 @@ const WorkerPage = () => {
   if (!user) return <div className="error-state">Profile not found</div>;
 
   const rating = user.technician_rate || 0;
-
+const profileImageUrl = getProfileImageUrl(user?.profileImage);
   return (
     <div className="client-profile-container"> {/* Reusing container class for consistent padding */}
       
@@ -38,9 +41,29 @@ const WorkerPage = () => {
         <div className="header-background worker-bg"></div> {/* Custom blue/gradient for workers */}
         <div className="header-content">
           <div className="avatar-section">
-            <div className="avatar-circle">
+            <div 
+              className="avatar-circle"
+              style={{
+                backgroundImage: profileImageUrl ? `url(${profileImageUrl})` : "none",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundColor: profileImageUrl ? "transparent" : "#e2e8f0", // لون احتياطي
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {/* إظهار أول حرف من الاسم إذا لم توجد صورة */}
+              {!profileImageUrl && (
+                <span className="avatar-initials" style={{ fontSize: '2rem', fontWeight: 'bold', color: '#64748b' }}>
+                  {user.name?.charAt(0).toUpperCase()}
+                </span>
+              )}
               <span className="online-indicator"></span>
             </div>
+            {/* <div className="avatar-circle">
+              <span className="online-indicator"></span>
+            </div> */}
           </div>
           <div className="profile-info">
             <h1>{user.name}</h1>

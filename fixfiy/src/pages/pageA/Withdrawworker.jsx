@@ -32,6 +32,7 @@ const Withdrawworker = () => {
   };
 
   return (
+    <div className="withdraw-page-container">
     <div className="withdraw-page">
 
       <div className="withdraw-card">
@@ -60,6 +61,7 @@ const Withdrawworker = () => {
 
       </div>
 
+    </div>
     </div>
   );
 };

@@ -51,13 +51,19 @@ const ClientProfilePage = () => {
             <div
               className="avatar-circle"
               style={{
+                
                 backgroundImage: profileImageUrl ? `url(${profileImageUrl})` : "none",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
+                backgroundColor: profileImageUrl ? "transparent" : "#e2e8f0", // لون احتياطي
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              
               }}
             >
               {!profileImageUrl && (
-                <span className="avatar-initials">{user.name?.charAt(0)}</span>
+                <span className="avatar-initials"style={{ fontSize: '2rem', fontWeight: 'bold', color: '#64748b' }}>{user.name?.charAt(0)}</span>
               )}
               <span className="online-indicator"></span>
             </div>

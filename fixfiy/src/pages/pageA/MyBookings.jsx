@@ -70,6 +70,7 @@ const handleChat = (jobId) => {
   navigate(`/chat?jobId=${jobId}`);
 };
   return (
+    <div className="bookings-container">
     <div className="my-bookings-container">
 
       {/* <h2>My Bookings</h2> */}
@@ -150,6 +151,7 @@ const handleChat = (jobId) => {
 
         </div>
       )}
+    </div>
     </div>
   );
 };

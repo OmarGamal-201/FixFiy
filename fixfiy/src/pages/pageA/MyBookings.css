@@ -1,4 +1,6 @@
-﻿.my-bookings-container {
+﻿bookings-container {
+background-color: whitesmoke;}
+.my-bookings-container {
   padding: 20px;
   
 }

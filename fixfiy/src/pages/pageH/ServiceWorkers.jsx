@@ -109,6 +109,10 @@ const handleContact = (technician) => {
     },
   });
 };
+const getProfileImageUrl = (image) => {
+  if (!image) return null;
+  return image.startsWith("http") ? image : `${API.defaults.baseURL}${image}`;
+};
   return (
     <div className="workers-gallery-container">
       <h2 className="service-title">{serviceTitle}</h2>
@@ -120,9 +124,41 @@ const handleContact = (technician) => {
           {workers.map((technician) => (
             <div key={technician._id} className="worker-card">
 
-              <div className="worker-avatar">
-                <div className="placeholder-img"></div>
-              </div>
+              <div className="worker-avatar"
+    style={{
+      width: "80px", // يمكنك التحكم في الحجم هنا
+      height: "80px",
+      borderRadius: "50%",
+      backgroundImage: technician.profileImage ? `url(${getProfileImageUrl(technician.profileImage)})` : "none",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundColor: "#e2e8f0",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      margin: "0 auto 15px", // لتوسيط الصورة داخل الكارد
+      position: "relative",
+      border: "2px solid #f0f0f0"
+    }}
+  >
+    {/* إذا لم توجد صورة، نعرض أول حرف من الاسم */}
+    {!technician.profileImage && (
+      <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white' }}>
+        {technician.name?.charAt(0).toUpperCase()}
+      </span>
+    )}
+  
+  {/* <div className="worker-avatar">
+  <div 
+    className="avatar-circle"
+    style={{ backgroundImage: technician.profileImage ? `url(${getProfileImageUrl(technician.profileImage)})` : "none" }}
+  >
+    {!technician.profileImage && (
+      <span className="avatar-initials">{technician.name?.charAt(0)}</span>
+    )}
+  </div> 
+</div>*/}
+            </div>
 
               <div className="worker-info">
                 <h4

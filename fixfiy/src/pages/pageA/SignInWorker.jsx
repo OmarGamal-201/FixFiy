@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import API from "../../services/api";
 import { Eye, EyeOff } from "lucide-react";
 import "./SignInWorker.css";
@@ -127,6 +127,9 @@ console.log(showPassword);
         <button type="submit">
           Sign up as Worker
         </button>
+        <p className="auth-footer">
+          Already have an account? <Link to="/login">Log In</Link>
+        </p>
 
       </form>
     </div>

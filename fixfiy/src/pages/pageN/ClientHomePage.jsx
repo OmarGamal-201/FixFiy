@@ -1,4 +1,5 @@
 ﻿
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -86,10 +87,10 @@ export default function ClientHomePage() {
       try {
         const [servRes, workRes] = await Promise.all([
           API.get("/services"),
-          API.get("/workers"),
+          API.get("/profile"),
         ]);
         setServices(servRes.data || []);
-        setWorkers(workRes.data || []);
+        setWorkers(workRes.data?.data || []);
       } catch (err) {
         console.error("Error fetching initial data", err);
       } finally {
@@ -99,23 +100,21 @@ export default function ClientHomePage() {
     fetchData();
   }, []);
 
-  const handleServiceClick = async (service) => {
-    if (selectedService?.name === service.name) {
-      setSelectedService(null);
-      return;
-    }
-    setSelectedService(service);
-    setLoadingServiceWorkers(true);
-    try {
-      const res = await API.get(
-        `/users?specialty=${encodeURIComponent(service.name)}`
-      );
-      setServiceWorkers(res.data?.data || []);
-    } catch {
-      setServiceWorkers([]);
-    } finally {
-      setLoadingServiceWorkers(false);
-    }
+  // Maps service.category to the technician specialty enum value the backend expects
+  const CATEGORY_TO_SPECIALTY = {
+    plumbing:         "Plumber",
+    electrical:       "Electricity",
+    carpentry:        "Carpinter",
+    painting:         "Painter",
+    hvac:             "hvac",
+    appliance_repair: "appliance_repair",
+    general:          "general",
+  };
+
+  const handleServiceClick = (service) => {
+    const serviceIdentifier = service._id || encodeURIComponent(service.name.toLowerCase());
+    const specialty = CATEGORY_TO_SPECIALTY[service.category] || service.name;
+    navigate(`/workers/${serviceIdentifier}?specialty=${encodeURIComponent(specialty)}`);
   };
 
   const displayedServices =
@@ -173,7 +172,7 @@ export default function ClientHomePage() {
                 <span className="service-card-sub">
                   {selectedService?.name === service.name
                     ? "Viewing"
-                    : "Tap to filter"}
+                    : "Tap to view"}
                 </span>
               </div>
             ))}

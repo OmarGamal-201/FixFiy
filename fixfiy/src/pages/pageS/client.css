@@ -24,7 +24,8 @@
 
 .header-background {
   height: 260px;
-  background: linear-gradient(135deg, #1e88e5, #42a5f5);
+  /* background: linear-gradient(135deg, #1e88e5, #42a5f5); */
+  background: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
   width: 100%;
   border-radius: 0 0 40px 40px;
 }
@@ -56,6 +57,14 @@
   align-items: center;
   justify-content: center;
   font-size: 80px;
+  color: white;
+  overflow: hidden;
+}
+
+.avatar-initials {
+  font-size: 4rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .online-indicator {
@@ -110,7 +119,7 @@
 .edit-btn:hover {
   /*background: white;
   color: #667eea;*/
-   transform: translateY(-2px);
+  transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
   
 }
@@ -540,3 +549,13 @@
     padding: 0 16px;
   }
 }
+
+
+
+
+
+
+
+
+
+

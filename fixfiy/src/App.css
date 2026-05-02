@@ -417,6 +417,7 @@ body {
   margin-top: 30px;
   justify-content: center;
   padding-right: 20%;
+  flex-direction: row;
 }
 
 .btn-save {
@@ -430,6 +431,7 @@ body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  width: 120px;
 }
 
 .btn-cancel {
@@ -440,6 +442,7 @@ body {
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
+  width: 120px;
 }
 
 

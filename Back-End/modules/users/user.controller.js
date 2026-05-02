@@ -25,10 +25,12 @@ const updateProfile = async (req, res) => {
   try {
     const {
       name,
+      email,
       phone,
       governorate,
       city,
       street,
+      profileImage,
       experience_years,
       specialty,
       availability_status,
@@ -41,7 +43,9 @@ const updateProfile = async (req, res) => {
 
     // Common fields
     if (name) updateData.name = name;
+    if (email) updateData.email = email;
     if (phone) updateData.phone = phone;
+    if (profileImage) updateData.profileImage = profileImage;
     if (governorate) updateData["address.governorate"] = governorate;
     if (city) updateData["address.city"] = city;
     if (street) updateData["address.street"] = street;

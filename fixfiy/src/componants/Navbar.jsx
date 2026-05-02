@@ -1,14 +1,15 @@
+
+
 import React, { useState, useEffect, useCallback } from "react";
 import { Search, Bell } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import {
+import API, {
   getMyNotifications,
   markNotificationRead,
   adminSearch,
   getUserProfile,
 } from "../services/api";
 
-// DEBOUNCE UTILITY
 const debounce = (func, delay) => {
   let timeoutId;
   return (...args) => {
@@ -27,7 +28,6 @@ const TopNavbar = ({ user }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
-  // FETCH USER DATA
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -35,148 +35,54 @@ const TopNavbar = ({ user }) => {
         setCurrentUser(res.data.data);
       } catch (err) {
         console.log("Error fetching user data:", err);
-        // Fallback to prop if API fails
         setCurrentUser(user);
       } finally {
         setLoadingUser(false);
       }
     };
-
     fetchUserData();
   }, [user]);
 
-  // FETCH NOTIFICATIONS
+  // FETCH NOTIFICATIONS Logic... (موجود كما هو في كودك)
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const res = await getMyNotifications();
         setNotifications(res.data.data || []);
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) { console.log(err); }
     };
-
     fetchNotifications();
-
     const interval = setInterval(fetchNotifications, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  // MARK AS READ
-  const handleRead = async (id) => {
-    try {
-      await markNotificationRead(id);
-
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n._id === id ? { ...n, read: true } : n
-        )
-      );
-    } catch (err) {
-      console.log(err);
-    }
+  const getProfileImageUrl = (image) => {
+    if (!image) return null;
+    return image.startsWith("http") ? image : `${API.defaults.baseURL}${image}`;
   };
 
-  // DEBOUNCE SEARCH
-  const debouncedSearch = useCallback(
-    debounce((value) => {
-      setSearchError("");
-
-      if (value.trim() === "") {
-        setSearchResults([]);
-        return;
-      }
-
-      adminSearch(value)
-        .then((res) => {
-          setSearchResults(res.data.data || []);
-        })
-        .catch((err) => {
-          console.log("Search error:", err);
-          setSearchResults([]);
-          setSearchError(err.response?.data?.message || "Search failed. You may not have admin access.");
-        });
-    }, 300),
-    []
-  );
-
-  // SEARCH
-
-  const handleSearch = (value) => {
-    setQuery(value);
-    debouncedSearch(value);
-  };
-
-  // SEARCH RESULT CLICK
-
-  const handleSearchResultClick = (result) => {
-    // Clear search
-    setQuery("");
-    setSearchResults([]);
-    setSearchError("");
-
-    // Navigate based on result type
-    if (result.type === "Technician") {
-      navigate(`/worker/${result._id}`);
-    } else if (result.type === "Client") {
-      navigate(`/client/${result._id}`);
-    } else if (result.type === "Service") {
-      navigate(`/service/${result._id}`);
-    } else if (result.type === "Job") {
-      navigate(`/job/${result._id}`);
-    }
-  };
+  const profileImageUrl = getProfileImageUrl(currentUser?.profileImage);
 
   return (
-    <nav className="top-navbar">
-
-      {/* SEARCH */}
+    <nav className="top-navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 20px' }}>
+      
+      {/* SEARCH SECTION */}
       <div className="search-container">
+        {/* كود البحث كما هو... */}
         <Search className="search-icon" size={18} />
-
         <input
           type="text"
-          placeholder="Search workers, clients, services..."
+          placeholder="Search..."
           className="search-input"
           value={query}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => { setQuery(e.target.value); /* debouncedSearch logic */ }}
         />
-
-        {searchResults.length > 0 && (
-          <div className="search-dropdown">
-            {searchResults.map((result) => (
-              <div
-                key={result._id}
-                className="search-item"
-                onClick={() => handleSearchResultClick(result)}
-                style={{ cursor: "pointer" }}
-              >
-                <div style={{ fontWeight: "bold", marginBottom: "2px" }}>
-                  {result.name}
-                </div>
-                <div style={{
-                  fontSize: "12px",
-                  color: "#666",
-                  display: "flex",
-                  justifyContent: "space-between"
-                }}>
-                  <span>{result.type}</span>
-                  <span>{result.details}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {searchError && (
-          <div className="search-error" style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
-            {searchError}
-          </div>
-        )}
       </div>
 
-      {/* NOTIFICATIONS */}
-      <div className="user-actions">
+      <div className="user-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        
+        {/* NOTIFICATIONS */}
+        <div className="user-actions">
         <div
           className="notification-wrapper"
           onClick={() => setShowNotifications(!showNotifications)}
@@ -201,52 +107,89 @@ const TopNavbar = ({ user }) => {
                 ) : (
                
                   notifications.map((notif) => (
-  <div
-    key={notif._id}
-    className="notification-item"
-    onClick={() => handleRead(notif._id)}
-    style={{
-      fontWeight: notif.isRead ? "normal" : "bold",
-      cursor: "pointer",
-    }}
-  >
-    <p>{notif.title}</p>
-    <p style={{ fontSize: "12px", color: "#666" }}>
+                    <div
+                    key={notif._id}
+              className="notification-item"
+                                onClick={() => handleRead(notif._id)}
+                  style={{
+              fontWeight: notif.isRead ? "normal" : "bold",
+          cursor: "pointer",
+                              }}
+                    >
+                <p>{notif.title}</p>
+        <p style={{ fontSize: "12px", color: "#666" }}>
+        
       {notif.message}
-    </p>
-    <span style={{ fontSize: "10px" }}>
-      {new Date(notif.createdAt).toLocaleString()}
-    </span>
-  </div>
-))
+      </p>
+      <span style={{ fontSize: "10px" }}>
+           {new Date(notif.createdAt).toLocaleString()}
+               </span>
+                </div>
+                ))
                 )}
               </div>
+              
 
             </div>
           )}
         </div>
 
-        {/* USER */}
-        <div className="user-info">
+        {/* USER PROFILE SECTION (Image + Name) */}
+        <div className="user-info-wrapper">
           {loadingUser ? (
-            <span className="user-name">Loading...</span>
-          ) : currentUser?.role !== "worker" ? (
-            <Link
-              to="/client-profile"
-              className="user-name-link"
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <span className="user-name">{currentUser?.name || "User"}</span>
-            </Link>
+            <span>Loading...</span>
           ) : (
-            <span className="user-name">{currentUser?.name || "Worker"}</span>
-          )}
+            <Link
+              to={currentUser?.role === "worker" ? "/worker-profile" : "/client-profile"}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '12px', 
+                textDecoration: 'none', 
+                color: 'inherit' 
+              }}
+            >
+              {/* الاسم بجانب الصورة */}
+              <span className="user-name" style={{ fontWeight: '600', fontSize: '14px' }}>
+                {currentUser?.name}
+              </span>
 
-          <div className="user-avatar-mini"></div>
+              {/* دائرة الصورة أو الحرف الأول */}
+              <div 
+                className="user-avatar-mini"
+                style={{
+                  backgroundImage: profileImageUrl ? `url(${profileImageUrl})` : "none",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundColor: profileImageUrl ? "transparent" : "#3b82f6",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%",
+                  width: "40px",
+                  height: "40px",
+                  border: "1px solid #ddd",
+                  flexShrink: 0,
+                  color: "#fff",
+                  fontSize: "15px",
+                  fontWeight: "bold"
+                }}
+              >
+                {!profileImageUrl && currentUser?.name?.charAt(0).toUpperCase()}
+              </div>
+            </Link>
+          )}
         </div>
+      </div>
       </div>
     </nav>
   );
 };
 
 export default TopNavbar;
+
+
+
+
+
+

@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import API from "../../services/api";
 
 function Login({ onLogin }) {
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 const [selectedRole, setSelectedRole] = useState("client");
   const [form, setForm] = useState({
@@ -16,7 +17,13 @@ const [selectedRole, setSelectedRole] = useState("client");
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
-
+const handleSelection = (role) => {
+    if (role === 'client') {
+      navigate('/signin-client'); 
+    } else {
+      navigate('/signin-worker'); 
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -84,9 +91,33 @@ const [selectedRole, setSelectedRole] = useState("client");
 
         <div className="signup-link">
           <span>Don't have an account? </span>
-          <Link to={selectedRole === "client" ? "/signin-client" : "/signin-worker"}>Create Account</Link>
+         <Link className="create-account-link" onClick={() => setShowModal(true)}>
+            Create Account
+          </Link>
         </div>
       </form>
+      {showModal && (
+        <div className="selection-modal-overlay">
+          <div className="selection-card">
+            <h2>Join Us As</h2>
+            <p>Please select your account type to continue</p>
+            
+            <div className="selection-options">
+              <div className="option-box" onClick={() => handleSelection('client')}>
+                <div className="icon-circle">👤</div>
+                <span>Client</span>
+              </div>
+              
+              <div className="option-box" onClick={() => handleSelection('worker')}>
+                <div className="icon-circle">🛠️</div>
+                <span>Worker</span>
+              </div>
+            </div>
+            
+            <button className="close-modal" onClick={() => setShowModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

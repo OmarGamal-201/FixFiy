@@ -96,12 +96,12 @@ const handleSubmit = async (e) => {
     // طباعة البيانات في الكونسول للتأكد من وصولها (افتح الـ Inspect لتراها)
     console.log("Current jobData before submit:", jobData);
 
-    const { title, description, category } = jobData;
+    const { title, description, category,workerId } = jobData;
 
     // 4. التحقق المحسن
     if (!title || title.trim() === "" || 
         !description || description.trim() === "" || 
-        !category ) {
+        !category || !workerId ) {
       
       // لنعرف ما هو الحقل الناقص بالضبط
       let missing = [];
@@ -109,6 +109,7 @@ const handleSubmit = async (e) => {
       if (!description.trim()) missing.push("Description");
       if (!category) missing.push("Category");
       // if (!serviceId) missing.push("Service ID (from URL)");
+       if (!workerId) missing.push("Worker ID (from URL)");
 
       setStatus({ 
         type: "error", 

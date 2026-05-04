@@ -100,8 +100,10 @@ class JobService {
     const job = await Job.findById(jobId);
     if (!job) throw new Error("Job not found");
 
-    if (job.workerId && job.workerId.toString() !== workerId)
+    if (job.workerId.toString() != workerId.toString()) {
+      console.log(job.workerId.toString(),workerId.toString())
       throw new Error("Job already assigned to another technician");
+    }
 
     if (job.status !== "PENDING")
       throw new Error("Job must be pending to accept");
@@ -142,7 +144,7 @@ class JobService {
     const job = await Job.findById(jobId);
     if (!job) throw new Error("Job not found");
 
-    if (!job.workerId || job.workerId.toString() !== workerId)
+    if (job.workerId.toString() != workerId.toString())
       throw new Error("You can only reject jobs assigned to you");
 
     if (job.status !== "PENDING")
@@ -244,12 +246,22 @@ await job.save();
       user.role === "technician"
         ? { workerId: user.id }
         : { clientId: user.id };
-    // Error in Filter return Job.find(filter)
-    return Job.find()
-    .populate("workerId", "name")
-    .populate("clientId", "name")
-    .sort({ createdAt: -1 });
-    // .populate("serviceId", "name base_price")
+    // Error in Filter 
+    if (user.role === 'technician') {
+      return Job.find(filter)
+      .populate("workerId", "name")
+      .populate("clientId", "name")
+      .sort({ createdAt: -1 });
+      // .populate("serviceId", "name base_price")
+    }
+    else if (user.role === 'admin'){
+        return Job.find()
+      .populate("workerId", "name")
+      .populate("clientId", "name")
+      .sort({ createdAt: -1 });
+      // .populate("serviceId", "name base_price")
+    }
+    // return Job.find()
   }
 
   /* ================= ADMIN ================= */

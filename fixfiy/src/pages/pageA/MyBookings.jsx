@@ -1,5 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
+import { MessageSquare } from 'lucide-react';
 import API from "../../services/api";
 import "./MyBookings.css";
 

@@ -4,10 +4,10 @@ const jobService = require("./job.service");
 
 exports.createJob = async (req, res) => {
   try {
-    const { title, description,category } =
+    const { title, description,category,workerId} =
       req.body;
 
-    if (!title || !description || !category)
+    if (!title || !description || !category || !workerId)
       throw new Error("Missing required fields");
 
     const job = await jobService.createJob({
@@ -16,7 +16,7 @@ exports.createJob = async (req, res) => {
       category,
       // serviceId,
       clientId: req.user.id,
-      // workerId,
+      workerId,
     });
 
     res.status(201).json({ success: true, data: job });

@@ -18,6 +18,7 @@ const notificationSchema = new mongoose.Schema(
         // 🧰 Jobs
         "JOB_CREATED",
         "JOB_ACCEPTED",
+        "JOB_REJECTED",
         "JOB_IN_PROGRESS",
         "JOB_COMPLETED",
         "JOB_CANCELLED",

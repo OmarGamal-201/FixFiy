@@ -30,7 +30,6 @@ const updateProfile = async (req, res) => {
       governorate,
       city,
       street,
-      profileImage,
       experience_years,
       specialty,
       availability_status,
@@ -45,10 +44,16 @@ const updateProfile = async (req, res) => {
     if (name) updateData.name = name;
     if (email) updateData.email = email;
     if (phone) updateData.phone = phone;
-    if (profileImage) updateData.profileImage = profileImage;
     if (governorate) updateData["address.governorate"] = governorate;
     if (city) updateData["address.city"] = city;
     if (street) updateData["address.street"] = street;
+
+    if (req.file) {
+      updateData.profilePicture = {
+        url: req.file.path, 
+        public_id: req.file.filename 
+      };
+    }
 
     // Technician-specific fields
     if (user.role === "technician") {

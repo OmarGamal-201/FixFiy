@@ -13,11 +13,12 @@ const {
 } = require("./user.controller");
 const { protect } = require("../../middlewares/auth.middleware");
 const { authorize } = require("../../middlewares/role.middleware");
+const { uploadUserPicture, processUploadedFiles, handleMulterError } = require('../../middlewares/fileupload');
 
 // Get user dashboard data
 router.get("/me", protect, getDashboardData);
 // Update user profile (common + role-specific fields)
-router.put("/me", protect, updateProfile);
+router.put("/me", protect, uploadUserPicture, handleMulterError, processUploadedFiles, updateProfile);
 // Password management
 router.put("/change-password", protect, changePassword);
 // Account management

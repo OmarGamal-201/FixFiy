@@ -81,10 +81,16 @@ const userSchema = new mongoose.Schema(
       },
     },
 
-    profileImage: {
+    profilePicture: [{
+    url: {
       type: String,
-      default: null,
+      required: true
     },
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
 
     bio: {
       type: String,

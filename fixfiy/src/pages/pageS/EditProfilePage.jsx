@@ -108,7 +108,7 @@ const handleSubmit = async (e) => {
         Object.keys(profileData).forEach((key) => {
           data.append(key, profileData[key]);
         });
-        data.append("image", imageFile); // تأكدي أن السيرفر يتوقع اسم الحقل "image"
+        data.append("profilePicture", imageFile); // تأكدي أن السيرفر يتوقع اسم الحقل "image"
         
         await API.put("/profile/me", data);
       } else {
@@ -125,7 +125,7 @@ const handleSubmit = async (e) => {
       }
 
       alert("Profile updated successfully");
-      navigate("/profile");
+      navigate("/home");
     } catch (err) {
       console.error("Update Error:", err.response?.data || err.message);
       const errorMsg = err.response?.data?.message || "Error updating profile";

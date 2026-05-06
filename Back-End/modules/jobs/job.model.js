@@ -103,19 +103,26 @@ const jobSchema = new mongoose.Schema(
       type: String,
       enum: ["UNPAID", "DEPOSIT_PAID", "PAID"],
       default: "UNPAID",
+      index: true,
     },
 
     depositAmount: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     paymentMethod: {
       type: String,
-      enum: ["PAYPAL", "PAYMOB", "CASH"],
+      enum: ["MOCK", "FAWRY", "PAYPAL", "CASH"],
+      index: true,
     },
 
-    paymentRef: String,
+    paymentRef: {
+      type: String,
+      index: true,
+      sparse: true,
+    },
   },
   { timestamps: true }
 );

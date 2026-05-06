@@ -25,9 +25,11 @@ const notificationSchema = new mongoose.Schema(
         "JOB_DISPUTED",
 
         // 💰 Payments
+        "PAYMENT_INITIATED",
         "PAYMENT_COMPLETED",
         "PAYMENT_FAILED",
         "WITHDRAWAL_COMPLETED",
+        "WITHDRAWAL_REJECTED",
 
         // 👮 Admin / System
         "ADMIN_ALERT",

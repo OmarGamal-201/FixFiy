@@ -12,22 +12,22 @@ const DEPOSIT_PERCENT = 20;
 class JobService {
   /* ================= CREATE JOB ================= */
   async createJob({
-    title,
-    description,
-    // serviceId,
-    category,
-    clientId,
-    workerId,
-  }) {
+  title,
+  description,
+  category,
+  clientId,
+  workerId,
+  total_price
+}) {
     // ✅ validate service & get base price
     // const service =
     //   await serviceService.validateServiceForJob(serviceId);
 
     // const total_price = service.base_price;
 
-    // const depositAmount = +(
-    //   (total_price * DEPOSIT_PERCENT) / 100
-    // ).toFixed(2);
+    const depositAmount = +(
+      (total_price * DEPOSIT_PERCENT) / 100
+    ).toFixed(2);
 
     if (workerId) {
       const requestedWorker = await User.findOne({
@@ -46,8 +46,8 @@ class JobService {
       // serviceId,
       clientId:clientId || undefined,
       workerId: workerId || undefined,
-      // total_price,
-      // depositAmount,
+      total_price,
+      depositAmount,
       site_commission: GLOBAL_COMMISSION_RATE,
       category,
       status: "PENDING",

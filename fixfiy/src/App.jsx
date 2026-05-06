@@ -14,7 +14,7 @@ import Login from "./pages/pageA/Login";
 import Payments from './pages/pageA/Payments';
 import Waallet from "./pages/pageA/Waallet";
 import WithdrawAdmin from './pages/pageA/WithdrawAdmin';
-import Withdrawworker from './pages/pageA/withdrawworker';
+import Withdrawworker from './pages/pageA/Withdrawworker';
 import RestNewPassword from './pages/pageA/ResetNewPassword';
 import ForgotPassword from './pages/pageA/ForgotPassword';
 import SignInAdmin from './pages/pageA/SignInAdmin';

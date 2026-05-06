@@ -50,13 +50,14 @@ const adminRoutes = require("./modules/admin/admin.routes");
 app.use("/api/auth", authRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/reviews", reviewRoutes);
+// Payment routes include webhooks (public) + protected endpoints
+app.use("/api/payments", paymentRoutes);
 
 /* ========================
    PROTECTED ROUTES
 ======================== */
 app.use("/api/profile", protect, userRoutes);
 app.use("/api/jobs", protect, jobRoutes);
-app.use("/api/payments", protect, paymentRoutes);
 app.use("/api/wallet", protect, walletRoutes);
 app.use("/api/withdraw", protect, withdrawRoutes);
 app.use("/api/messages", protect, messagingRoutes);

@@ -69,35 +69,35 @@ const userSchema = new mongoose.Schema(
       governorate: {
         type: String, required: true,
         enum: [
-        "Cairo",
-        "Giza",
-        "Alexandria",
-        "Dakahlia",
-        "Red Sea",
-        "Beheira",
-        "Fayoum",
-        "Gharbia",
-        "Ismailia",
-        "Monufia",
-        "Minya",
-        "Qalyubia",
-        "New Valley",
-        "Suez",
-        "Aswan",
-        "Assiut",
-        "Beni Suef",
-        "Port Said",
-        "Damietta",
-        "Sharqia",
-        "South Sinai",
-        "Kafr El Sheikh",
-        "Matrouh",
-        "Luxor",
-        "Qena",
-        "North Sinai",
-        "Sohag",
-      ],
-       },
+          "Cairo",
+          "Giza",
+          "Alexandria",
+          "Dakahlia",
+          "Red Sea",
+          "Beheira",
+          "Fayoum",
+          "Gharbia",
+          "Ismailia",
+          "Monufia",
+          "Minya",
+          "Qalyubia",
+          "New Valley",
+          "Suez",
+          "Aswan",
+          "Assiut",
+          "Beni Suef",
+          "Port Said",
+          "Damietta",
+          "Sharqia",
+          "South Sinai",
+          "Kafr El Sheikh",
+          "Matrouh",
+          "Luxor",
+          "Qena",
+          "North Sinai",
+          "Sohag",
+        ],
+      },
     },
 
     location: {
@@ -113,15 +113,15 @@ const userSchema = new mongoose.Schema(
     },
 
     profilePicture: [{
-    url: {
-      type: String,
-      required: true
-    },
-    uploadedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
+      url: {
+        type: String,
+        required: true
+      },
+      uploadedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }],
 
     bio: {
       type: String,
@@ -132,6 +132,12 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["ACTIVE", "SUSPENDED"],
+      default:"ACTIVE",
     },
 
     settings: {

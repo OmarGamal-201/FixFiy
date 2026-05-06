@@ -96,6 +96,11 @@ class AuthService {
       throw new Error("Invalid credentials");
     }
 
+    const isSuspended = user.status === "SUSPENDED";
+    if (isSuspended) {
+      throw new Error("User is Suspended,Contact Support");
+    }
+
     // FIX: Should pass user._id, not entire user object
     const token = generateToken(user._id);
 

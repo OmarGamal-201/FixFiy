@@ -170,7 +170,7 @@ const ServicesManagementPage = () => {
                     <select name="category" value={form.category} onChange={handleChange}>
                       <option value="">Select</option>
                       <option value="plumbing">Plumbing</option>
-                      <option value="electrical">Electrical</option>
+                      <option value="Electricity">Electrical</option>
                       <option value="carpentry">Carpentry</option>
                       <option value="painting">Painting</option>
                       <option value="cleaning">Cleaning</option>

@@ -14,16 +14,16 @@ class JobService {
   async createJob({
   title,
   description,
-  category,
+  serviceId,
   clientId,
   workerId,
   total_price
 }) {
     // ✅ validate service & get base price
-    // const service =
-    //   await serviceService.validateServiceForJob(serviceId);
+    const service =
+      await serviceService.validateServiceForJob(serviceId);
 
-    // const total_price = service.base_price;
+    total_price = service.base_price;
 
     const depositAmount = +(
       (total_price * DEPOSIT_PERCENT) / 100
@@ -43,13 +43,12 @@ class JobService {
     const job = await Job.create({
       title,
       description,
-      // serviceId,
+      serviceId,
       clientId:clientId || undefined,
       workerId: workerId || undefined,
       total_price,
       depositAmount,
       site_commission: GLOBAL_COMMISSION_RATE,
-      category,
       status: "PENDING",
       paymentStatus: "UNPAID",
       statusHistory: [{ status: "PENDING" }],

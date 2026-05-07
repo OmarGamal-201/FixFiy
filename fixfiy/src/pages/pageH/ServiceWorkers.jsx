@@ -14,7 +14,7 @@ const ServiceWorkersPage = () => {
   const [loading, setLoading] = useState(true);
   // This will hold the real MongoDB ObjectId for the service
   const [serviceObjectId, setServiceObjectId] = useState(null);
-  const [serviceTitle, setServiceTitle] = useState("Our Workers");
+  const [serviceCategory, setServiceTitle] = useState("Our Workers");
 
   useEffect(() => {
     if (!serviceId) return;
@@ -39,7 +39,7 @@ const ServiceWorkersPage = () => {
             signal: controller.signal,
           });
           const service = serviceRes.data?.data;
-          resolvedTitle = service?.name ?? serviceId;
+          resolvedTitle = service?.category ?? serviceId;
           // specialty on technicians matches service category/name
           resolvedServiceId = serviceId;
         } else {
@@ -54,7 +54,7 @@ const ServiceWorkersPage = () => {
           );
           if (matched) {
             resolvedServiceId = matched._id; // real ObjectId
-            resolvedTitle = matched.name;
+            resolvedTitle = matched.category;
           } else {
             // Fallback: capitalise the slug as best-guess title
             resolvedTitle = serviceId.charAt(0).toUpperCase() + serviceId.slice(1);
@@ -115,7 +115,7 @@ const getProfileImageUrl = (image) => {
 };
   return (
     <div className="workers-gallery-container">
-      <h2 className="service-title">{serviceTitle}</h2>
+      <h2 className="service-title">{serviceCategory}</h2>
 
       {workers.length === 0 ? (
         <p>No workers found for this service.</p>

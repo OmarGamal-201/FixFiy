@@ -7,18 +7,18 @@ exports.createJob = async (req, res) => {
     const {
   title,
   description,
-  category,
+  serviceId,
   workerId,
   total_price
 } = req.body;
 
-if (!title || !description || !category || !workerId || !total_price)
+if (!title || !description || !serviceId || !workerId || !total_price)
   throw new Error("Missing required fields");
 
 const job = await jobService.createJob({
   title,
   description,
-  category,
+  serviceId,
   clientId: req.user.id,
   workerId,
   total_price

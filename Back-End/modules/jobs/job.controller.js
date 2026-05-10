@@ -95,6 +95,7 @@ exports.getAllJobs = async (req, res) => {
   }
 };
 
+
 exports.rejectJob = async (req, res) => {
   try {
     const job = await jobService.rejectJob(req.params.id, req.user.id);

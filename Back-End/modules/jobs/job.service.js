@@ -261,6 +261,13 @@ await job.save();
       // .populate("serviceId", "name base_price")
     }
     // return Job.find()
+     else if (user.role === "client") {
+    return Job.find(filter)
+      .populate("workerId", "name")
+      .populate("clientId", "name")
+      .populate("serviceId", "name")
+      .sort({ createdAt: -1 });
+  }
   }
 
   /* ================= ADMIN ================= */

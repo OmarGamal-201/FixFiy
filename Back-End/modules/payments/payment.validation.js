@@ -12,7 +12,9 @@ class PaymentValidator {
    */
   static async validateDepositPayment(jobId, clientId, requestingUserId) {
     // 1. Check authorization
-    if (clientId !== requestingUserId) {
+    if (clientId !== requestingUserId)
+      // ✅ صح
+  {
       throw new PaymentError(PaymentErrors.UNAUTHORIZED, {
         clientId,
         requestingUserId,

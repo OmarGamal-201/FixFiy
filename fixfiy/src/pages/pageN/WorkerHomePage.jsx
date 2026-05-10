@@ -2,6 +2,7 @@
 import React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { Star, CheckCircle, Clock, DollarSign } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./WorkerHomePage.css";
 import API from "../../services/api";
 
@@ -10,7 +11,7 @@ function WorkerHomePage() {
   const [requests, setRequests] = useState([]);
   const [workerName, setWorkerName] = useState("");
   const [profile, setProfile] = useState(null);
-
+  const location = useLocation();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,6 +29,9 @@ function WorkerHomePage() {
 
     fetchData();
   }, []);
+
+
+  
 
   const fetchRequests = async () => {
     try {
@@ -72,18 +76,36 @@ function WorkerHomePage() {
     ];
   }, [requests, profile]);
 
-  const handleAccept = async (jobId) => {
+  // const handleAccept = async (jobId) => {
+  //   try {
+  //     await API.patch(`/jobs/${jobId}/accept`);
+  //     fetchRequests();
+  //   } catch (err) {
+  //     console.log("Accept request error:", err);
+  //   }
+  // };
+
+  const handleAccept = async (request) => {
+    // التأكد من أن العميل دفع العربون أولاً
+    if (request.paymentStatus !== "DEPOSIT_PAID") {
+      alert("⚠️ لا يمكنك قبول الطلب بعد.. يجب على العميل دفع العربون أولاً.");
+      return;
+    }
+
     try {
-      await API.patch(`/jobs/${jobId}/accept`);
+      await API.patch(`/jobs/${request._id}/accept`);
+      // تحديث القائمة فوراً بعد القبول
       fetchRequests();
     } catch (err) {
+      const errorMsg = err.response?.data?.message || "حدث خطأ أثناء قبول الطلب";
+      alert(errorMsg);
       console.log("Accept request error:", err);
     }
   };
 
-  const handleReject = async (jobId) => {
+  const handleReject = async (request) => {
     try {
-      await API.patch(`/jobs/${jobId}/reject`);
+      await API.patch(`/jobs/${request._id}/reject`);
       fetchRequests();
     } catch (err) {
       console.log("Reject request error:", err);
@@ -145,8 +167,26 @@ function WorkerHomePage() {
                 <tr key={request._id}>
                   <td>{request._id.slice(-5)}</td>
                   <td>{request.clientId?.name || "-"}</td>
-                  <td>{request.serviceId?.name || "-"}</td>
-                  <td>{request.location || "-"}</td>
+                  <td>{request.serviceId?.name || request.title || "Unknown Service"}</td>
+                  <td>{request.location ? (
+    /* لو العميل بعت إحداثيات (Object) */
+    typeof request.location === 'object' && request.location.lat ? (
+      <a 
+        href={`https://www.google.com/maps?q=${request.location.lat},${request.location.lng}`} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        style={{ color: "#1976d2", fontWeight: "bold" }}
+      >
+        📍 لوكيشن العميل
+      </a>
+    ) : (
+      /* لو العميل كاتب عنوان نصي */
+      <span>{request.location}</span>
+    )
+  ) : (
+    /* fallback في حال عدم وجود لوكيشن في الطلب، نجيبه من ملف العميل */
+    <span>{request.clientId?.address || "غير محدد"}</span>
+  )}</td>
                   <td>
                     {request.createdAt
                       ? new Date(request.createdAt).toLocaleDateString()
@@ -168,14 +208,27 @@ function WorkerHomePage() {
                   <td>
                     {request.status === "PENDING" ? (
                       <div className="request-actions">
-                        <button
+                        {/* <button
                           className="accept-button"
                           onClick={() => handleAccept(request._id)}
                         >
                           Accept
-                        </button>
+                        </button> */}
                         <button
-                          className="reject-button"
+  className="accept-button"
+  onClick={() => handleAccept(request)}
+  // الزرار هيكون مطفي (Disabled) لو الدفع متمش
+  disabled={request.paymentStatus !== "DEPOSIT_PAID"}
+  style={{
+    backgroundColor: request.paymentStatus !== "DEPOSIT_PAID" ? "#ccc" : "#4caf50",
+    cursor: request.paymentStatus !== "DEPOSIT_PAID" ? "not-allowed" : "pointer",
+    opacity: request.paymentStatus !== "DEPOSIT_PAID" ? 0.7 : 1
+  }}
+>
+  {request.paymentStatus !== "DEPOSIT_PAID" ? "Waiting Deposit" : "Accept"}
+</button>
+                        <button
+                          className="reject-button" style={{ backgroundColor: "#f44336" }}
                           onClick={() => handleReject(request._id)}
                         >
                           Reject

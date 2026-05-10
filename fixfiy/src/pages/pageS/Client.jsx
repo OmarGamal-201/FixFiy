@@ -34,7 +34,7 @@ const ClientProfilePage = () => {
 
   if (loading) return <div className="loading-state">Loading profile...</div>;
 
-  const profileImageUrl = getProfileImageUrl(user?.profileImage);
+  const profileImageUrl = getProfileImageUrl(user?.profilePicture?.[0]?.url);
 
   //  حساب الإحصائيات
   const completed = bookings.filter(b => b.status === "completed").length;

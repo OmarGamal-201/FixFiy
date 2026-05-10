@@ -17,6 +17,21 @@ app.use(cors({
   origin: "http://localhost:5173",
   credentials: true
 }));
+
+//
+app.use((req, res, next) => {
+  res.removeHeader('Content-Security-Policy');
+  next();
+});
+
+
+/* ========================
+   CHROME DEVTOOLS FIX
+======================== */
+app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
+  res.json({});
+});
+
 /* ========================
    BASIC MIDDLEWARES
 ======================== */

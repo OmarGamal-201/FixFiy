@@ -48,15 +48,19 @@ const Sidebar = ({ userRole }) => {
         {/* ================= CLIENT ================= */}
         {userRole === 'client' && (
           <>
-            <div className={`menu-item ${isActive('/booking')}`} onClick={() => navigate('/booking')}>
+            {/* <div className={`menu-item ${isActive('/booking')}`} onClick={() => navigate('/booking')}>
               <ClipboardList size={20} />
               <span>Book Service</span>
-            </div>
+            </div> */}
 
-            <div className={`menu-item ${isActive('/my-bookings')}`} onClick={() => navigate('/my-bookings')}>
+            {/* <div className={`menu-item ${isActive('/my-bookings')}`} onClick={() => navigate('/my-bookings')}>
               <FileText size={20} />
               <span>My Bookings</span>
-            </div>
+            </div> */}
+            <div className={`menu-item ${isActive('/my-bookings')}`} onClick={() => navigate('/my-bookings')}>
+              <ClipboardList size={20} />
+              <span>My Jobs</span>
+            </div> 
 
             <div className={`menu-item ${isActive('/client-profile')}`} onClick={() => navigate('/client-profile')}>
               <User size={20} />
@@ -72,10 +76,10 @@ const Sidebar = ({ userRole }) => {
         {/* ================= WORKER ================= */}
         {userRole === 'technician' && (
           <>
-            <div className={`menu-item ${isActive('/my-bookings')}`} onClick={() => navigate('/my-bookings')}>
+            {/* <div className={`menu-item ${isActive('/technician-bookings')}`} onClick={() => navigate('/technician-bookings')}>
               <ClipboardList size={20} />
               <span>My Jobs</span>
-            </div>
+            </div> */}
 
             <div className={`menu-item ${isActive('/worker-profile')}`} onClick={() => navigate('/worker-profile')}>
               <User size={20} />

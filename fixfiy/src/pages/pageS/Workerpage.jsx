@@ -32,7 +32,7 @@ const getProfileImageUrl = (image) => {
   if (!user) return <div className="error-state">Profile not found</div>;
 
   const rating = user.technician_rate || 0;
-const profileImageUrl = getProfileImageUrl(user?.profileImage);
+const profileImageUrl = getProfileImageUrl(user?.profilePicture?.[0]?.url);
   return (
     <div className="worker-profile-container"> {/* Reusing container class for consistent padding */}
       
@@ -59,7 +59,7 @@ const profileImageUrl = getProfileImageUrl(user?.profileImage);
                   {user.name?.charAt(0).toUpperCase()}
                 </span>
               )}
-              <span className="online-indicator"></span>
+              {/* <span className="online-indicator"></span> */}
             </div>
             {/* <div className="avatar-circle">
               <span className="online-indicator"></span>

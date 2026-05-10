@@ -29,6 +29,8 @@ import ServicesManagementPage from './pages/pageN/ServicesManagementPage';
 import WelcomePage from './pages/pageH/WelcomPage';
 import ServiceWorkersPage from './pages/pageH/ServiceWorkers';
 import MyBookings from './pages/pageA/MyBookings';
+import PaymentCallback from './pages/pageA/PaymentCallback';
+// import TechnicianBookings from './pages/pageA/TechnicianBookings';
 //import Chat from './pages/pageA/Chat';
 function AppContent() {
 
@@ -145,10 +147,12 @@ function AppContent() {
             <Route path="/booking" element={<Booking />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/payments" element={<Payments />} />
+            <Route path="/payment-callback" element={<PaymentCallback />} />
             <Route path="/wallet" element={<Waallet />} />
             <Route path="/withdraw-admin" element={<WithdrawAdmin />} />
             <Route path="/withdraw-worker" element={<Withdrawworker />} />
             <Route path="/chat" element={<Chat />} />
+            {/* <Route path='/technicain-bookings'element={<TechnicianBookings />} /> */}
            {/* <Route path="/chat" element={<Chat />} /> */}
             <Route path="/chat/:conversationId" element={<Chat />} />
             {/* <Route path="/setting-home" element={<SettingHome />} /> */}

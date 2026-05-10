@@ -1,41 +1,61 @@
+
+
+///222
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { MapPin } from "lucide-react";
+
 import "./Booking.css";
 import API from "../../services/api";
 
 const Booking = () => {
   const location = useLocation();
-
-  // 1. استخراج المعرفات من الرابط
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const serviceIdFromUrl = queryParams.get("serviceId") || "";
   const workerIdFromUrl = queryParams.get("workerId") || "";
 
-  // 2. إعداد الحالة (State) 
-  const [services, setServices] = useState([]); // كل الخدمات
-  const [workerCategory, setWorkerCategory] = useState(""); // تخصص العامل
+  const [services, setServices] = useState([]);
+  const [workerCategory, setWorkerCategory] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({ type: "", text: "" });
 
-  // إعداد الحالة الخاصة ببيانات الحجز (ضفنا فيها السعر)
   const [jobData, setJobData] = useState({
     title: "",
     description: "",
     category: "",
-    price: "", // الخانة الجديدة للتكلفة
+    price: "",
     serviceId: serviceIdFromUrl,
     workerId: workerIdFromUrl,
+    location: null, // تأكدي من وجودها هنا
   });
 
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ type: "", text: "" });
+  // جلب الموقع
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setJobData((prev) => ({
+            ...prev,
+            location: {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            },
+          }));
+        },
+        (error) => console.error("Error getting location:", error)
+      );
+    }
+  }, []);
 
-  // 3. جلب بيانات العامل عشان نعرف تخصصه
+  // جلب بيانات العامل
   useEffect(() => {
     const fetchWorkerData = async () => {
       if (workerIdFromUrl) {
         try {
           const res = await API.get(`/profile/${workerIdFromUrl}`);
           if (res.data && res.data.success) {
-            setWorkerCategory(res.data.data.specialty); 
+            setWorkerCategory(res.data.data.specialty);
           }
         } catch (error) {
           console.error("Error fetching worker data:", error);
@@ -45,7 +65,7 @@ const Booking = () => {
     fetchWorkerData();
   }, [workerIdFromUrl]);
 
-  // 4. جلب كل الخدمات من الباك إند
+  // جلب الخدمات
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -60,29 +80,22 @@ const Booking = () => {
     fetchServices();
   }, []);
 
-  // 5. تحديث الـ Category والـ Price لو الـ serviceId جاي من الرابط تلقائياً
+  // تحديث البيانات بناءً على الرابط
   useEffect(() => {
-    let matchedCategory = "";
-    let matchedPrice = "";
-
-    if (serviceIdFromUrl && services.length > 0) {
+    if (services.length > 0) {
       const matchedService = services.find((s) => s._id === serviceIdFromUrl);
-      if (matchedService) {
-        matchedCategory = matchedService.category;
-        matchedPrice = matchedService.base_price || 0; // سحب السعر من الخدمة
-      }
+      setJobData((prev) => ({
+        ...prev,
+        serviceId: serviceIdFromUrl,
+        workerId: workerIdFromUrl,
+        category: matchedService ? matchedService.category : prev.category,
+        price: matchedService ? matchedService.base_price : prev.price,
+      }));
     }
-
-    setJobData((prev) => ({
-      ...prev,
-      serviceId: serviceIdFromUrl,
-      workerId: workerIdFromUrl,
-      ...(matchedCategory && { category: matchedCategory }),
-      ...(matchedPrice !== "" && { price: matchedPrice }),
-    }));
   }, [serviceIdFromUrl, workerIdFromUrl, services]);
 
-  // دالة التعامل مع التغيير في الحقول العادية
+  
+
   const handleChange = (e) => {
     setJobData({
       ...jobData,
@@ -90,7 +103,6 @@ const Booking = () => {
     });
   };
 
-  // دالة التعامل مع تغيير اختيار الخدمة من القائمة (عشان نحدث السعر)
   const handleServiceChange = (e) => {
     const selectedServiceId = e.target.value;
     const selectedService = services.find((s) => s._id === selectedServiceId);
@@ -99,35 +111,99 @@ const Booking = () => {
       ...prev,
       serviceId: selectedServiceId,
       category: selectedService ? selectedService.category : "",
-      price: selectedService ? selectedService.base_price || 0 : "", // تحديث السعر بناءً على الاختيار
+      price: selectedService ? selectedService.base_price || 0 : "",
     }));
   };
 
-  const handleSubmit = async (e) => {
+  // --- دالة واحدة فقط للـ Submit لمنع تضارب الكود ---
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const { title, description, serviceId, workerId, price } = jobData;
+
+  //   // التحقق من الحقول
+  //   if (!title?.trim() || !description?.trim() || !serviceId || !workerId) {
+  //     setStatus({ type: "error", text: "Please fill all required fields." });
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   setStatus({ type: "", text: "" });
+
+  //   try {
+  //     const res = await API.post("/jobs", {
+  //       title: title.trim(),
+  //       description: description.trim(),
+  //       total_price: Number(price),
+  //       serviceId,
+  //       workerId,
+  //     });
+
+  //     setStatus({ type: "success", text: "Booking created successfully!" });
+      
+  //     // تصفير الفورم
+  //     setJobData((prev) => ({
+  //       ...prev,
+  //       title: "",
+  //       description: "",
+  //     }));
+  //   } catch (error) {
+  //     const message = error.response?.data?.message || "Error creating booking.";
+  //     setStatus({ type: "error", text: message });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+// const handleSubmit = async (e) => {
+//   e.preventDefault();
+//   const { title, description, serviceId, workerId, price } = jobData;
+
+//   if (!title?.trim() || !description?.trim() || !serviceId || !workerId) {
+//     setStatus({ type: "error", text: "Please fill all required fields." });
+//     return;
+//   }
+
+//   setLoading(true);
+//   setStatus({ type: "", text: "" });
+
+//   try {
+//     const res = await API.post("/jobs", {
+//       title: title.trim(),
+//       description: description.trim(),
+//       total_price: Number(price),
+//       serviceId,
+//       workerId,
+//     });
+
+//     // التعديل هنا: التوجه لصفحة الدفع مباشرة
+//     if (res.data && res.data.success) {
+//       const createdJobId = res.data.data._id;
+//       setStatus({ type: "success", text: "Booking created! Redirecting to payment..." });
+      
+//       // التوجه لصفحة الدفع بعد ثانية واحدة
+//       setTimeout(() => {
+//         navigate(`/payments?jobId=${createdJobId}`);
+//       }, 1000);
+//     }
+
+//   } catch (error) {
+//     const message = error.response?.data?.message || "Error creating booking.";
+//     setStatus({ type: "error", text: message });
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+
+
+const handleSubmit = async (e) => {
     e.preventDefault();
+    // استخراج الحقول من jobData بما فيها الـ location
+    const { title, description, serviceId, workerId, price, location } = jobData;
 
-    console.log("Current jobData before submit:", jobData);
-
-    const { title, description, workerId, serviceId, price } = jobData;
-
-    // التحقق المحسن
-    if (
-      !title ||
-      title.trim() === "" ||
-      !description ||
-      description.trim() === "" ||
-      !serviceId
-    ) {
-      let missing = [];
-      if (!title?.trim()) missing.push("Title");
-      if (!description?.trim()) missing.push("Description");
-      if (!serviceId) missing.push("Service");
-      if (!workerId) missing.push("Worker ID (from URL)");
-
-      setStatus({
-        type: "error",
-        text: `Missing fields: ${missing.join(", ")}`,
-      });
+    // 1. التحقق من الحقول المطلوبة
+    if (!title?.trim() || !description?.trim() || !serviceId || !workerId) {
+      setStatus({ type: "error", text: "Please fill all required fields." });
       return;
     }
 
@@ -135,40 +211,43 @@ const Booking = () => {
     setStatus({ type: "", text: "" });
 
     try {
-      // إرسال البيانات بما فيها السعر للباك إند
+      // 2. إرسال الطلب مع تأمين البيانات
       const res = await API.post("/jobs", {
         title: title.trim(),
         description: description.trim(),
-        // category: category.trim(),
-        total_price: Number(price), // حولناها لرقم عشان الموديل بتاعك
+        // تحويل السعر لرقم أو إرسال 0 لتجنب خطأ toFixed في السيرفر
+        total_price: Number(price) || 0, 
         serviceId,
-        workerId: jobData.workerId,
+        workerId,
+        location: location, // إرسال الموقع الجغرافي
       });
 
-      setStatus({ type: "success", text: "Booking created successfully!" });
-      // تصفير الحقول بعد النجاح
-      setJobData((prev) => ({
-        ...prev,
-        title: "",
-        description: "",
-        serviceId: "",
-        // category: "",
-        total_price: "",
-      }));
+      if (res.data && res.data.success) {
+        const createdJobId = res.data.data._id;
+        setStatus({ type: "success", text: "Booking created! Redirecting to payment..." });
+        
+        // 3. التوجه لصفحة الدفع بعد نجاح الحجز
+        setTimeout(() => {
+          navigate(`/payments?jobId=${createdJobId}`);
+        }, 1000);
+      }
+
     } catch (error) {
-      const message =
-        error.response?.data?.message || "Error creating booking.";
+      // طباعة الخطأ في الكونسول لمعرفة السبب الحقيقي لو فشل
+      console.error("Booking Submission Error:", error.response?.data);
+      const message = error.response?.data?.message || "Error creating booking.";
       setStatus({ type: "error", text: message });
     } finally {
       setLoading(false);
     }
   };
 
-  // ----- الفلترة هنا -----
   const filteredServices = workerCategory
     ? services.filter((service) => service.category === workerCategory)
     : services;
-
+console.log("Worker Category:", workerCategory);
+console.log("All Services:", services);
+console.log("Filtered Results:", filteredServices);
   return (
     <div className="booking-page">
       <div className="booking-container">
@@ -180,14 +259,18 @@ const Booking = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            <label htmlFor="title">Job Title</label>
+            <div className="location-info-bar">
+              <MapPin size={16} />
+              <span>{jobData.location ? "Location captured ✅" : "Capturing location..."}</span>
+            </div>
+
+            <label>Job Title (Summary)</label>
             <input
-              id="title"
               type="text"
               name="title"
               value={jobData.title}
               onChange={handleChange}
-              placeholder="e.g., Fix electricity issue"
+              placeholder="e.g., Fixing a lamp"
             />
 
             <label htmlFor="description">Detailed Description</label>
@@ -207,22 +290,26 @@ const Booking = () => {
               onChange={handleServiceChange}
             >
               <option value="">Choose a service...</option>
-              {filteredServices.map((service) => (
+              {/* {filteredServices.map((service) => (
                 <option key={service._id} value={service._id}>
                   {service.name} ({service.category})
                 </option>
-              ))}
+              ))} */}
+              {(filteredServices.length > 0 ? filteredServices : services).map((service) => (
+    <option key={service._id} value={service._id}>
+      {service.name}
+    </option>
+  ))}
             </select>
 
-            {/* الخانة الجديدة لعرض التكلفة */}
             <label htmlFor="price">Estimated Cost (EGP)</label>
             <input
               id="price"
               type="number"
               name="price"
               value={jobData.price}
-              readOnly // خليناها readOnly عشان العميل ميغيرش السعر الثابت للخدمة
-              className="readonly-input" // ممكن تديها كلاس CSS يخلي لونها باهت شوية عشان تبان إنها للعرض بس
+              readOnly
+              className="readonly-input"
               placeholder="Select a service to see the price"
             />
 

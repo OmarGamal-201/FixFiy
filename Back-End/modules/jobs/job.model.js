@@ -140,6 +140,8 @@ jobSchema.virtual("commission_amount").get(function () {
 jobSchema.virtual("provider_earnings").get(function () {
   return +(this.total_price - this.commission_amount).toFixed(2);
 });
+
+
 jobSchema.virtual("uiState").get(function () {
   return {
     canReview: this.status === "DONE" && !this.reviewId,

@@ -5,6 +5,7 @@ const Payment = require("../payments/payment.model");
 const AuditLog = require("./auditLog.model");
 const SystemSettings = require("./systemSettings.model");
 const jobService = require("../jobs/job.service");
+
 const { createNotification } =
   require("../notifications/notification.service");
 const { emitNotification } =
@@ -38,7 +39,51 @@ const getDashboardStats = async () => {
     0
   );
 
-  return { users, jobs, revenue };
+  const paidDeposits = await Payment.aggregate([
+  {
+    $match: {
+      type: "DEPOSIT",
+      status: "PAID",
+      heldBy: "PLATFORM",
+    },
+  },
+  {
+    $group: {
+      _id: null,
+      total: { $sum: "$amount" },
+    },
+  },
+]);
+
+const finalPayments = await Payment.aggregate([
+  {
+    $match: {
+      type: "FINAL",
+      status: "PAID",
+    },
+  },
+  {
+    $group: {
+      _id: null,
+      total: { $sum: "$amount" },
+    },
+  },
+]);
+
+const platformBalance = paidDeposits[0]?.total || 0;
+const releasedToWorkers = finalPayments[0]?.total || 0;
+
+return {
+  users,
+  jobs,
+  revenue,
+
+  finance: {
+    platformBalance,
+    releasedToWorkers,
+    totalDeposits: platformBalance + releasedToWorkers,
+  },
+};
 };
 
 /* ================= ANALYTICS ================= */

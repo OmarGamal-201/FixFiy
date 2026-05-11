@@ -15,6 +15,7 @@ const notificationSchema = new mongoose.Schema(
         // 💬 Messaging
         "NEW_MESSAGE",
 
+        "NEW_REVIEW",
         // 🧰 Jobs
         "JOB_CREATED",
         "JOB_ACCEPTED",
@@ -24,7 +25,14 @@ const notificationSchema = new mongoose.Schema(
         "JOB_CANCELLED",
         "JOB_DISPUTED",
 
-        // 💰 Payments
+        // � Proposals
+        "NEW_PROPOSAL",
+        "PROPOSAL_ACCEPTED",
+        "PROPOSAL_REJECTED",
+        "PROPOSAL_WITHDRAWN",
+        "PROPOSAL_ASSIGNED",
+
+        // �💰 Payments
         "PAYMENT_INITIATED",
         "PAYMENT_COMPLETED",
         "PAYMENT_FAILED",

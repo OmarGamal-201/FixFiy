@@ -1,321 +1,725 @@
+import React, {
+  useState,
+  useEffect,
+} from "react";
 
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
-///222
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { MapPin } from "lucide-react";
+import {
+  MapPin,
+  AlertCircle,
+} from "lucide-react";
 
 import "./Booking.css";
 import API from "../../services/api";
 
 const Booking = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const queryParams = new URLSearchParams(location.search);
-  const serviceIdFromUrl = queryParams.get("serviceId") || "";
-  const workerIdFromUrl = queryParams.get("workerId") || "";
 
-  const [services, setServices] = useState([]);
-  const [workerCategory, setWorkerCategory] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ type: "", text: "" });
+  const location =
+    useLocation();
 
-  const [jobData, setJobData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    price: "",
-    serviceId: serviceIdFromUrl,
-    workerId: workerIdFromUrl,
-    location: null, // تأكدي من وجودها هنا
-  });
+  const navigate =
+    useNavigate();
 
-  // جلب الموقع
+  const queryParams =
+    new URLSearchParams(
+      location.search
+    );
+
+  const serviceIdFromUrl =
+    queryParams.get(
+      "serviceId"
+    ) || "";
+
+  const workerIdFromUrl =
+    queryParams.get(
+      "workerId"
+    ) || "";
+
+  const [services, setServices] =
+    useState([]);
+
+  const [
+    workerCategory,
+    setWorkerCategory,
+  ] = useState("");
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [status, setStatus] =
+    useState({
+      type: "",
+      text: "",
+    });
+
+  const [
+    bookingType,
+    setBookingType,
+  ] = useState(
+    workerIdFromUrl
+      ? "DIRECT"
+      : "OPEN"
+  );
+
+  const [jobData, setJobData] =
+    useState({
+      title: "",
+      description: "",
+      category: "",
+      price: "",
+      serviceId:
+        serviceIdFromUrl,
+      workerId:
+        workerIdFromUrl,
+      location: null,
+    });
+
+  /* ================= LOCATION ================= */
+
   useEffect(() => {
-    if ("geolocation" in navigator) {
+
+    if (
+      "geolocation" in navigator
+    ) {
+
       navigator.geolocation.getCurrentPosition(
+
         (position) => {
-          setJobData((prev) => ({
-            ...prev,
-            location: {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            },
-          }));
+
+          setJobData(
+            (prev) => ({
+              ...prev,
+
+              location: {
+                lat:
+                  position.coords.latitude,
+
+                lng:
+                  position.coords.longitude,
+              },
+            })
+          );
         },
-        (error) => console.error("Error getting location:", error)
+
+        (error) =>
+          console.error(
+            "Location Error:",
+            error
+          )
       );
     }
   }, []);
 
-  // جلب بيانات العامل
-  useEffect(() => {
-    const fetchWorkerData = async () => {
-      if (workerIdFromUrl) {
-        try {
-          const res = await API.get(`/profile/${workerIdFromUrl}`);
-          if (res.data && res.data.success) {
-            setWorkerCategory(res.data.data.specialty);
-          }
-        } catch (error) {
-          console.error("Error fetching worker data:", error);
-        }
-      }
-    };
-    fetchWorkerData();
-  }, [workerIdFromUrl]);
+  /* ================= SERVICES ================= */
 
-  // جلب الخدمات
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const res = await API.get("/services");
-        if (res.data && res.data.success) {
-          setServices(res.data.data);
+
+    const fetchServices =
+      async () => {
+
+        try {
+
+          const res =
+            await API.get(
+              "/services"
+            );
+
+          if (
+            res.data.success
+          ) {
+
+            setServices(
+              res.data.data
+            );
+          }
+
+        } catch (error) {
+
+          console.error(
+            error
+          );
         }
-      } catch (error) {
-        console.error("Error fetching services:", error);
-      }
-    };
+      };
+
     fetchServices();
+
   }, []);
 
-  // تحديث البيانات بناءً على الرابط
+  /* ================= WORKER ================= */
+
   useEffect(() => {
-    if (services.length > 0) {
-      const matchedService = services.find((s) => s._id === serviceIdFromUrl);
-      setJobData((prev) => ({
-        ...prev,
-        serviceId: serviceIdFromUrl,
-        workerId: workerIdFromUrl,
-        category: matchedService ? matchedService.category : prev.category,
-        price: matchedService ? matchedService.base_price : prev.price,
-      }));
+
+    const fetchWorker =
+      async () => {
+
+        if (
+          !workerIdFromUrl
+        )
+          return;
+
+        try {
+
+          const res =
+            await API.get(
+              `/profile/${workerIdFromUrl}`
+            );
+
+          if (
+            res.data.success
+          ) {
+
+            setWorkerCategory(
+              res.data.data
+                .specialty
+            );
+          }
+
+        } catch (error) {
+
+          console.error(
+            error
+          );
+        }
+      };
+
+    fetchWorker();
+
+  }, [workerIdFromUrl]);
+
+  /* ================= PREFILL ================= */
+
+  useEffect(() => {
+
+    if (
+      services.length > 0
+    ) {
+
+      const matchedService =
+        services.find(
+          (s) =>
+            s._id ===
+            serviceIdFromUrl
+        );
+
+      setJobData(
+        (prev) => ({
+          ...prev,
+
+          serviceId:
+            serviceIdFromUrl,
+
+          workerId:
+            workerIdFromUrl,
+
+          category:
+            matchedService
+              ?.category || "",
+
+          price:
+            matchedService
+              ?.base_price || 0,
+        })
+      );
     }
-  }, [serviceIdFromUrl, workerIdFromUrl, services]);
 
-  
+  }, [
+    services,
+    serviceIdFromUrl,
+    workerIdFromUrl,
+  ]);
 
-  const handleChange = (e) => {
+  /* ================= FILTERED SERVICES ================= */
+
+  const filteredServices =
+    workerCategory
+
+      ? services.filter(
+          (service) =>
+            service.category ===
+            workerCategory
+        )
+
+      : services;
+
+  /* ================= CHANGE ================= */
+
+  const handleChange = (
+    e
+  ) => {
+
     setJobData({
       ...jobData,
-      [e.target.name]: e.target.value,
+
+      [e.target.name]:
+        e.target.value,
     });
   };
 
-  const handleServiceChange = (e) => {
-    const selectedServiceId = e.target.value;
-    const selectedService = services.find((s) => s._id === selectedServiceId);
+  /* ================= SERVICE CHANGE ================= */
 
-    setJobData((prev) => ({
-      ...prev,
-      serviceId: selectedServiceId,
-      category: selectedService ? selectedService.category : "",
-      price: selectedService ? selectedService.base_price || 0 : "",
-    }));
-  };
+  const handleServiceChange =
+    (e) => {
 
-  // --- دالة واحدة فقط للـ Submit لمنع تضارب الكود ---
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const { title, description, serviceId, workerId, price } = jobData;
+      const selectedServiceId =
+        e.target.value;
 
-  //   // التحقق من الحقول
-  //   if (!title?.trim() || !description?.trim() || !serviceId || !workerId) {
-  //     setStatus({ type: "error", text: "Please fill all required fields." });
-  //     return;
-  //   }
+      const selectedService =
+        services.find(
+          (s) =>
+            s._id ===
+            selectedServiceId
+        );
 
-  //   setLoading(true);
-  //   setStatus({ type: "", text: "" });
+      setJobData(
+        (prev) => ({
+          ...prev,
 
-  //   try {
-  //     const res = await API.post("/jobs", {
-  //       title: title.trim(),
-  //       description: description.trim(),
-  //       total_price: Number(price),
-  //       serviceId,
-  //       workerId,
-  //     });
+          serviceId:
+            selectedServiceId,
 
-  //     setStatus({ type: "success", text: "Booking created successfully!" });
-      
-  //     // تصفير الفورم
-  //     setJobData((prev) => ({
-  //       ...prev,
-  //       title: "",
-  //       description: "",
-  //     }));
-  //   } catch (error) {
-  //     const message = error.response?.data?.message || "Error creating booking.";
-  //     setStatus({ type: "error", text: message });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+          category:
+            selectedService
+              ?.category || "",
 
-// const handleSubmit = async (e) => {
-//   e.preventDefault();
-//   const { title, description, serviceId, workerId, price } = jobData;
+          price:
+            selectedService
+              ?.base_price || 0,
+        })
+      );
+    };
 
-//   if (!title?.trim() || !description?.trim() || !serviceId || !workerId) {
-//     setStatus({ type: "error", text: "Please fill all required fields." });
-//     return;
-//   }
+  /* ================= SUBMIT ================= */
 
-//   setLoading(true);
-//   setStatus({ type: "", text: "" });
+  const handleSubmit =
+    async (e) => {
 
-//   try {
-//     const res = await API.post("/jobs", {
-//       title: title.trim(),
-//       description: description.trim(),
-//       total_price: Number(price),
-//       serviceId,
-//       workerId,
-//     });
+      e.preventDefault();
 
-//     // التعديل هنا: التوجه لصفحة الدفع مباشرة
-//     if (res.data && res.data.success) {
-//       const createdJobId = res.data.data._id;
-//       setStatus({ type: "success", text: "Booking created! Redirecting to payment..." });
-      
-//       // التوجه لصفحة الدفع بعد ثانية واحدة
-//       setTimeout(() => {
-//         navigate(`/payments?jobId=${createdJobId}`);
-//       }, 1000);
-//     }
-
-//   } catch (error) {
-//     const message = error.response?.data?.message || "Error creating booking.";
-//     setStatus({ type: "error", text: message });
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-
-
-
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    // استخراج الحقول من jobData بما فيها الـ location
-    const { title, description, serviceId, workerId, price, location } = jobData;
-
-    // 1. التحقق من الحقول المطلوبة
-    if (!title?.trim() || !description?.trim() || !serviceId || !workerId) {
-      setStatus({ type: "error", text: "Please fill all required fields." });
-      return;
-    }
-
-    setLoading(true);
-    setStatus({ type: "", text: "" });
-
-    try {
-      // 2. إرسال الطلب مع تأمين البيانات
-      const res = await API.post("/jobs", {
-        title: title.trim(),
-        description: description.trim(),
-        // تحويل السعر لرقم أو إرسال 0 لتجنب خطأ toFixed في السيرفر
-        total_price: Number(price) || 0, 
+      const {
+        title,
+        description,
         serviceId,
-        workerId,
-        location: location, // إرسال الموقع الجغرافي
-      });
+        location,
+      } = jobData;
 
-      if (res.data && res.data.success) {
-        const createdJobId = res.data.data._id;
-        setStatus({ type: "success", text: "Booking created! Redirecting to payment..." });
-        
-        // 3. التوجه لصفحة الدفع بعد نجاح الحجز
-        setTimeout(() => {
-          navigate(`/payments?jobId=${createdJobId}`);
-        }, 1000);
+      if (
+        !title?.trim() ||
+        !description?.trim() ||
+        !serviceId
+      ) {
+
+        setStatus({
+          type: "error",
+
+          text:
+            "Please fill all required fields.",
+        });
+
+        return;
       }
 
-    } catch (error) {
-      // طباعة الخطأ في الكونسول لمعرفة السبب الحقيقي لو فشل
-      console.error("Booking Submission Error:", error.response?.data);
-      const message = error.response?.data?.message || "Error creating booking.";
-      setStatus({ type: "error", text: message });
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (
+        bookingType ===
+          "DIRECT" &&
+        !jobData.workerId
+      ) {
 
-  const filteredServices = workerCategory
-    ? services.filter((service) => service.category === workerCategory)
-    : services;
-console.log("Worker Category:", workerCategory);
-console.log("All Services:", services);
-console.log("Filtered Results:", filteredServices);
+        setStatus({
+          type: "error",
+
+          text:
+            "Please select a technician.",
+        });
+
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+
+        const payload = {
+
+          title:
+            title.trim(),
+
+          description:
+            description.trim(),
+
+          serviceId,
+
+          location,
+
+          bookingType,
+        };
+
+        // DIRECT
+
+        if (
+          bookingType ===
+          "DIRECT"
+        ) {
+
+          payload.workerId =
+            jobData.workerId;
+        }
+
+        const res =
+          await API.post(
+            "/jobs",
+            payload
+          );
+
+        if (
+          res.data.success
+        ) {
+
+          const createdJobId =
+            res.data.data._id;
+
+          setStatus({
+            type: "success",
+
+            text:
+              bookingType ===
+              "DIRECT"
+
+                ? "Booking created successfully!"
+
+                : "Open request created successfully!",
+          });
+
+          setTimeout(() => {
+
+            if (
+              bookingType ===
+              "DIRECT"
+            ) {
+
+              navigate(
+                `/payments?jobId=${createdJobId}`
+              );
+            }
+
+            else {
+
+              navigate(
+                `/jobs/${createdJobId}/proposals`
+              );
+            }
+
+          }, 1000);
+        }
+
+      } catch (error) {
+
+        console.error(
+          error.response?.data
+        );
+
+        setStatus({
+          type: "error",
+
+          text:
+            error.response?.data
+              ?.message ||
+
+            "Error creating booking",
+        });
+
+      } finally {
+
+        setLoading(false);
+      }
+    };
+
   return (
     <div className="booking-page">
+
       <div className="booking-container">
+
         <div className="booking-card">
-          <h2>Booking Request</h2>
+
+          <h2>
+            Create Booking
+          </h2>
 
           {status.text && (
-            <div className={`message-box ${status.type}`}>{status.text}</div>
+
+            <div
+              className={`message-box ${status.type}`}
+            >
+
+              {status.type ===
+                "error" && (
+                <AlertCircle
+                  size={16}
+                />
+              )}
+
+              {status.text}
+            </div>
           )}
 
-          <form onSubmit={handleSubmit}>
+          {/* BOOKING TYPE */}
+
+          <div className="booking-type-section">
+
+            <label>
+              Booking Type
+            </label>
+
+            <div className="booking-type-options">
+
+              {/* DIRECT */}
+
+              <div
+                className={`type-option ${
+                  bookingType ===
+                  "DIRECT"
+                    ? "active"
+                    : ""
+                } ${
+                  !workerIdFromUrl
+                    ? "disabled"
+                    : ""
+                }`}
+                onClick={() => {
+
+                  if (
+                    !workerIdFromUrl
+                  )
+                    return;
+
+                  setBookingType(
+                    "DIRECT"
+                  );
+
+                  setJobData(
+                    (prev) => ({
+                      ...prev,
+
+                      workerId:
+                        workerIdFromUrl,
+                    })
+                  );
+                }}
+              >
+
+                <div className="type-icon">
+                  📍
+                </div>
+
+                <div className="type-text">
+
+                  <h4>
+                    Direct Booking
+                  </h4>
+
+                  <p>
+                    Book a specific technician
+                  </p>
+
+                </div>
+              </div>
+
+              {/* OPEN */}
+
+              <div
+                className={`type-option ${
+                  bookingType ===
+                  "OPEN"
+                    ? "active"
+                    : ""
+                }`}
+                onClick={() => {
+
+                  setBookingType(
+                    "OPEN"
+                  );
+
+                  setJobData(
+                    (prev) => ({
+                      ...prev,
+
+                      workerId:
+                        "",
+                    })
+                  );
+                }}
+              >
+
+                <div className="type-icon">
+                  🔓
+                </div>
+
+                <div className="type-text">
+
+                  <h4>
+                    Open Request
+                  </h4>
+
+                  <p>
+                    Receive technician proposals
+                  </p>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* FORM */}
+
+          <form
+            onSubmit={
+              handleSubmit
+            }
+          >
+
             <div className="location-info-bar">
-              <MapPin size={16} />
-              <span>{jobData.location ? "Location captured ✅" : "Capturing location..."}</span>
+
+              <MapPin
+                size={16}
+              />
+
+              <span>
+                {jobData.location
+
+                  ? "Location captured successfully"
+
+                  : "Capturing location..."}
+              </span>
+
             </div>
 
-            <label>Job Title (Summary)</label>
+            {/* TITLE */}
+
+            <label>
+              Job Title
+            </label>
+
             <input
               type="text"
               name="title"
-              value={jobData.title}
-              onChange={handleChange}
-              placeholder="e.g., Fixing a lamp"
+              value={
+                jobData.title
+              }
+              onChange={
+                handleChange
+              }
+              placeholder="Enter title"
+              required
             />
 
-            <label htmlFor="description">Detailed Description</label>
+            {/* DESCRIPTION */}
+
+            <label>
+              Description
+            </label>
+
             <textarea
-              id="description"
               name="description"
-              value={jobData.description}
-              onChange={handleChange}
-              placeholder="Describe the issue in detail..."
+              value={
+                jobData.description
+              }
+              onChange={
+                handleChange
+              }
+              placeholder="Describe the issue..."
+              required
             />
 
-            <label htmlFor="service">Select Service</label>
+            {/* SERVICE */}
+
+            <label>
+              Service
+            </label>
+
             <select
-              id="service"
-              name="serviceId"
-              value={jobData.serviceId}
-              onChange={handleServiceChange}
+              value={
+                jobData.serviceId
+              }
+              onChange={
+                handleServiceChange
+              }
             >
-              <option value="">Choose a service...</option>
-              {/* {filteredServices.map((service) => (
-                <option key={service._id} value={service._id}>
-                  {service.name} ({service.category})
-                </option>
-              ))} */}
-              {(filteredServices.length > 0 ? filteredServices : services).map((service) => (
-    <option key={service._id} value={service._id}>
-      {service.name}
-    </option>
-  ))}
+
+              <option value="">
+                Select Service
+              </option>
+
+              {filteredServices.map(
+                (service) => (
+
+                  <option
+                    key={
+                      service._id
+                    }
+                    value={
+                      service._id
+                    }
+                  >
+                    {service.name}
+                  </option>
+                )
+              )}
             </select>
 
-            <label htmlFor="price">Estimated Cost (EGP)</label>
+            {/* FIXED PRICE */}
+
+            <label>
+              Service Price
+            </label>
+
             <input
-              id="price"
               type="number"
-              name="price"
-              value={jobData.price}
+              value={
+                jobData.price
+              }
               readOnly
               className="readonly-input"
-              placeholder="Select a service to see the price"
             />
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Processing..." : "Book Now"}
+            {/* OPEN NOTE */}
+
+            {bookingType ===
+              "OPEN" && (
+
+              <div className="open-booking-note">
+
+                <small className="text-muted">
+
+                  Technicians will compete using experience and response quality — not pricing.
+
+                </small>
+
+              </div>
+            )}
+
+            {/* BUTTON */}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="submit-btn"
+            >
+
+              {loading
+
+                ? "Processing..."
+
+                : bookingType ===
+                  "DIRECT"
+
+                ? "Book Now"
+
+                : "Post Request"}
             </button>
+
           </form>
         </div>
       </div>

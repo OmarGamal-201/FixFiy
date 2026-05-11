@@ -5,24 +5,43 @@ const jobService = require("./job.service");
 exports.createJob = async (req, res) => {
   try {
     const {
-  title,
-  description,
-  serviceId,
-  workerId,
-  total_price
-} = req.body;
+      title,
+      description,
+      serviceId,
+      workerId,
+      bookingType = "DIRECT",
+      total_price
+    } = req.body;
 
-if (!title || !description || !serviceId || !workerId || !total_price)
-  throw new Error("Missing required fields");
+    // Validate required fields
+    if (!title || !description || !serviceId) {
+      throw new Error("Missing required fields: title, description, serviceId");
+    }
 
-const job = await jobService.createJob({
-  title,
-  description,
-  serviceId,
-  clientId: req.user.id,
-  workerId,
-  total_price
-});
+    // Validate booking type
+    if (!["DIRECT", "OPEN"].includes(bookingType)) {
+      throw new Error("bookingType must be either DIRECT or OPEN");
+    }
+
+    // DIRECT booking requires workerId
+    if (bookingType === "DIRECT" && !workerId) {
+      throw new Error("workerId is required for DIRECT bookings");
+    }
+
+    // OPEN booking must not have workerId
+    if (bookingType === "OPEN" && workerId) {
+      throw new Error("workerId must not be provided for OPEN bookings");
+    }
+
+    const job = await jobService.createJob({
+      title,
+      description,
+      serviceId,
+      clientId: req.user.id,
+      workerId: bookingType === "DIRECT" ? workerId : null,
+      bookingType,
+      total_price
+    });
 
     res.status(201).json({ success: true, data: job });
   } catch (err) {

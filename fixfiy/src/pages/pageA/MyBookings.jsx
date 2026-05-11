@@ -1,6 +1,6 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   MessageSquare,
   Loader2,
@@ -9,262 +9,602 @@ import {
   CreditCard,
   Star,
   XCircle,
+  Eye,
 } from "lucide-react";
+
 import API from "../../services/api";
+
 import "./MyBookings.css";
 
 const MyBookings = () => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
-  // قراءة الـ role
+  const [jobs, setJobs] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState(null);
+
+  const navigate =
+    useNavigate();
+
+  // ================= ROLE =================
+
   const userRole = (
-    localStorage.getItem("role") ||
-    localStorage.getItem("userRole")
+    localStorage.getItem(
+      "role"
+    ) ||
+    localStorage.getItem(
+      "userRole"
+    )
   )?.toLowerCase();
 
   useEffect(() => {
-    if (userRole !== "client") {
+
+    if (
+      userRole !== "client"
+    ) {
+
       navigate("/");
       return;
     }
 
     fetchJobs();
-  }, [userRole, navigate]);
 
-  // =========================
-  // Fetch Jobs
-  // =========================
-  const fetchJobs = async () => {
-    setLoading(true);
-    setError(null);
+  }, [userRole]);
 
-    try {
-      const res = await API.get("/jobs");
+  // ================= FETCH =================
 
-      const fetchedJobs = res.data.data || res.data;
-      setJobs(Array.isArray(fetchedJobs) ? fetchedJobs : []);
-    } catch (err) {
-      console.error("Fetch Error:", err.response?.data);
-      setError(
-        err.response?.data?.message ||
-          "Failed to load bookings. Please try again."
+  const fetchJobs =
+    async () => {
+
+      setLoading(true);
+
+      setError(null);
+
+      try {
+
+        const res =
+          await API.get(
+            "/jobs"
+          );
+
+        const fetchedJobs =
+          res.data.data ||
+          res.data;
+
+        setJobs(
+          Array.isArray(
+            fetchedJobs
+          )
+            ? fetchedJobs
+            : []
+        );
+
+      } catch (err) {
+
+        console.error(
+          err.response?.data
+        );
+
+        setError(
+          err.response?.data
+            ?.message ||
+            "Failed to load jobs."
+        );
+
+        setJobs([]);
+
+      } finally {
+
+        setLoading(false);
+      }
+    };
+
+  // ================= CANCEL =================
+
+  const handleCancel =
+    async (jobId) => {
+
+      const confirm =
+        window.confirm(
+          "Are you sure you want to cancel this job?"
+        );
+
+      if (!confirm)
+        return;
+
+      try {
+
+        await API.patch(
+          `/jobs/${jobId}/cancel`,
+          {
+            reason:
+              "Canceled by client",
+          }
+        );
+
+        alert(
+          "Job canceled successfully"
+        );
+
+        fetchJobs();
+
+      } catch (err) {
+
+        alert(
+          err.response?.data
+            ?.message ||
+            "Failed to cancel job"
+        );
+      }
+    };
+
+  // ================= CHAT =================
+
+  const handleChat = (
+    jobId,
+    workerId
+  ) => {
+
+    navigate(
+      `/chat?jobId=${jobId}&receiverId=${workerId}`
+    );
+  };
+
+  // ================= PAYMENT =================
+
+  const handlePayment =
+    (jobId) => {
+
+      navigate(
+        `/payments?jobId=${jobId}`
       );
-      setJobs([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  // =========================
-  // Cancel Booking
-  // =========================
-  const handleCancel = async (jobId) => {
-    if (!window.confirm("Are you sure you want to cancel this booking?"))
-      return;
+  // ================= STATUS =================
 
-    try {
-      await API.patch(`/jobs/${jobId}/cancel`, {
-        reason: "Client canceled from MyBookings",
-      });
+  const getStatusClass =
+    (status) => {
 
-      alert("Booking canceled successfully.");
-      fetchJobs();
-    } catch (err) {
-      alert(err.response?.data?.message || "Failed to cancel booking.");
-    }
-  };
+      switch (status) {
 
-  // =========================
-  // Chat Navigation
-  // =========================
-  const handleChat = (jobId, workerId) => {
-    navigate(`/chat?jobId=${jobId}&receiverId=${workerId}`);
-  };
+        case "PENDING":
+          return "pending";
 
-  // =========================
-  // Payment Navigation
-  // =========================
-  const handleDepositPayment = (jobId) => {
-    navigate(`/payments?jobId=${jobId}`);
-  };
+        case "ACCEPTED":
+          return "accepted";
 
-  const handleFinalPayment = (jobId) => {
-    navigate(`/payments?jobId=${jobId}`);
-  };
+        case "ACTIVE":
+          return "active";
 
-  // =========================
-  // Status Styling
-  // =========================
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "PENDING":
-        return "pending";
-      case "ACCEPTED":
-        return "accepted";
-      case "ACTIVE":
-        return "active";
-      case "DONE":
-        return "done";
-      case "CANCELED":
-        return "canceled";
-      case "REJECTED":
-        return "rejected";
-      default:
-        return "";
-    }
-  };
+        case "DONE":
+          return "done";
 
-  if (userRole !== "client") return null;
+        case "CANCELED":
+          return "canceled";
+
+        case "REJECTED":
+          return "rejected";
+
+        default:
+          return "";
+      }
+    };
+
+  if (
+    userRole !== "client"
+  )
+    return null;
 
   return (
+
     <div className="bookings-container">
+
       <div className="my-bookings-container">
-        {/* ================= HEADER ================= */}
+
+        {/* HEADER */}
+
         <div className="bookings-header">
-          <h2>My Bookings</h2>
-          <p>View and manage all your service requests</p>
+
+          <div>
+
+            <h2>
+              My Jobs
+            </h2>
+
+            <p>
+              Manage all your bookings and payments
+            </p>
+
+          </div>
+
         </div>
 
-        {/* ================= LOADING ================= */}
+        {/* LOADING */}
+
         {loading && (
+
           <div className="loading-state">
+
             <Loader2 className="spinner" />
-            <p>Fetching your bookings...</p>
+
+            <p>
+              Fetching your jobs...
+            </p>
+
           </div>
         )}
 
-        {/* ================= ERROR ================= */}
+        {/* ERROR */}
+
         {error && (
+
           <div className="error-banner">
-            <AlertCircle size={18} />
-            <span>{error}</span>
+
+            <AlertCircle
+              size={18}
+            />
+
+            <span>
+              {error}
+            </span>
+
           </div>
         )}
 
-        {/* ================= EMPTY STATE ================= */}
-        {!loading && jobs.length === 0 && !error && (
+        {/* EMPTY */}
+
+        {!loading &&
+          !error &&
+          jobs.length === 0 && (
+
           <div className="empty-state">
-            <Calendar size={48} />
-            <h3>No Bookings Found</h3>
-            <p>You haven't booked any services yet.</p>
+
+            <Calendar
+              size={55}
+            />
+
+            <h3>
+              No Jobs Yet
+            </h3>
+
+            <p>
+              You haven't created any jobs yet.
+            </p>
+
             <button
-              onClick={() => navigate("/services")}
               className="book-now-btn"
+              onClick={() =>
+                navigate(
+                  "/booking"
+                )
+              }
             >
-              Book a Service
+              Create Job
             </button>
+
           </div>
         )}
 
-        {/* ================= BOOKINGS CARDS ================= */}
-        {!loading && !error && jobs.length > 0 && (
+        {/* JOBS */}
+
+        {!loading &&
+          !error &&
+          jobs.length > 0 && (
+
           <div className="bookings-cards">
-            {jobs.map((job) => (
-              <div key={job._id} className="booking-card">
-                {/* Title */}
-                <div className="booking-card-header">
-                  <h3>{job.title}</h3>
-                  <span
-                    className={`status-badge ${getStatusClass(job.status)}`}
+
+            {jobs.map(
+              (job) => {
+
+                const totalPrice =
+                  Number(
+                    job.total_price
+                  ) || 0;
+
+                const depositAmount =
+                  Number(
+                    job.depositAmount
+                  ) || 0;
+
+                return (
+
+                  <div
+                    key={job._id}
+                    className="modern-booking-card"
                   >
-                    {job.status}
-                  </span>
-                </div>
 
-                {/* Details */}
-                <div className="booking-details">
-                  <p>
-                    <strong>Service:</strong>{" "}
-                    {job.serviceId?.name || "Service not available"}
-                  </p>
+                    {/* TOP */}
 
-                  <p>
-                    <strong>Technician:</strong>{" "}
-                    {job.workerId?.name || "Searching for technician..."}
-                  </p>
+                    <div className="modern-card-top">
 
-                  <p>
-                    <strong>Total Price:</strong> {job.total_price} EGP
-                  </p>
+                      <div>
 
-                  <p>
-                    <strong>Payment Status:</strong>{" "}
-                    {job.paymentStatus || "UNPAID"}
-                  </p>
-                </div>
+                        <div className="job-title-row">
 
-                {/* ================= ACTION BUTTONS ================= */}
-                <div className="booking-actions">
-                  {/* Deposit Payment */}
-                  {job.paymentStatus === "UNPAID" && (
-                    <button
-                      className="pay-btn"
-                      onClick={() => handleDepositPayment(job._id)}
-                    >
-                      <CreditCard size={16} />
-                      Pay Deposit
-                    </button>
-                  )}
+                          <h3>
+                            {job.title}
+                          </h3>
 
-                  {/* Final Payment */}
-                  {job.status === "DONE" &&
-                    job.paymentStatus === "DEPOSIT_PAID" && (
-                      <button
-                        className="pay-final-btn"
-                        onClick={() => handleFinalPayment(job._id)}
-                      >
-                        <CreditCard size={16} />
-                        Pay Remaining Amount
-                      </button>
-                    )}
+                          <span className="job-price">
 
-                  {/* Review */}
-                  {job.status === "DONE" &&
-                    job.paymentStatus === "PAID" &&
-                    !job.reviewId && (
-                      <button
-                        className="review-btn"
-                        onClick={() => navigate(`/rate/${job._id}`)}
-                      >
-                        <Star size={16} />
-                        Review Service
-                      </button>
-                    )}
+                            {totalPrice.toFixed(
+                              2
+                            )}{" "}
+                            EGP
 
-                  {/* Cancel */}
-                  {job.status === "PENDING" && (
-                    <button
-                      className="cancel-btn"
-                      onClick={() => handleCancel(job._id)}
-                    >
-                      <XCircle size={16} />
-                      Cancel Booking
-                    </button>
-                  )}
+                          </span>
 
-                  {/* Chat */}
-                  {(job.status === "ACCEPTED" ||
-                    job.status === "ACTIVE") &&
-                    job.workerId?._id && (
-                      <button
-                        className="chat-btn"
-                        onClick={() =>
-                          handleChat(job._id, job.workerId._id)
-                        }
-                      >
-                        <MessageSquare size={16} />
-                        Chat with Technician
-                      </button>
-                    )}
-                </div>
-              </div>
-            ))}
+                        </div>
+
+                        <p className="job-date">
+
+                          Created{" "}
+                          {new Date(
+                            job.createdAt
+                          ).toLocaleDateString()}
+
+                        </p>
+
+                      </div>
+
+                      <div className="job-badges">
+
+                        <span
+                          className={`modern-status ${getStatusClass(
+                            job.status
+                          )}`}
+                        >
+                          {job.status}
+                        </span>
+
+                        <span className="booking-type-badge">
+
+                          {job.bookingType ===
+                          "OPEN"
+                            ? "OPEN REQUEST"
+                            : "DIRECT"}
+
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                    {/* BODY */}
+
+                    <div className="modern-job-body">
+
+                      <div className="modern-job-row">
+
+                        <span>
+                          Service
+                        </span>
+
+                        <strong>
+                          {job.serviceId
+                            ?.name || "N/A"}
+                        </strong>
+
+                      </div>
+
+                      <div className="modern-job-row">
+
+                        <span>
+                          Technician
+                        </span>
+
+                        <strong>
+
+                          {job.workerId
+                            ?.name ||
+
+                            (job.bookingType ===
+                            "OPEN"
+                              ? "Waiting for proposals"
+                              : "N/A")}
+
+                        </strong>
+
+                      </div>
+
+                      <div className="modern-job-row">
+
+                        <span>
+                          Deposit
+                        </span>
+
+                        <strong>
+
+                          {depositAmount.toFixed(
+                            2
+                          )}{" "}
+                          EGP
+
+                        </strong>
+
+                      </div>
+
+                      <div className="modern-job-row">
+
+                        <span>
+                          Payment Status
+                        </span>
+
+                        <strong>
+                          {
+                            job.paymentStatus
+                          }
+                        </strong>
+
+                      </div>
+
+                    </div>
+
+                    {/* ACTIONS */}
+
+                    <div className="modern-actions">
+
+                      {/* PROPOSALS */}
+
+                      {job.bookingType ===
+                        "OPEN" &&
+                        job.status ===
+                          "PENDING" && (
+
+                        <button
+                          className="modern-btn primary"
+                          onClick={() =>
+                            navigate(
+                              `/jobs/${job._id}/proposals`
+                            )
+                          }
+                        >
+
+                          <Eye size={17} />
+
+                          Proposals
+
+                        </button>
+                      )}
+
+                      {/* PAY */}
+
+                      {job.paymentStatus ===
+                        "UNPAID" &&
+                        job.workerId && (
+
+                        <button
+                          className="modern-btn success"
+                          onClick={() =>
+                            handlePayment(
+                              job._id
+                            )
+                          }
+                        >
+
+                          <CreditCard
+                            size={17}
+                          />
+
+                          Pay Deposit
+
+                        </button>
+                      )}
+
+                      {/* FINAL */}
+
+                      {job.status ===
+                        "DONE" &&
+                        job.paymentStatus ===
+                          "DEPOSIT_PAID" && (
+
+                        <button
+                          className="modern-btn warning"
+                          onClick={() =>
+                            handlePayment(
+                              job._id
+                            )
+                          }
+                        >
+
+                          <CreditCard
+                            size={17}
+                          />
+
+                          Pay Remaining
+
+                        </button>
+                      )}
+
+                     {/* REVIEW */}
+
+{job.status === "DONE" &&
+  !job.reviewId && (
+
+  <button
+    className="modern-btn review"
+    onClick={() =>
+      navigate(
+        `/review/${job._id}`
+      )
+    }
+  >
+
+    <Star size={17} />
+
+    Write Review
+
+  </button>
+)}
+
+                      {/* CHAT */}
+
+                      {(job.status ===
+                        "ACCEPTED" ||
+                        job.status ===
+                          "ACTIVE") &&
+                        job.workerId
+                          ?._id && (
+
+                        <button
+                          className="modern-btn dark"
+                          onClick={() =>
+                            handleChat(
+                              job._id,
+                              job.workerId
+                                ._id
+                            )
+                          }
+                        >
+
+                          <MessageSquare
+                            size={17}
+                          />
+
+                          Chat
+
+                        </button>
+                      )}
+
+                      {/* CANCEL */}
+
+                      {job.status ===
+                        "PENDING" && (
+
+                        <button
+                          className="modern-btn danger"
+                          onClick={() =>
+                            handleCancel(
+                              job._id
+                            )
+                          }
+                        >
+
+                          <XCircle
+                            size={17}
+                          />
+
+                          Cancel
+
+                        </button>
+                      )}
+
+                    </div>
+
+                  </div>
+                );
+              }
+            )}
+
           </div>
         )}
+
       </div>
+
     </div>
   );
 };

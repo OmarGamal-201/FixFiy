@@ -51,6 +51,7 @@ const authRoutes = require("./modules/auth/auth.routes");
 const userRoutes = require("./modules/users/user.routes");
 const serviceRoutes = require("./modules/services/service.routes");
 const jobRoutes = require("./modules/jobs/job.routes");
+const proposalRoutes = require("./modules/proposals/proposal.routes");
 const paymentRoutes = require("./modules/payments/payment.routes");
 const walletRoutes = require("./modules/payments/wallet.routes");
 const withdrawRoutes = require("./modules/payments/withdraw.routes");
@@ -73,6 +74,7 @@ app.use("/api/payments", paymentRoutes);
 ======================== */
 app.use("/api/profile", protect, userRoutes);
 app.use("/api/jobs", protect, jobRoutes);
+app.use("/api/proposals", protect, proposalRoutes);
 app.use("/api/wallet", protect, walletRoutes);
 app.use("/api/withdraw", protect, withdrawRoutes);
 app.use("/api/messages", protect, messagingRoutes);

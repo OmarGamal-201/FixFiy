@@ -46,52 +46,84 @@ const Sidebar = ({ userRole }) => {
         </div>
 
         {/* ================= CLIENT ================= */}
-        {userRole === 'client' && (
-          <>
-            {/* <div className={`menu-item ${isActive('/booking')}`} onClick={() => navigate('/booking')}>
-              <ClipboardList size={20} />
-              <span>Book Service</span>
-            </div> */}
+{userRole === 'client' && (
+  <>
+    <div
+      className={`menu-item ${isActive('/booking')}`}
+      onClick={() => navigate('/booking')}
+    >
+      <ClipboardList size={20} />
+      <span>Create Job</span>
+    </div>
 
-            {/* <div className={`menu-item ${isActive('/my-bookings')}`} onClick={() => navigate('/my-bookings')}>
-              <FileText size={20} />
-              <span>My Bookings</span>
-            </div> */}
-            <div className={`menu-item ${isActive('/my-bookings')}`} onClick={() => navigate('/my-bookings')}>
-              <ClipboardList size={20} />
-              <span>My Jobs</span>
-            </div> 
+    <div
+      className={`menu-item ${isActive('/my-bookings')}`}
+      onClick={() => navigate('/my-bookings')}
+    >
+      <FileText size={20} />
+      <span>My Jobs</span>
+    </div>
 
-            <div className={`menu-item ${isActive('/client-profile')}`} onClick={() => navigate('/client-profile')}>
-              <User size={20} />
-              <span>Profile</span>
-            </div>
-            <div className={`menu-item ${isActive('/payments')}`} onClick={() => navigate('/payments')}>
-              <CreditCard size={20} />
-              <span>Payments</span>
-            </div>
-          </>
-        )}
+    <div
+      className={`menu-item ${isActive('/client-profile')}`}
+      onClick={() => navigate('/client-profile')}
+    >
+      <User size={20} />
+      <span>Profile</span>
+    </div>
 
+    <div
+      className={`menu-item ${isActive('/payments')}`}
+      onClick={() => navigate('/payments')}
+    >
+      <CreditCard size={20} />
+      <span>Payments</span>
+    </div>
+  </>
+)}
         {/* ================= WORKER ================= */}
-        {userRole === 'technician' && (
-          <>
-            {/* <div className={`menu-item ${isActive('/technician-bookings')}`} onClick={() => navigate('/technician-bookings')}>
-              <ClipboardList size={20} />
-              <span>My Jobs</span>
-            </div> */}
+{userRole === 'technician' && (
+  <>
+    <div
+      className={`menu-item ${isActive('/open-jobs')}`}
+      onClick={() => navigate('/open-jobs')}
+    >
+      <Briefcase size={20} />
+      <span>Open Jobs</span>
+    </div>
 
-            <div className={`menu-item ${isActive('/worker-profile')}`} onClick={() => navigate('/worker-profile')}>
-              <User size={20} />
-              <span>Profile</span>
-            </div>
+    <div
+      className={`menu-item ${isActive('/my-proposals')}`}
+      onClick={() => navigate('/my-proposals')}
+    >
+      <FileText size={20} />
+      <span>My Proposals</span>
+    </div>
 
-            <div className={`menu-item ${isActive('/wallet')}`} onClick={() => navigate('/wallet')}>
-              <CreditCard size={20} />
-              <span>Wallet</span>
-            </div>
-          </>
-        )}
+    <div
+      className={`menu-item ${isActive('/worker-profile')}`}
+      onClick={() => navigate('/worker-profile')}
+    >
+      <User size={20} />
+      <span>Profile</span>
+    </div>
+<div
+  className={`menu-item ${isActive('/technician-jobs')}`}
+  onClick={() => navigate('/technician-jobs')}
+>
+  <ClipboardList size={20} />
+  <span>My Jobs</span>
+</div>
+    <div
+      className={`menu-item ${isActive('/wallet')}`}
+      onClick={() => navigate('/wallet')}
+    >
+      <CreditCard size={20} />
+      <span>Wallet</span>
+    </div>
+  </>
+  
+)}
 
         {/* ================= ADMIN ================= */}
         {userRole === 'admin' && (

@@ -51,6 +51,10 @@ router.patch(
 router.get("/:id", protect, controller.getJobById);
 router.get("/", protect, controller.getAllJobs);
 
+/* ========= OPEN JOBS ========= */
+// Note: Actual open jobs endpoint is in proposals.routes.js
+// This is kept for reference/backward compatibility
+
 /* ========= ADMIN ========= */
 router.patch(
   "/:id/status",

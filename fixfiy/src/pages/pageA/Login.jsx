@@ -1,68 +1,177 @@
 import { useState } from "react";
-import "./Login.css"; 
+import "./Login.css";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../../services/api";
 
 function Login({ onLogin }) {
-  const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
-const [selectedRole, setSelectedRole] = useState("client");
-  const [form, setForm] = useState({
-    email: "",
-    password: ""
-  });
+
+  const [showModal,
+    setShowModal] =
+    useState(false);
+
+  const navigate =
+    useNavigate();
+
+  const [selectedRole,
+    setSelectedRole] =
+    useState("client");
+
+  const [form,
+    setForm] =
+    useState({
+      email: "",
+      password: ""
+    });
+
+  // ================= HANDLE INPUT =================
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+
+    const {
+      name,
+      value
+    } = e.target;
+
+    setForm({
+      ...form,
+      [name]: value
+    });
   };
-const handleSelection = (role) => {
-    if (role === 'client') {
-      navigate('/signin-client'); 
+
+  // ================= ACCOUNT TYPE =================
+
+  const handleSelection = (role) => {
+
+    if (role === "client") {
+
+      navigate(
+        "/signin-client"
+      );
+
     } else {
-      navigate('/signin-worker'); 
+
+      navigate(
+        "/signin-worker"
+      );
     }
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    if (!form.email || !form.password) {
-      alert("Please fill in all fields");
-      return;
-    }
+  // ================= LOGIN =================
 
-    try {
-      const res = await API.post("/auth/login", form);
+  const handleSubmit =
+    async (e) => {
 
-      console.log(" LOGIN SUCCESS:", res.data);
+      e.preventDefault();
 
-      const { token, user } = res.data;
+      if (
+        !form.email ||
+        !form.password
+      ) {
 
-      
-      localStorage.setItem("token", token);
-      localStorage.setItem("userRole", user.role);
+        alert(
+          "Please fill in all fields"
+        );
 
-      
-      navigate("/home");
-
-      
-      if (onLogin) {
-        onLogin(user.role);
+        return;
       }
 
-    } catch (error) {
-      console.log(" LOGIN ERROR:", error.response?.data);
-      alert(error.response?.data?.message || "Login failed");
-    }
-  };
+      try {
+
+        const res =
+          await API.post(
+            "/auth/login",
+            form
+          );
+
+        console.log(
+          "LOGIN SUCCESS:",
+          res.data
+        );
+
+        // ================= BACKEND RESPONSE =================
+
+        const token =
+          res.data.token;
+
+        const user =
+          res.data.user;
+
+        // ================= SAVE DATA =================
+
+        localStorage.setItem(
+          "token",
+          token
+        );
+
+        localStorage.setItem(
+          "userRole",
+          user.role
+        );
+
+        // IMPORTANT FIX FOR CHAT
+
+        localStorage.setItem(
+  "userId",
+  user.id || user._id
+);
+
+        localStorage.setItem(
+          "userName",
+          user.name || ""
+        );
+
+        console.log(
+          "USER ID SAVED:",
+          user._id
+        );
+
+        // ================= REDIRECT =================
+
+        navigate("/home");
+
+        // ================= UPDATE APP STATE =================
+
+        if (onLogin) {
+
+          onLogin(
+            user.role
+          );
+        }
+
+      } catch (error) {
+
+        console.log(
+          "LOGIN ERROR:",
+          error.response?.data
+        );
+
+        alert(
+          error.response?.data?.message ||
+          "Login failed"
+        );
+      }
+    };
 
   return (
-    <div className="container">
-      <form className="form" onSubmit={handleSubmit}>
-        <h2 className="login-header">Login</h2>
 
-        <label>Email
+    <div className="container">
+
+      <form
+        className="form"
+        onSubmit={handleSubmit}
+      >
+
+        <h2 className="login-header">
+          Login
+        </h2>
+
+        {/* EMAIL */}
+
+        <label>
+
+          Email
+
           <input
             name="email"
             type="email"
@@ -70,9 +179,15 @@ const handleSelection = (role) => {
             onChange={handleChange}
             required
           />
+
         </label>
 
-        <label>Password
+        {/* PASSWORD */}
+
+        <label>
+
+          Password
+
           <input
             name="password"
             type="password"
@@ -80,44 +195,135 @@ const handleSelection = (role) => {
             onChange={handleChange}
             required
           />
-          <Link to="/forgot-password" className="forget-password">
+
+          <Link
+            to="/forgot-password"
+            className="forget-password"
+          >
+
             forget password?
+
           </Link>
+
         </label>
 
-        <button type="submit" className="login-btn">
+        {/* LOGIN BUTTON */}
+
+        <button
+          type="submit"
+          className="login-btn"
+        >
+
           Log in
+
         </button>
 
+        {/* SIGNUP */}
+
         <div className="signup-link">
-          <span>Don't have an account? </span>
-         <Link className="create-account-link" onClick={() => setShowModal(true)}>
+
+          <span>
+            Don't have an account?
+          </span>
+
+          <Link
+            className="create-account-link"
+            onClick={() =>
+              setShowModal(true)
+            }
+          >
+
             Create Account
+
           </Link>
+
         </div>
+
       </form>
+
+      {/* MODAL */}
+
       {showModal && (
+
         <div className="selection-modal-overlay">
+
           <div className="selection-card">
-            <h2>Join Us As</h2>
-            <p>Please select your account type to continue</p>
-            
+
+            <h2>
+              Join Us As
+            </h2>
+
+            <p>
+              Please select your
+              account type to continue
+            </p>
+
             <div className="selection-options">
-              <div className="option-box" onClick={() => handleSelection('client')}>
-                <div className="icon-circle">👤</div>
-                <span>Client</span>
+
+              {/* CLIENT */}
+
+              <div
+                className="option-box"
+                onClick={() =>
+                  handleSelection(
+                    "client"
+                  )
+                }
+              >
+
+                <div className="icon-circle">
+
+                  👤
+
+                </div>
+
+                <span>
+                  Client
+                </span>
+
               </div>
-              
-              <div className="option-box" onClick={() => handleSelection('worker')}>
-                <div className="icon-circle">🛠️</div>
-                <span>Worker</span>
+
+              {/* WORKER */}
+
+              <div
+                className="option-box"
+                onClick={() =>
+                  handleSelection(
+                    "worker"
+                  )
+                }
+              >
+
+                <div className="icon-circle">
+
+                  🛠️
+
+                </div>
+
+                <span>
+                  Worker
+                </span>
+
               </div>
+
             </div>
-            
-            <button className="close-modal" onClick={() => setShowModal(false)}>Cancel</button>
+
+            <button
+              className="close-modal"
+              onClick={() =>
+                setShowModal(false)
+              }
+            >
+
+              Cancel
+
+            </button>
+
           </div>
+
         </div>
       )}
+
     </div>
   );
 }

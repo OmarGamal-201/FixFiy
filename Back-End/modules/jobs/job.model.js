@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const jobSchema = new mongoose.Schema(
   {
     // ================= Core Info =================
+
     title: {
       type: String,
       required: true,
@@ -18,23 +19,8 @@ const jobSchema = new mongoose.Schema(
       minLength: 15,
     },
 
-    // category: {
-    //   type: String,
-    //   required: true,
-    //   enum: [
-    //     "plumbing",
-    //     "Electricity",
-    //     "carpentry",
-    //     "painting",
-    //     "hvac",
-    //     "appliance_repair",
-    //     "cleaning",
-    //     "landscaping",
-    //     "pest_control",
-    //     "general",
-    //   ],
-    //   index: true,
-    // },
+    // ================= Service =================
+
     serviceId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Service",
@@ -42,12 +28,14 @@ const jobSchema = new mongoose.Schema(
     },
 
     // ================= Relations =================
+
     clientId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
+    // Optional for OPEN jobs
     workerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -58,16 +46,40 @@ const jobSchema = new mongoose.Schema(
       ref: "Review",
     },
 
+    acceptedProposalId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Proposal",
+    },
+
+    // ================= Booking Type =================
+
+    bookingType: {
+      type: String,
+      enum: ["DIRECT", "OPEN"],
+      default: "DIRECT",
+      index: true,
+    },
+
     // ================= Status =================
+
     status: {
       type: String,
-      enum: ["PENDING", "ACCEPTED", "ACTIVE", "DONE", "CANCELED","REJECTED"],
+      enum: [
+        "PENDING",
+        "ACCEPTED",
+        "ACTIVE",
+        "DONE",
+        "CANCELED",
+        "REJECTED",
+      ],
       default: "PENDING",
+      index: true,
     },
 
     statusHistory: [
       {
         status: String,
+
         changedAt: {
           type: Date,
           default: Date.now,
@@ -77,18 +89,23 @@ const jobSchema = new mongoose.Schema(
 
     canceledBy: {
       type: String,
-      enum: ["CLIENT", "TECHNICIAN", "ADMIN"],
+      enum: [
+        "CLIENT",
+        "TECHNICIAN",
+        "ADMIN",
+      ],
     },
 
     cancelReason: String,
 
     // ================= Pricing =================
+
     total_price: {
       type: Number,
       required: true,
       min: 0,
       max: 10000,
-      default:500,
+      default: 0,
     },
 
     site_commission: {
@@ -99,9 +116,14 @@ const jobSchema = new mongoose.Schema(
     },
 
     // ================= Payment =================
+
     paymentStatus: {
       type: String,
-      enum: ["UNPAID", "DEPOSIT_PAID", "PAID"],
+      enum: [
+        "UNPAID",
+        "DEPOSIT_PAID",
+        "PAID",
+      ],
       default: "UNPAID",
       index: true,
     },
@@ -114,7 +136,12 @@ const jobSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
-      enum: ["MOCK", "FAWRY", "PAYPAL", "CASH"],
+      enum: [
+        "MOCK",
+        "FAWRY",
+        "PAYPAL",
+        "CASH",
+      ],
       index: true,
     },
 
@@ -123,35 +150,131 @@ const jobSchema = new mongoose.Schema(
       index: true,
       sparse: true,
     },
+
+    // ================= Optional Location =================
+
+    location: {
+      lat: Number,
+      lng: Number,
+    },
   },
-  { timestamps: true }
+
+  {
+    timestamps: true,
+  }
 );
 
 // ================= Indexes =================
-jobSchema.index({ clientId: 1 });
-jobSchema.index({ workerId: 1 });
-jobSchema.index({ status: 1 });
+
+jobSchema.index({
+  clientId: 1,
+});
+
+jobSchema.index({
+  workerId: 1,
+});
+
+jobSchema.index({
+  status: 1,
+});
+
+jobSchema.index({
+  bookingType: 1,
+});
+
+jobSchema.index({
+  bookingType: 1,
+  status: 1,
+});
+
+jobSchema.index({
+  acceptedProposalId: 1,
+});
 
 // ================= Virtuals =================
-jobSchema.virtual("commission_amount").get(function () {
-  return +(this.total_price * (this.site_commission / 100)).toFixed(2);
+
+jobSchema.virtual(
+  "commission_amount"
+).get(function () {
+
+  const total =
+    Number(
+      this.total_price
+    ) || 0;
+
+  const commission =
+    Number(
+      this.site_commission
+    ) || 0;
+
+  return +(
+    total *
+    (commission / 100)
+  ).toFixed(2);
 });
 
-jobSchema.virtual("provider_earnings").get(function () {
-  return +(this.total_price - this.commission_amount).toFixed(2);
+jobSchema.virtual(
+  "provider_earnings"
+).get(function () {
+
+  const total =
+    Number(
+      this.total_price
+    ) || 0;
+
+  const commission =
+    Number(
+      this.commission_amount
+    ) || 0;
+
+  return +(
+    total - commission
+  ).toFixed(2);
 });
 
+// ================= UI STATE =================
 
-jobSchema.virtual("uiState").get(function () {
-  return {
-    canReview: this.status === "DONE" && !this.reviewId,
-    canChat: ["ACCEPTED", "ACTIVE"].includes(this.status),
-    canAccept: this.status === "PENDING",
-    canPayFinal: this.status === "DONE" && this.paymentStatus !== "PAID",
-  };
+jobSchema.virtual("uiState").get(
+  function () {
+    return {
+
+      canReview:
+        this.status ===
+          "DONE" &&
+        !this.reviewId,
+
+      canChat: [
+        "ACCEPTED",
+        "ACTIVE",
+      ].includes(
+        this.status
+      ),
+
+      canAccept:
+        this.status ===
+        "PENDING",
+
+      canPayFinal:
+        this.status ===
+          "DONE" &&
+        this.paymentStatus !==
+          "PAID",
+    };
+  }
+);
+
+// ================= JSON =================
+
+jobSchema.set("toJSON", {
+  virtuals: true,
 });
 
-jobSchema.set("toJSON", { virtuals: true });
-jobSchema.set("toObject", { virtuals: true });
+jobSchema.set("toObject", {
+  virtuals: true,
+});
 
-module.exports = mongoose.model("Job", jobSchema);
+module.exports =
+  mongoose.model(
+    "Job",
+    jobSchema
+  );

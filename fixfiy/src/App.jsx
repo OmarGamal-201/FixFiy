@@ -32,7 +32,11 @@ import MyBookings from './pages/pageA/MyBookings';
 import PaymentCallback from './pages/pageA/PaymentCallback';
 // import TechnicianBookings from './pages/pageA/TechnicianBookings';
 //import Chat from './pages/pageA/Chat';
-
+import OpenJobs from './pages/pageA/OpenJobs';
+import JobProposals from './pages/pageA/JobProposals';
+import MyProposals from './pages/pageA/MyProposals';
+import TechnicianJobs from "./pages/pageA/TechnicianJobs";
+import CreateReview from "./pages/CreateReview/CreateReview";
 function AppContent() {
 
   //  نخلي role في state (مش localStorage بس)
@@ -143,7 +147,10 @@ function AppContent() {
 
             {/* General */}
             {/* <Route path="/profile" element={<ProfilePage userData={currentUser} />} /> */}
-
+<Route
+  path="/review/:jobId"
+  element={<CreateReview />}
+/>
             <Route path="/edit-profile" element={<EditProfilePage userData={currentUser} />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/my-bookings" element={<MyBookings />} />
@@ -160,7 +167,36 @@ function AppContent() {
             <Route path="/workers/:serviceId" element={<ServiceWorkersPage />} />
             <Route path="/worker-profile/:id" element={<WorkerPage userData={currentUser} />} />
             <Route path="/client-profile/:id" element={<Client userData={currentUser} />} />
+<Route
+  path="/open-jobs"
+  element={
+    role === "technician"
+      ? <OpenJobs />
+      : <Navigate to="/home" />
+  }
+/>
 
+<Route
+  path="/my-proposals"
+  element={
+    role === "technician"
+      ? <MyProposals />
+      : <Navigate to="/home" />
+  }
+/>
+
+<Route
+  path="/jobs/:id/proposals"
+  element={
+    role === "client"
+      ? <JobProposals />
+      : <Navigate to="/home" />
+  }
+/>
+<Route
+  path="/technician-jobs"
+  element={<TechnicianJobs />}
+/>
             {/* fallback */}
             <Route path="*" element={<Navigate to="/" />} />
 

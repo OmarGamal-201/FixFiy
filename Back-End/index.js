@@ -14,14 +14,14 @@ const app = express();
 const cors = require("cors");
 
 app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
+   origin: "http://localhost:5173",
+   credentials: true
 }));
 
 //
 app.use((req, res, next) => {
-  res.removeHeader('Content-Security-Policy');
-  next();
+   res.removeHeader('Content-Security-Policy');
+   next();
 });
 
 
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
    CHROME DEVTOOLS FIX
 ======================== */
 app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
-  res.json({});
+   res.json({});
 });
 
 /* ========================
@@ -82,10 +82,10 @@ app.use("/api/notifications", protect, notificationRoutes);
    ADMIN ROUTES
 ======================== */
 app.use(
-  "/api/admin",
-  protect,
-  authorize("admin"),
-  adminRoutes
+   "/api/admin",
+   protect,
+   authorize("admin"),
+   adminRoutes
 );
 
 /* ========================
@@ -96,5 +96,5 @@ initSocket(server);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+   console.log(`🚀 Server running on port ${PORT}`);
 });

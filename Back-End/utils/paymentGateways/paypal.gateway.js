@@ -80,7 +80,7 @@ class PayPalGateway extends PaymentGateway {
       clientId,
       type,
       description = 'FixFiy Service Payment',
-      returnUrl = `${process.env.APP_URL || 'http://localhost:3000'}/payment-callback`,
+      returnUrl = `${process.env.APP_URL || 'http://localhost:3000'}/PaymentCallback`,
     } = paymentData;
 
     // Validate amount

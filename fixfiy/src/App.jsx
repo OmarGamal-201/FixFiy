@@ -32,6 +32,7 @@ import MyBookings from './pages/pageA/MyBookings';
 import PaymentCallback from './pages/pageA/PaymentCallback';
 // import TechnicianBookings from './pages/pageA/TechnicianBookings';
 //import Chat from './pages/pageA/Chat';
+
 function AppContent() {
 
   //  نخلي role في state (مش localStorage بس)

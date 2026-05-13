@@ -78,6 +78,19 @@ const Booking = () => {
       location: null,
     });
 
+  /* ================= SPECIALTY MAP ================= */
+
+  const SPECIALTY_TO_CATEGORY = {
+    Plumber: "plumbing",
+    Electricity: "electrical",
+    Painter: "painting",
+    Carpinter: "carpentry",
+    hvac: "hvac",
+    appliance_repair:
+      "appliance_repair",
+    general: "general",
+  };
+
   /* ================= LOCATION ================= */
 
   useEffect(() => {
@@ -235,12 +248,19 @@ const Booking = () => {
   /* ================= FILTERED SERVICES ================= */
 
   const filteredServices =
-    workerCategory
+
+    bookingType === "OPEN"
+
+      ? services
+
+      : workerCategory
 
       ? services.filter(
           (service) =>
             service.category ===
-            workerCategory
+            SPECIALTY_TO_CATEGORY[
+              workerCategory
+            ]
         )
 
       : services;
@@ -356,8 +376,6 @@ const Booking = () => {
 
           bookingType,
         };
-
-        // DIRECT
 
         if (
           bookingType ===
@@ -640,6 +658,7 @@ const Booking = () => {
             </label>
 
             <select
+              name="serviceId"
               value={
                 jobData.serviceId
               }

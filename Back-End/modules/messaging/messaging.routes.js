@@ -8,5 +8,8 @@ router.use(protect);
 router.post("/conversations", controller.createConversation);
 router.get("/:conversationId", controller.getMessages);
 router.post("/:conversationId", controller.sendMessage);
-
+router.get(
+  "/conversations/my",
+  controller.getMyConversations
+);
 module.exports = router;

@@ -35,12 +35,26 @@ const Chat = () => {
       location.search
     );
 
+  // ================= PARAMS =================
+
   const jobId =
     searchParams.get(
       "jobId"
     );
 
-  // IMPORTANT FIX
+  const workerId =
+    searchParams.get(
+      "workerId"
+    );
+
+  // ================= TYPE =================
+
+  const conversationType =
+    jobId
+      ? "JOB"
+      : "INQUIRY";
+
+  // ================= USER =================
 
   const currentUserId =
     String(
@@ -55,6 +69,8 @@ const Chat = () => {
     location.state
       ?.clientName ||
     "Chat";
+
+  // ================= STATES =================
 
   const [
     conversationId,
@@ -96,16 +112,12 @@ const Chat = () => {
         }
       );
 
-    // RECEIVE REALTIME MESSAGE
-
     socketRef.current.on(
       "newMessage",
       (msg) => {
 
         setMessages(
           (prev) => {
-
-            // PREVENT DUPLICATES
 
             const exists =
               prev.some(
@@ -127,23 +139,7 @@ const Chat = () => {
         scrollToBottom();
       }
     );
-console.log("CURRENT USER ID:", currentUserId);
 
-messages.forEach((msg) => {
-
-  const senderId =
-    typeof msg.senderId === "object"
-      ? msg.senderId?._id
-      : msg.senderId;
-
-  console.log({
-    senderId: String(senderId),
-    currentUserId: String(currentUserId),
-    equal:
-      String(senderId) ===
-      String(currentUserId),
-  });
-});
     return () => {
       socketRef.current.disconnect();
     };
@@ -156,23 +152,36 @@ messages.forEach((msg) => {
     useCallback(
       async () => {
 
-        if (!jobId)
-          return;
-
         try {
 
           setLoading(
             true
           );
 
+          const body = {
+            conversationType,
+          };
+
+          // JOB CHAT
+
+          if (jobId) {
+            body.jobId =
+              jobId;
+          }
+
+          // INQUIRY CHAT
+
+          if (workerId) {
+            body.workerId =
+              workerId;
+          }
+
           // CREATE / GET CONVERSATION
 
           const res =
             await API.post(
               "/messages/conversations",
-              {
-                jobId,
-              }
+              body
             );
 
           const conv =
@@ -194,7 +203,7 @@ messages.forEach((msg) => {
               .data || []
           );
 
-          // JOIN ROOM
+          // JOIN SOCKET ROOM
 
           socketRef.current.emit(
             "joinConversation",
@@ -230,7 +239,11 @@ messages.forEach((msg) => {
           );
         }
       },
-      [jobId]
+      [
+        jobId,
+        workerId,
+        conversationType,
+      ]
     );
 
   useEffect(() => {
@@ -282,16 +295,12 @@ messages.forEach((msg) => {
         const savedMessage =
           res.data.data;
 
-        // ADD ONLY ONCE
-
         setMessages(
           (prev) => [
             ...prev,
             savedMessage,
           ]
         );
-
-        // EMIT SOCKET
 
         socketRef.current.emit(
           "sendMessage",
@@ -345,7 +354,10 @@ messages.forEach((msg) => {
             </h4>
 
             <span>
-              Active now
+              {conversationType ===
+              "INQUIRY"
+                ? "Inquiry Chat"
+                : "Job Chat"}
             </span>
 
           </div>
@@ -389,8 +401,6 @@ messages.forEach((msg) => {
               index
             ) => {
 
-              // FIX SENDER ID
-
               const senderId =
 
                 String(
@@ -401,8 +411,6 @@ messages.forEach((msg) => {
 
                     : msg.senderId
                 );
-
-              // IMPORTANT
 
               const isMine =
                 senderId ===

@@ -174,18 +174,8 @@ jobSchema.index({
   workerId: 1,
 });
 
-jobSchema.index({
-  status: 1,
-});
 
-jobSchema.index({
-  bookingType: 1,
-});
 
-jobSchema.index({
-  bookingType: 1,
-  status: 1,
-});
 
 jobSchema.index({
   acceptedProposalId: 1,

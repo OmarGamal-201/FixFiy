@@ -1,6 +1,4 @@
-﻿
-
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Zap,
@@ -12,24 +10,36 @@ import {
   CalendarCheck,
   Search,
   CheckCircle,
-  X,
   ArrowRight,
-  Users,
   Wrench,
   BadgeCheck,
-  ChevronRight
+  ChevronRight,
+  Wind,
+  Settings,
 } from "lucide-react";
+
 import API from "../../services/api";
 import "./ClientHomePage.css";
 
 const serviceIcons = {
-  Electricity: <Zap size={22} />,
-  Plumber: <Droplets size={22} />,
-  Painter: <Paintbrush size={22} />,
-  Carpinter: <Hammer size={22} />,
+  Electricity: <Zap size={26} />,
+  Plumber: <Droplets size={26} />,
+  Painter: <Paintbrush size={26} />,
+  Carpinter: <Hammer size={26} />,
+  hvac: <Wind size={26} />,
+  appliance_repair: <Settings size={26} />,
+  general: <Wrench size={26} />,
 };
 
-const DEFAULT_SERVICES = ["Electricity", "Plumber", "Painter", "Carpinter"];
+const DEFAULT_SERVICES = [
+  { name: "Electricity", category: "electrical" },
+  { name: "Plumber", category: "plumbing" },
+  { name: "Painter", category: "painting" },
+  { name: "Carpinter", category: "carpentry" },
+  { name: "hvac", category: "hvac" },
+  { name: "appliance_repair", category: "appliance_repair" },
+  { name: "general", category: "general" },
+];
 
 function getInitials(name = "") {
   return name
@@ -42,6 +52,7 @@ function getInitials(name = "") {
 
 function StarRating({ rating }) {
   const rounded = Math.round(rating || 0);
+
   return (
     <div className="star-rating">
       {[...Array(5)].map((_, i) => (
@@ -49,10 +60,13 @@ function StarRating({ rating }) {
           key={i}
           size={12}
           fill={i < rounded ? "#F59E0B" : "none"}
-          color={i < rounded ? "#F59E0B" : "#cbd5e1"}
+          color={i < rounded ? "#F59E0B" : "#CBD5E1"}
         />
       ))}
-      <span className="rating-value">{(rating || 0).toFixed(1)}</span>
+
+      <span className="rating-value">
+        {(rating || 0).toFixed(1)}
+      </span>
     </div>
   );
 }
@@ -60,9 +74,10 @@ function StarRating({ rating }) {
 function SkeletonWorkers() {
   return (
     <>
-      {[...Array(4)].map((_, i) => (
+      {[...Array(5)].map((_, i) => (
         <div className="skeleton-worker" key={i}>
           <div className="skeleton skeleton-circle" />
+
           <div className="skeleton-lines">
             <div className="skeleton skeleton-line-a" />
             <div className="skeleton skeleton-line-b" />
@@ -75,113 +90,123 @@ function SkeletonWorkers() {
 
 export default function ClientHomePage() {
   const navigate = useNavigate();
+
   const [workers, setWorkers] = useState([]);
-  const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
-  const [serviceWorkers, setServiceWorkers] = useState([]);
-  const [loadingServiceWorkers, setLoadingServiceWorkers] = useState(false);
-  const [loadingInitial, setLoadingInitial] = useState(true);
+
+  const [loading, setLoading] = useState(true);
+
+  const CATEGORY_TO_SPECIALTY = {
+    plumbing: "Plumber",
+    electrical: "Electricity",
+    carpentry: "Carpinter",
+    painting: "Painter",
+    hvac: "hvac",
+    appliance_repair: "appliance_repair",
+    general: "general",
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [servRes, workRes] = await Promise.all([
-          API.get("/services"),
-          API.get("/profile"),
-        ]);
-        setServices(servRes.data || []);
-        setWorkers(workRes.data?.data || []);
-      } catch (err) {
-        console.error("Error fetching initial data", err);
-      } finally {
-        setLoadingInitial(false);
-      }
-    };
-    fetchData();
+    fetchWorkers();
   }, []);
 
-  // Maps service.category to the technician specialty enum value the backend expects
-  const CATEGORY_TO_SPECIALTY = {
-    plumbing:         "Plumber",
-    electrical:       "Electricity",
-    carpentry:        "Carpinter",
-    painting:         "Painter",
-    hvac:             "hvac",
-    appliance_repair: "appliance_repair",
-    general:          "general",
+  const fetchWorkers = async (specialty = "") => {
+    try {
+      setLoading(true);
+
+      let url = "/profile";
+
+      if (specialty) {
+        url += `?specialty=${specialty}`;
+      }
+
+      const res = await API.get(url);
+
+      console.log(res.data);
+
+      if (Array.isArray(res.data)) {
+        setWorkers(res.data);
+      } else {
+        setWorkers(res.data.data || []);
+      }
+    } catch (err) {
+      console.log(err);
+      setWorkers([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleServiceClick = (service) => {
-    const serviceIdentifier = service._id || encodeURIComponent(service.name.toLowerCase());
-    const specialty = CATEGORY_TO_SPECIALTY[service.category] || service.name;
-    navigate(`/workers/${serviceIdentifier}?specialty=${encodeURIComponent(specialty)}`);
+  const handleServiceClick = async (service) => {
+    setSelectedService(service);
+
+    const specialty =
+      CATEGORY_TO_SPECIALTY[service.category] || service.name;
+
+    await fetchWorkers(specialty);
   };
 
-  const displayedServices =
-    services.length > 0
-      ? services
-      : DEFAULT_SERVICES.map((name) => ({ name, _id: name }));
-
-  const displayedWorkers = selectedService ? serviceWorkers : workers.slice(0, 8);
-  const isLoading = loadingInitial || loadingServiceWorkers;
+  const clearFilter = async () => {
+    setSelectedService(null);
+    await fetchWorkers();
+  };
 
   return (
     <div className="client-home-container">
-      {/* ── Hero Banner ── */}
+      {/* HERO */}
+
       <div className="welcome-banner">
         <div className="welcome-text">
           <div className="hero-badge">
-            <BadgeCheck size={12} />
+            <BadgeCheck size={14} />
             Trusted professionals
           </div>
-          <h3>Find the best technicians near you</h3>
+
+          <h3>
+            Find the best technicians near you
+          </h3>
+
           <p>
-            Book verified home-service professionals in seconds — no hassle,
-            no guesswork.
+            Book verified home-service professionals
+            in seconds — no hassle, no guesswork.
           </p>
-           
-          
         </div>
+      </div>
 
-   </div>
+      {/* PAGE CONTENT */}
 
-      {/* ── Page Content ── */}
       <div className="page-content">
-        {/* ── Services ── */}
-        <div className="services-section">
-          <div className="section-header-row">
-            <div>
-              <p className="section-title">Our Services</p>
-              <p className="section-subtitle">What do you need help with?</p>
-            </div>
-          </div>
+        {/* SERVICES */}
 
-          <div className="services-grid">
-            {displayedServices.map((service) => (
-              <div
-                key={service._id || service.name}
-                className={`service-card ${
-                  selectedService?.name === service.name ? "active" : ""
-                }`}
-                onClick={() => handleServiceClick(service)}
-              >
-                <div className="service-icon-wrap">
-                  {serviceIcons[service.name] || <Wrench size={22} />}
-                </div>
-                <span className="service-card-name">{service.name}</span>
-                <span className="service-card-sub">
-                  {selectedService?.name === service.name
-                    ? "Viewing"
-                    : "Tap to view"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <div className="services-wrapper">
+  {DEFAULT_SERVICES.map((service) => (
+    <button
+      key={service.name}
+      className={`service-pill ${
+        selectedService?.name === service.name
+          ? "active"
+          : ""
+      }`}
+      onClick={() => handleServiceClick(service)}
+    >
+      <div className="service-pill-icon">
+        {serviceIcons[service.name] || (
+          <Wrench size={22} />
+        )}
+      </div>
 
-        {/* ── Lower Section ── */}
+      <span className="service-pill-name">
+        {service.name}
+      </span>
+    </button>
+  ))}
+</div>
+
+        {/* LOWER SECTION */}
+
         <div className="lower-section">
-          {/* Workers Panel */}
+          {/* WORKERS */}
+
           <div className="workers-panel">
             <div className="workers-panel-header">
               <div>
@@ -190,54 +215,54 @@ export default function ClientHomePage() {
                     ? `${selectedService.name} Technicians`
                     : "Top Rated Technicians"}
                 </p>
+
                 <p className="section-subtitle">
                   {selectedService
-                    ? `Showing experts in ${selectedService.name}`
-                    : "Handpicked based on ratings & reviews"}
+                    ? `Experts in ${selectedService.name}`
+                    : "Verified technicians"}
                 </p>
               </div>
-              {selectedService && (
-                <button
-                  className="clear-filter-btn"
-                  onClick={() => setSelectedService(null)}
-                >
-                  Clear filter
-                </button>
-              )}
             </div>
 
             <div className="workers-list">
-              {isLoading ? (
+              {loading ? (
                 <SkeletonWorkers />
-              ) : displayedWorkers.length === 0 ? (
+              ) : workers.length === 0 ? (
                 <p className="empty-msg">
-                  No technicians found in this category.
+                  No technicians found
                 </p>
               ) : (
-                displayedWorkers.map((tech) => (
+                workers.map((tech) => (
                   <div
                     className="worker-card"
                     key={tech._id}
-                    onClick={() => navigate(`/worker/${tech._id}`)}
+                    onClick={() =>
+                      navigate(`/worker/${tech._id}`)
+                    }
                   >
                     <div className="worker-avatar">
                       {getInitials(tech.name)}
                     </div>
+
                     <div className="worker-info">
-                      <p className="worker-name">{tech.name}</p>
+                      <p className="worker-name">
+                        {tech.name}
+                      </p>
+
                       <p className="worker-specialty">
-                        {tech.specialty || "Technician"}
+                        {tech.specialty ||
+                          "Technician"}
                       </p>
                     </div>
+
                     <div className="worker-meta">
-                      <StarRating rating={tech.technician_rate} />
+                      <StarRating
+                        rating={tech.technician_rate}
+                      />
                     </div>
-                    <div className="worker-arrow" onClick={() => 
-                        
-                        navigate(`/worker-profile/${tech._id}`)}>
-                     
-                      
-                      <ChevronRight size={15} />
+
+                    <div className="worker-arrow">
+                      <ChevronRight size={16} />
                     </div>
                   </div>
                 ))
@@ -245,114 +270,90 @@ export default function ClientHomePage() {
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* SIDEBAR */}
+
           <div className="sidebar">
-            {/* How It Works */}
             <div className="how-it-works-card">
               <h4>How it works</h4>
+
               <div className="steps-list">
                 {[
                   {
                     icon: <Search size={14} />,
                     title: "Choose a service",
-                    desc: "Pick the type of work you need done",
+                    desc: "Select what you need",
                   },
                   {
                     icon: <MapPin size={14} />,
-                    title: "Set your location",
-                    desc: "We find professionals near you",
+                    title: "Find nearby workers",
+                    desc: "See available technicians",
                   },
                   {
-                    icon: <CalendarCheck size={14} />,
-                    title: "Book a technician",
-                    desc: "Pick a time slot that works for you",
+                    icon: (
+                      <CalendarCheck size={14} />
+                    ),
+                    title: "Book technician",
+                    desc: "Send booking request",
                   },
                   {
-                    icon: <CheckCircle size={14} />,
-                    title: "Job done!",
-                    desc: "Rate your experience afterward",
+                    icon: (
+                      <CheckCircle size={14} />
+                    ),
+                    title: "Done",
+                    desc: "Rate your experience",
                   },
                 ].map((step, idx) => (
-                  <div className="step-item" key={idx}>
-                    <div className="step-num">{step.icon}</div>
+                  <div
+                    className="step-item"
+                    key={idx}
+                  >
+                    <div className="step-num">
+                      {step.icon}
+                    </div>
+
                     <div className="step-body">
-                      <p className="step-title">{step.title}</p>
-                      <p className="step-desc">{step.desc}</p>
+                      <p className="step-title">
+                        {step.title}
+                      </p>
+
+                      <p className="step-desc">
+                        {step.desc}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Promo Card */}
+            {/* PROMO */}
+
             <div className="promo-card">
-              <div className="promo-tag">Limited offer</div>
-              <h4>First booking free inspection</h4>
+              <div className="promo-tag">
+                Limited offer
+              </div>
+
+              <h4>
+                First booking free inspection
+              </h4>
+
               <p>
-                New clients get a complimentary diagnostic with their first
-                service appointment.
+                Get free inspection on your first
+                booking.
               </p>
-              <button className="promo-btn" onClick={() => navigate("/booking")}>
-                Book now <ArrowRight size={14} />
+
+              <button
+                className="promo-btn"
+                onClick={() =>
+                  navigate("/booking")
+                }
+              >
+                Book now
+                <ArrowRight size={15} />
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* ── Modal ── */}
-      {selectedService && (
-        <div className="modal-overlay" onClick={() => setSelectedService(null)}>
-          <div
-            className="custom-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <h4>{selectedService.name} Experts</h4>
-              <button
-                className="modal-close"
-                onClick={() => setSelectedService(null)}
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <div className="workers-list">
-              {loadingServiceWorkers ? (
-                <SkeletonWorkers />
-              ) : serviceWorkers.length === 0 ? (
-                <p className="empty-msg">No technicians found.</p>
-              ) : (
-                serviceWorkers.map((tech) => (
-                  <div
-                    className="worker-card"
-                    key={tech._id}
-                    onClick={() => {
-                      setSelectedService(null);
-                      navigate(`/worker/${tech._id}`);
-                    }}
-                  >
-                    <div className="worker-avatar">
-                      {getInitials(tech.name)}
-                    </div>
-                    <div className="worker-info">
-                      <p className="worker-name">{tech.name}</p>
-                      <p className="worker-specialty">
-                        {tech.specialty || "Technician"}
-                      </p>
-                    </div>
-                    <div className="worker-meta">
-                      <StarRating rating={tech.technician_rate} />
-                    </div>
-                    <div className="worker-arrow">
-                      <ChevronRight size={15} />
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

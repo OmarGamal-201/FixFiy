@@ -4,7 +4,7 @@ import Sidebar from './componants/Sidebar';
 import Navbar from './componants/Navbar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-
+import WorkerProfile from "./pages/pageN/WorkerProfile";
 import Chat from './pages/pageA/Chat';
 import EditProfilePage from './pages/pageS/EditProfilePage';
 import WorkerPage from './pages/pageS/Workerpage';
@@ -37,6 +37,8 @@ import JobProposals from './pages/pageA/JobProposals';
 import MyProposals from './pages/pageA/MyProposals';
 import TechnicianJobs from "./pages/pageA/TechnicianJobs";
 import CreateReview from "./pages/CreateReview/CreateReview";
+import WorkerDetails from "./pages/worker/WorkerDetails";
+import MessagesPage from "./pages/messages/MessagesPage";
 function AppContent() {
 
   //  نخلي role في state (مش localStorage بس)
@@ -197,6 +199,14 @@ function AppContent() {
   path="/technician-jobs"
   element={<TechnicianJobs />}
 />
+<Route
+  path="/worker/:id"
+  element={<WorkerProfile />}
+/>
+<Route
+  path="/messages"
+  element={<MessagesPage />}
+/>
             {/* fallback */}
             <Route path="*" element={<Navigate to="/" />} />
 
@@ -206,6 +216,7 @@ function AppContent() {
     </div>
   );
 }
+
 
 export default function App() {
   return (

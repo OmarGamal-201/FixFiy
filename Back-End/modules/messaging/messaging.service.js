@@ -10,6 +10,10 @@ const Job =
   require("../jobs/job.model");
 
 const {
+  User,
+} = require("../users/user.model");
+
+const {
   createNotification,
 } = require(
   "../notifications/notification.service"
@@ -28,106 +32,221 @@ const {
  */
 
 const createConversation =
-  async (
+  async ({
+    conversationType,
     jobId,
-    userId
-  ) => {
+    workerId,
+    userId,
+  }) => {
 
-    if (!jobId)
-      throw new Error(
-        "jobId is required"
-      );
-
-    if (!userId)
+    if (!userId) {
       throw new Error(
         "userId is required"
       );
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        jobId
-      )
-    ) {
-      throw new Error(
-        "Invalid jobId"
-      );
     }
 
-    const job =
-      await Job.findById(
-        jobId
-      );
-
-    if (!job)
-      throw new Error(
-        "Job not found"
-      );
-
-    // ONLY ACCEPTED / ACTIVE JOBS
+    /**
+     * =========================================
+     * INQUIRY CHAT
+     * =========================================
+     */
 
     if (
-      ![
-        "ACCEPTED",
-        "ACTIVE",
-      ].includes(
-        job.status
-      )
+      conversationType ===
+      "INQUIRY"
     ) {
-      throw new Error(
-        "Conversation not allowed for this job"
-      );
-    }
 
-    const userIdStr =
-      userId.toString();
+      if (!workerId) {
+        throw new Error(
+          "workerId is required"
+        );
+      }
 
-    const isClient =
-      job.clientId.toString() ===
-      userIdStr;
+      const worker =
+        await User.findById(
+          workerId
+        );
 
-    const isWorker =
-      job.workerId &&
-      job.workerId.toString() ===
-        userIdStr;
+      if (!worker) {
+        throw new Error(
+          "Worker not found"
+        );
+      }
 
-    if (
-      !isClient &&
-      !isWorker
-    ) {
-      throw new Error(
-        "Not authorized"
-      );
-    }
+      // prevent self chat
 
-    // CHECK EXISTING CONVERSATION
+      if (
+        workerId.toString() ===
+        userId.toString()
+      ) {
+        throw new Error(
+          "Cannot chat with yourself"
+        );
+      }
 
-    let conversation =
-      await Conversation.findOne(
-        {
-          jobId,
-        }
-      );
+      /**
+       * CHECK EXISTING
+       */
 
-    if (conversation)
+      let existingConversation =
+        await Conversation.findOne(
+          {
+            conversationType:
+              "INQUIRY",
+
+            participants: {
+              $all: [
+                userId,
+                workerId,
+              ],
+            },
+          }
+        );
+
+      if (
+        existingConversation
+      ) {
+        return existingConversation;
+      }
+
+      /**
+       * CREATE
+       */
+
+      const conversation =
+        await Conversation.create(
+          {
+            conversationType:
+              "INQUIRY",
+
+            jobId: null,
+
+            participants: [
+              userId,
+              workerId,
+            ],
+
+            isClosed: false,
+          }
+        );
+
       return conversation;
+    }
 
-    // CREATE NEW
+    /**
+     * =========================================
+     * JOB CHAT
+     * =========================================
+     */
 
-    conversation =
-      await Conversation.create(
-        {
-          jobId,
+    if (
+      conversationType === "JOB"
+    ) {
 
-          participants: [
-            job.clientId,
-            job.workerId,
-          ],
+      if (!jobId) {
+        throw new Error(
+          "jobId is required"
+        );
+      }
 
-          isClosed: false,
-        }
-      );
+      if (
+        !mongoose.Types.ObjectId.isValid(
+          jobId
+        )
+      ) {
+        throw new Error(
+          "Invalid jobId"
+        );
+      }
 
-    return conversation;
+      const job =
+        await Job.findById(
+          jobId
+        );
+
+      if (!job) {
+        throw new Error(
+          "Job not found"
+        );
+      }
+
+      // ONLY ACCEPTED / ACTIVE
+
+      if (
+        ![
+          "ACCEPTED",
+          "ACTIVE",
+        ].includes(
+          job.status
+        )
+      ) {
+        throw new Error(
+          "Conversation not allowed for this job"
+        );
+      }
+
+      const isClient =
+        job.clientId.toString() ===
+        userId.toString();
+
+      const isWorker =
+        job.workerId &&
+        job.workerId.toString() ===
+          userId.toString();
+
+      if (
+        !isClient &&
+        !isWorker
+      ) {
+        throw new Error(
+          "Not authorized"
+        );
+      }
+
+      /**
+       * EXISTING
+       */
+
+      let conversation =
+        await Conversation.findOne(
+          {
+            jobId,
+            conversationType:
+              "JOB",
+          }
+        );
+
+      if (conversation) {
+        return conversation;
+      }
+
+      /**
+       * CREATE
+       */
+
+      conversation =
+        await Conversation.create(
+          {
+            jobId,
+
+            conversationType:
+              "JOB",
+
+            participants: [
+              job.clientId,
+              job.workerId,
+            ],
+
+            isClosed: false,
+          }
+        );
+
+      return conversation;
+    }
+
+    throw new Error(
+      "Invalid conversation type"
+    );
   };
 
 /**
@@ -162,16 +281,6 @@ const sendMessage =
       );
     }
 
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        conversationId
-      )
-    ) {
-      throw new Error(
-        "Invalid conversationId"
-      );
-    }
-
     const conversation =
       await Conversation.findById(
         conversationId
@@ -191,16 +300,11 @@ const sendMessage =
       );
     }
 
-    const senderIdStr =
-      senderId.toString();
-
-    // VERIFY PARTICIPANT
-
     const isParticipant =
       conversation.participants.some(
         (id) =>
           id.toString() ===
-          senderIdStr
+          senderId.toString()
       );
 
     if (!isParticipant) {
@@ -210,7 +314,7 @@ const sendMessage =
     }
 
     /**
-     * SAVE MESSAGE
+     * CREATE MESSAGE
      */
 
     let message =
@@ -219,11 +323,6 @@ const sendMessage =
         senderId,
         content,
       });
-
-    /**
-     * IMPORTANT FIX
-     * POPULATE SENDER
-     */
 
     message =
       await Message.findById(
@@ -246,24 +345,18 @@ const sendMessage =
     await conversation.save();
 
     /**
-     * FIND RECEIVER
+     * RECEIVER
      */
 
     const receiverId =
       conversation.participants.find(
         (id) =>
           id.toString() !==
-          senderIdStr
+          senderId.toString()
       );
-
-    if (!receiverId) {
-      throw new Error(
-        "Receiver not found"
-      );
-    }
 
     /**
-     * CREATE NOTIFICATION
+     * NOTIFICATION
      */
 
     await createNotification({
@@ -280,10 +373,6 @@ const sendMessage =
       referenceId:
         conversation._id,
     });
-
-    /**
-     * REALTIME NOTIFICATION
-     */
 
     emitNotification(
       receiverId,
@@ -317,28 +406,6 @@ const getConversationMessages =
     userId
   ) => {
 
-    if (!conversationId) {
-      throw new Error(
-        "conversationId is required"
-      );
-    }
-
-    if (!userId) {
-      throw new Error(
-        "userId is required"
-      );
-    }
-
-    if (
-      !mongoose.Types.ObjectId.isValid(
-        conversationId
-      )
-    ) {
-      throw new Error(
-        "Invalid conversationId"
-      );
-    }
-
     const conversation =
       await Conversation.findById(
         conversationId
@@ -363,11 +430,6 @@ const getConversationMessages =
       );
     }
 
-    /**
-     * IMPORTANT FIX
-     * POPULATE senderId
-     */
-
     return Message.find({
       conversationId,
     })
@@ -380,8 +442,29 @@ const getConversationMessages =
       });
   };
 
+const getMyConversations =
+  async (userId) => {
+
+    const conversations =
+      await Conversation.find({
+        participants: userId,
+      })
+        .populate(
+          "participants",
+          "name role specialty"
+        )
+        .populate(
+          "jobId"
+        )
+        .sort({
+          updatedAt: -1,
+        });
+
+    return conversations;
+  };
 module.exports = {
   createConversation,
   sendMessage,
   getConversationMessages,
+  getMyConversations
 };

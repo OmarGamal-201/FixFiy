@@ -149,9 +149,9 @@ const MyBookings = () => {
     workerId
   ) => {
 
-    navigate(
-      `/chat?jobId=${jobId}&receiverId=${workerId}`
-    );
+   navigate(
+  `/chat?jobId=${jobId}&type=JOB`
+);
   };
 
   // ================= PAYMENT =================

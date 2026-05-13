@@ -2,36 +2,81 @@ const mongoose = require("mongoose");
 
 const conversationSchema = new mongoose.Schema(
   {
-    jobId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Job",
-      required: true,
-      unique: true
+    // ================= JOB =================
+
+   jobId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Job",
+  default: null,
+  sparse: true,
+},
+
+    // ================= TYPE =================
+
+    conversationType: {
+      type: String,
+      enum: ["INQUIRY", "JOB"],
+      default: "INQUIRY",
     },
+
+    // ================= USERS =================
 
     participants: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true
-      }
+        required: true,
+      },
     ],
+
+    // ================= LAST MESSAGE =================
 
     lastMessage: {
       type: String,
-      default: ""
+      default: "",
     },
 
     lastMessageAt: {
-      type: Date
+      type: Date,
+      default: Date.now,
     },
+
+    lastMessageSender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    // ================= STATUS =================
 
     isClosed: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  { timestamps: true }
+
+  {
+    timestamps: true,
+  }
 );
 
-module.exports = mongoose.model("Conversation", conversationSchema);
+// ================= INDEXES =================
+
+// Fast participant search
+conversationSchema.index({
+  participants: 1,
+});
+
+// Fast job conversation search
+conversationSchema.index({
+  jobId: 1,
+});
+
+// Fast sorting by latest message
+conversationSchema.index({
+  lastMessageAt: -1,
+});
+
+module.exports = mongoose.model(
+  "Conversation",
+  conversationSchema
+);

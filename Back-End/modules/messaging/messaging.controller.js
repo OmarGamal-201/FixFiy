@@ -1,45 +1,82 @@
 const messagingService = require("./messaging.service");
 
 /**
- * @desc    Create new conversation (job-based)
- * @route   POST /api/conversations
- * @access  Protected
+ * @desc Create conversation
+ * @route POST /api/messages/conversations
  */
 const createConversation = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized: user not authenticated",
+        message: "Unauthorized",
       });
     }
 
-    console.log("REQ BODY:", req.body);
-    console.log("REQ BODY jobId:", req.body.jobId);
+    const {
+      jobId,
+      workerId,
+      conversationType,
+    } = req.body;
 
-    const { jobId } = req.body;
+    // ================= VALIDATION =================
 
-    if (!jobId) {
+    if (
+      !["INQUIRY", "JOB"].includes(
+        conversationType
+      )
+    ) {
       return res.status(400).json({
         success: false,
-        message: "jobId is required",
+        message:
+          "conversationType must be INQUIRY or JOB",
       });
     }
 
-    const userId = req.user.id;
-    console.log("USER ID:", userId);
+    // Inquiry chat
+    if (
+      conversationType === "INQUIRY" &&
+      !workerId
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "workerId is required for inquiry chat",
+      });
+    }
 
-    const conversation = await messagingService.createConversation(
-      jobId,
-      userId
-    );
+    // Job chat
+    if (
+      conversationType === "JOB" &&
+      !jobId
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "jobId is required for job chat",
+      });
+    }
+
+    // ================= CREATE =================
+
+    const conversation =
+      await messagingService.createConversation({
+        conversationType,
+        jobId,
+        workerId,
+        userId: req.user.id,
+      });
 
     return res.status(201).json({
       success: true,
       data: conversation,
     });
+
   } catch (err) {
-    console.error("Create Conversation Error:", err.message);
+    console.error(
+      "Create Conversation Error:",
+      err.message
+    );
 
     return res.status(400).json({
       success: false,
@@ -48,44 +85,27 @@ const createConversation = async (req, res) => {
   }
 };
 
-
 /**
- * @desc    Get messages of a conversation
- * @route   GET /api/messages/:conversationId
- * @access  Protected (participant only)
+ * @desc Get messages
+ * @route GET /api/messages/:conversationId
  */
-const getMessages = async (req, res) => {
+const getMessages = async (
+  req,
+  res
+) => {
   try {
-    // ✅ Auth validation
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: user not authenticated",
-      });
-    }
+    const messages =
+      await messagingService.getConversationMessages(
+        req.params.conversationId,
+        req.user.id
+      );
 
-    const { conversationId } = req.params;
-
-    // ✅ Param validation
-    if (!conversationId) {
-      return res.status(400).json({
-        success: false,
-        message: "conversationId is required",
-      });
-    }
-
-    const messages = await messagingService.getConversationMessages(
-      conversationId,
-      req.user.id
-    );
-
-    return res.status(200).json({
+    return res.json({
       success: true,
       data: messages,
     });
-  } catch (err) {
-    console.error("Get Messages Error:", err.message);
 
+  } catch (err) {
     return res.status(403).json({
       success: false,
       message: err.message,
@@ -93,54 +113,70 @@ const getMessages = async (req, res) => {
   }
 };
 
-const sendMessage = async (req, res) => {
+/**
+ * @desc Send message
+ * @route POST /api/messages/:conversationId
+ */
+const sendMessage = async (
+  req,
+  res
+) => {
   try {
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized: user not authenticated",
-      });
-    }
-
-    const { conversationId } = req.params;
     const { content } = req.body;
 
-    if (!conversationId) {
+    if (!content?.trim()) {
       return res.status(400).json({
         success: false,
-        message: "conversationId is required",
+        message:
+          "Message content is required",
       });
     }
 
-    if (!content || !content.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Message content is required",
-      });
-    }
-
-    const message = await messagingService.sendMessage(
-      conversationId,
-      req.user.id,
-      content
-    );
+    const message =
+      await messagingService.sendMessage(
+        req.params.conversationId,
+        req.user.id,
+        content
+      );
 
     return res.status(201).json({
       success: true,
       data: message,
     });
-  } catch (err) {
-    console.error("Send Message Error:", err.message);
 
+  } catch (err) {
     return res.status(400).json({
       success: false,
       message: err.message,
     });
   }
 };
+const getMyConversations =
+  async (req, res) => {
 
+    try {
+
+      const conversations =
+        await messagingService.getMyConversations(
+          req.user.id
+        );
+
+      res.json({
+        success: true,
+        data: conversations,
+      });
+
+    } catch (err) {
+
+      res.status(400).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
 module.exports = {
   createConversation,
   getMessages,
   sendMessage,
+  getMyConversations
 };

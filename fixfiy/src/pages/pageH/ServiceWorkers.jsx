@@ -597,92 +597,213 @@ const ServiceWorkersPage = () => {
 
   if (loading) return <div className="loading-state"><h2>Loading Workers...</h2></div>;
 
-  return (
-    <div className="workers-gallery-container">
-      <h2 className="service-title">{serviceCategory}</h2>
+  // return (
+  //   <div className="workers-gallery-container">
+  //     <h2 className="service-title">{serviceCategory}</h2>
 
-      <div className="map-wrapper" style={{ height: "350px", width: "100%", marginBottom: "30px", borderRadius: "15px", overflow: "hidden" }}>
-        <MapContainer center={userCoords ? [userCoords.lat, userCoords.lng] : [30.0444, 31.2357]} zoom={13} style={{ height: "100%", width: "100%" }}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+  //     <div className="map-wrapper" style={{ height: "350px", width: "100%", marginBottom: "30px", borderRadius: "15px", overflow: "hidden" }}>
+  //       <MapContainer center={userCoords ? [userCoords.lat, userCoords.lng] : [30.0444, 31.2357]} zoom={13} style={{ height: "100%", width: "100%" }}>
+  //         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           
-          {userCoords && (
-            <>
-              <ChangeView center={[userCoords.lat, userCoords.lng]} />
-              <Marker position={[userCoords.lat, userCoords.lng]}>
-                <Popup><b>Your Location</b></Popup>
-              </Marker>
-            </>
-          )}
+  //         {userCoords && (
+  //           <>
+  //             <ChangeView center={[userCoords.lat, userCoords.lng]} />
+  //             <Marker position={[userCoords.lat, userCoords.lng]}>
+  //               <Popup><b>Your Location</b></Popup>
+  //             </Marker>
+  //           </>
+  //         )}
 
-          {workers.map((worker) => {
-            // تأكد من هيكلة بيانات الموقع القادمة من الباك إند
-            const lat = worker.location?.coordinates?.[1] || worker.location?.lat;
-            const lng = worker.location?.coordinates?.[0] || worker.location?.lng;
+  //         {workers.map((worker) => {
+  //           // تأكد من هيكلة بيانات الموقع القادمة من الباك إند
+  //           const lat = worker.location?.coordinates?.[1] || worker.location?.lat;
+  //           const lng = worker.location?.coordinates?.[0] || worker.location?.lng;
 
-            if (lat && lng) {
-              return (
-                <Marker key={worker._id} position={[lat, lng]}>
-                  <Popup>
-                    <div className="map-popup">
-                      <strong>{worker.name}</strong>
-                      <p>{worker.specialty}</p>
-                      <button onClick={() => handleBook(worker)}>Book Now</button>
-                    </div>
-                  </Popup>
-                </Marker>
-              );
-            }
-            return null;
-          })}
-        </MapContainer>
-      </div>
+  //           if (lat && lng) {
+  //             return (
+  //               <Marker key={worker._id} position={[lat, lng]}>
+  //                 <Popup>
+  //                   <div className="map-popup">
+  //                     <strong>{worker.name}</strong>
+  //                     <p>{worker.specialty}</p>
+  //                     <button onClick={() => handleBook(worker)}>Book Now</button>
+  //                   </div>
+  //                 </Popup>
+  //               </Marker>
+  //             );
+  //           }
+  //           return null;
+  //         })}
+  //       </MapContainer>
+  //     </div>
 
-      {workers.length === 0 ? (
-        <p className="no-data">No workers found for this service.</p>
-      ) : (
-        <div className="workers-grid">
-          {workers.map((technician) => (
-            <div key={technician._id} className="worker-card">
-              <div className="worker-avatar-container">
-                <div className="worker-avatar"
-                  style={{
-                    backgroundImage: technician.profilePicture?.[0]?.url 
-                      ? `url(${getProfileImageUrl(technician.profilePicture[0].url)})` 
-                      : "none",
-                    backgroundColor: "#e2e8f0",
-                    backgroundSize: "cover"
-                  }}>
-                  {!technician.profilePicture?.[0]?.url && <span>{technician.name?.charAt(0).toUpperCase()}</span>}
-                </div>
-              </div>
+  //     {workers.length === 0 ? (
+  //       <p className="no-data">No workers found for this service.</p>
+  //     ) : (
+  //       <div className="workers-grid">
+  //         {workers.map((technician) => (
+  //           <div key={technician._id} className="worker-card">
+  //             <div className="worker-avatar-container">
+  //               <div className="worker-avatar"
+  //                 style={{
+  //                   backgroundImage: technician.profilePicture?.[0]?.url 
+  //                     ? `url(${getProfileImageUrl(technician.profilePicture[0].url)})` 
+  //                     : "none",
+  //                   backgroundColor: "#e2e8f0",
+  //                   backgroundSize: "cover"
+  //                 }}>
+  //                 {!technician.profilePicture?.[0]?.url && <span>{technician.name?.charAt(0).toUpperCase()}</span>}
+  //               </div>
+  //             </div>
 
-              <div className="worker-info">
-                <h4 onClick={() => navigate(`/worker-profile/${technician._id}`)}>{technician.name}</h4>
-                <p className="worker-job">{technician.specialty}</p>
+  //             <div className="worker-info">
+  //               <h4 onClick={() => navigate(`/worker-profile/${technician._id}`)}>{technician.name}</h4>
+  //               <p className="worker-job">{technician.specialty}</p>
                 
-                <div className="rating-stars">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={14}
-                      fill={i < (technician.rating || 0) ? "#FFD700" : "none"}
-                      color={i < (technician.rating || 0) ? "#FFD700" : "#cbd5e1"}
-                    />
-                  ))}
-                  <span className="rating-num">({technician.rating || 0})</span>
-                </div>
+  //               <div className="rating-stars">
+  //                 {[...Array(5)].map((_, i) => (
+  //                   <Star
+  //                     key={i}
+  //                     size={14}
+  //                     fill={i < (technician.rating || 0) ? "#FFD700" : "none"}
+  //                     color={i < (technician.rating || 0) ? "#FFD700" : "#cbd5e1"}
+  //                   />
+  //                 ))}
+  //                 <span className="rating-num">({technician.rating || 0})</span>
+  //               </div>
+  //             </div>
+
+  //             <div className="worker-actions">
+  //               <button className="book-btn" onClick={() => handleBook(technician)}>Book</button>
+  //               <button className="contact-btn" onClick={() => handleContact(technician)}>Contact</button>
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     )}
+  //   </div>
+  // );
+ 
+return (
+  <div className="workers-gallery-container">
+    <div className="workers-hero-section">
+      <h1 className="service-title">{serviceCategory}</h1>
+      <p className="service-subtitle">
+        Browse trusted professionals near you and book instantly.
+      </p>
+    </div>
+
+    <div className="map-card">
+      <MapContainer
+        center={userCoords ? [userCoords.lat, userCoords.lng] : [30.0444, 31.2357]}
+        zoom={13}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        {userCoords && (
+          <>
+            <ChangeView center={[userCoords.lat, userCoords.lng]} />
+            <Marker position={[userCoords.lat, userCoords.lng]}>
+              <Popup>
+                <b>Your Location</b>
+              </Popup>
+            </Marker>
+          </>
+        )}
+
+        {workers.map((worker) => {
+          const lat = worker.location?.coordinates?.[1] || worker.location?.lat;
+          const lng = worker.location?.coordinates?.[0] || worker.location?.lng;
+
+          if (lat && lng) {
+            return (
+              <Marker key={worker._id} position={[lat, lng]}>
+                <Popup>
+                  <div className="map-popup">
+                    <strong>{worker.name}</strong>
+                    <p>{worker.specialty}</p>
+                    <button onClick={() => handleBook(worker)}>
+                      Book Now
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          }
+          return null;
+        })}
+      </MapContainer>
+    </div>
+
+    {workers.length === 0 ? (
+      <div className="empty-state">
+        <h3>No workers found</h3>
+        <p>Try another category or check back later.</p>
+      </div>
+    ) : (
+      <div className="workers-grid">
+        {workers.map((technician) => (
+          <div key={technician._id} className="worker-card">
+            <div className="worker-top-section">
+              <div
+                className="worker-avatar"
+                style={{
+                  backgroundImage: technician.profilePicture?.[0]?.url
+                    ? `url(${getProfileImageUrl(
+                        technician.profilePicture[0].url
+                      )})`
+                    : "none",
+                }}
+              >
+                {!technician.profilePicture?.[0]?.url && (
+                  <span>
+                    {technician.name?.charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
 
-              <div className="worker-actions">
-                <button className="book-btn" onClick={() => handleBook(technician)}>Book</button>
-                <button className="contact-btn" onClick={() => handleContact(technician)}>Contact</button>
+              <div className="worker-basic-info">
+                <h4 onClick={() => navigate(`/worker-profile/${technician._id}`)}>
+                  {technician.name}
+                </h4>
+                <p>{technician.specialty}</p>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
 
+            <div className="rating-stars">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  size={16}
+                  fill={i < (technician.rating || 0) ? "#FFD700" : "none"}
+                  color={i < (technician.rating || 0) ? "#FFD700" : "#cbd5e1"}
+                />
+              ))}
+              <span className="rating-num">
+                {technician.rating || 0}
+              </span>
+            </div>
+
+            <div className="worker-actions">
+              <button
+                className="book-btn"
+                onClick={() => handleBook(technician)}
+              >
+                Book Now
+              </button>
+              <button
+                className="contact-btn"
+                onClick={() => handleContact(technician)}
+              >
+                Contact
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+}
 export default ServiceWorkersPage;

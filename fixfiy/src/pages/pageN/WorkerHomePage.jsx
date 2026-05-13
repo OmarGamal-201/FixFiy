@@ -11,36 +11,78 @@ function WorkerHomePage() {
   const [requests, setRequests] = useState([]);
   const [workerName, setWorkerName] = useState("");
   const [profile, setProfile] = useState(null);
+  const [updating, setUpdating] = useState(false);
   const location = useLocation();
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const profileRes = await API.get("/profile/me");
+  //       const profileData = profileRes.data.data;
+  //       setWorkerName(profileData.name || "Worker");
+  //       setProfile(profileData);
+
+  //       const requestsRes = await API.get("/jobs");
+  //       setRequests(requestsRes.data.data || []);
+  //     } catch (err) {
+  //       console.log("Fetch error:", err);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const profileRes = await API.get("/profile/me");
-        const profileData = profileRes.data.data;
-        setWorkerName(profileData.name || "Worker");
-        setProfile(profileData);
-
-        const requestsRes = await API.get("/jobs");
-        setRequests(requestsRes.data.data || []);
-      } catch (err) {
-        console.log("Fetch error:", err);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
-  
-
+  // const fetchRequests = async () => {
+  //   try {
+  //     const res = await API.get("/jobs");
+  //     setRequests(res.data.data || []);
+  //   } catch (err) {
+  //     console.log("Jobs fetch error:", err);
+  //   }
+  // };
   const fetchRequests = async () => {
+  try {
+    setUpdating(true);
+    const res = await API.get("/jobs");
+    setRequests(res.data.data || []);
+  } finally {
+    setUpdating(false);
+  }
+};
+
+  const fetchProfile = async () => {
     try {
-      const res = await API.get("/jobs");
-      setRequests(res.data.data || []);
+      const res = await API.get("/profile/me");
+      const data = res.data.data;
+      setWorkerName(data.name || "Worker");
+      setProfile(data);
     } catch (err) {
-      console.log("Jobs fetch error:", err);
+      console.log("Profile error:", err);
     }
   };
+
+  // أول تحميل
+  fetchProfile();
+  fetchRequests();
+
+  // 🔥 polling كل 4 ثواني
+  const interval = setInterval(() => {
+    fetchRequests();
+  }, 4000);
+
+  // cleanup
+  return () => clearInterval(interval);
+}, []);
+
+  // const fetchRequests = async () => {
+  //   try {
+  //     const res = await API.get("/jobs");
+  //     setRequests(res.data.data || []);
+  //   } catch (err) {
+  //     console.log("Jobs fetch error:", err);
+  //   }
+  // };
 
   const displayedRequests = showAll ? requests : requests.slice(0, 3);
 
@@ -151,6 +193,7 @@ function WorkerHomePage() {
             </span>
           </div>
           <table className="custom-table">
+            {updating && <p style={{ color: "gray" }}>Updating requests...</p>}
             <thead>
               <tr>
                 <th>Request ID</th>

@@ -64,7 +64,7 @@ const Payments = () => {
           stopPolling();
           showMessage("success", "Payment confirmed! Redirecting…");
           await fetchJobData(); // تحديث عرض الصفحة
-          setTimeout(() => navigate("/my-bookings"), 2000);
+          setTimeout(() => navigate("/payment-callback"), 2000);
         }
         // لو FAILED
         if (status === "FAILED") {

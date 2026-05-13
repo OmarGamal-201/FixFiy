@@ -232,7 +232,11 @@ export default function ClientHomePage() {
                     <div className="worker-meta">
                       <StarRating rating={tech.technician_rate} />
                     </div>
-                    <div className="worker-arrow" onClick={() => navigate(`/worker-profile/${tech._id}`)}>
+                    <div className="worker-arrow" onClick={() => 
+                        
+                        navigate(`/worker-profile/${tech._id}`)}>
+                     
+                      
                       <ChevronRight size={15} />
                     </div>
                   </div>

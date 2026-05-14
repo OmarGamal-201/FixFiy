@@ -134,17 +134,18 @@ async updateUserLocation(userId, lng, lat) {
   }
 
   // Get technician by ID
-  async getTechnicianById(technicianId) {
-    const technician = await Technician.findById(technicianId).select(
-      "-password"
-    );
+ async getUserPublicProfile(userId) {
 
-    if (!technician) {
-      throw new Error("Technician not found");
-    }
+  const user =
+    await User.findById(userId)
+      .select("-password");
 
-    return technician;
+  if (!user) {
+    throw new Error("User not found");
   }
+
+  return user;
+}
 
   // Update technician availability
   async updateTechnicianAvailability(userId, availability_status) {

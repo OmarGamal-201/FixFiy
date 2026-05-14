@@ -100,22 +100,27 @@ const userSchema = new mongoose.Schema(
       },
     },
 
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        default: "Point",
-      },
-      coordinates: {
-        type: [Number], // [lng, lat]
-        required: true,
-      },
-    },
+   
+location: {
+  type: {
+    type: String,
+    enum: ["Point"],
+    default: "Point",
+  },
+
+  coordinates: {
+    type: [Number], // [lng, lat]
+
+    default: [31.2357, 30.0444],
+  },
+},
+
+
 
     profilePicture: [{
       url: {
         type: String,
-        required: true
+        required: false
       },
       uploadedAt: {
         type: Date,

@@ -10,6 +10,7 @@ import {
   Star,
   XCircle,
   Eye,
+  User,
 } from "lucide-react";
 
 import API from "../../services/api";
@@ -145,13 +146,12 @@ const MyBookings = () => {
   // ================= CHAT =================
 
   const handleChat = (
-    jobId,
-    workerId
+    jobId
   ) => {
 
-   navigate(
-  `/chat?jobId=${jobId}&type=JOB`
-);
+    navigate(
+      `/chat?jobId=${jobId}&type=JOB`
+    );
   };
 
   // ================= PAYMENT =================
@@ -471,6 +471,26 @@ const MyBookings = () => {
                         </button>
                       )}
 
+                      {/* VIEW TECHNICIAN */}
+
+                      {job.workerId?._id && (
+
+                        <button
+                          className="modern-btn info"
+                          onClick={() =>
+                            navigate(
+                              `/worker/${job.workerId._id}`
+                            )
+                          }
+                        >
+
+                          <User size={17} />
+
+                          Technician Profile
+
+                        </button>
+                      )}
+
                       {/* PAY */}
 
                       {job.paymentStatus ===
@@ -520,26 +540,26 @@ const MyBookings = () => {
                         </button>
                       )}
 
-                     {/* REVIEW */}
+                      {/* REVIEW */}
 
-{job.status === "DONE" &&
-  !job.reviewId && (
+                      {job.status === "DONE" &&
+                        !job.reviewId && (
 
-  <button
-    className="modern-btn review"
-    onClick={() =>
-      navigate(
-        `/review/${job._id}`
-      )
-    }
-  >
+                        <button
+                          className="modern-btn review"
+                          onClick={() =>
+                            navigate(
+                              `/review/${job._id}`
+                            )
+                          }
+                        >
 
-    <Star size={17} />
+                          <Star size={17} />
 
-    Write Review
+                          Write Review
 
-  </button>
-)}
+                        </button>
+                      )}
 
                       {/* CHAT */}
 
@@ -554,9 +574,7 @@ const MyBookings = () => {
                           className="modern-btn dark"
                           onClick={() =>
                             handleChat(
-                              job._id,
-                              job.workerId
-                                ._id
+                              job._id
                             )
                           }
                         >

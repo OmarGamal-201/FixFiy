@@ -99,9 +99,17 @@ export default function WorkerProfile() {
 
         <div className="worker-header">
 
-          <div className="worker-avatar-large">
-            {getInitials(worker.name)}
-          </div>
+       
+<img
+  src={
+    worker.profilePicture?.[0]?.url ||
+    `https://ui-avatars.com/api/?name=${worker.name}`
+  }
+  alt={worker.name}
+  className="worker-profile-image"
+/>
+
+
 
           <div>
 

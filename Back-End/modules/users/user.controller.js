@@ -1,5 +1,10 @@
 const userService = require("./user.service");
 
+const {
+  User,
+} = require("./user.model");
+
+
 // ==================== Profile Management ====================
 
 // Get dashboard data
@@ -21,89 +26,156 @@ const getDashboardData = async (req, res) => {
 };
 
 // Update profile
-const updateProfile = async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      phone,
-      governorate,
-      city,
-      street,
-      experience_years,
-      specialty,
-      availability_status,
-    } = req.body;
 
-    // Get current user to check role
-    const user = await userService.getUserById(req.user.id);
+const updateProfile = async (req, res) => {
+
+  try {
+
+    const currentUser =
+      await User.findById(req.user.id);
+
+    if (!currentUser) {
+
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     const updateData = {};
 
-    // Common fields
-    if (name) updateData.name = name;
-    if (email) updateData.email = email;
-    if (phone) updateData.phone = phone;
-    if (governorate) updateData["address.governorate"] = governorate;
-    if (city) updateData["address.city"] = city;
-    if (street) updateData["address.street"] = street;
+    /* ================= COMMON ================= */
+
+    if (req.body.name !== undefined) {
+      updateData.name = req.body.name;
+    }
+
+    if (req.body.phone !== undefined) {
+      updateData.phone = req.body.phone;
+    }
+
+    if (req.body.bio !== undefined) {
+      updateData.bio = req.body.bio;
+    }
+
+    /* ================= ADDRESS ================= */
+
+    updateData.address = {
+
+      governorate:
+        req.body.governorate ||
+        currentUser.address?.governorate,
+
+      city:
+        req.body.city ||
+        currentUser.address?.city,
+
+      street:
+        req.body.street ||
+        currentUser.address?.street,
+    };
+
+    /* ================= IMAGE ================= */
 
     if (req.file) {
-      updateData.profilePicture = {
-        url: req.file.path, 
-        public_id: req.file.filename 
-      };
+
+      updateData.profilePicture = [
+        {
+          url: req.file.path,
+          uploadedAt: new Date(),
+        },
+      ];
     }
 
-    // Technician-specific fields
-    if (user.role === "technician") {
-      if (experience_years !== undefined)
-        updateData.experience_years = experience_years;
-      if (specialty) updateData.specialty = specialty;
-      if (availability_status !== undefined)
-        updateData.availability_status = availability_status;
+    /* ================= TECHNICIAN ================= */
+
+    if (currentUser.role === "technician") {
+
+      if (
+        req.body.experience_years !== undefined
+      ) {
+
+        updateData.experience_years =
+          Number(req.body.experience_years);
+      }
+
+      if (req.body.specialty) {
+
+        updateData.specialty =
+          req.body.specialty;
+      }
+
+      if (
+        req.body.availability_status !== undefined
+      ) {
+
+        updateData.availability = {
+
+          isAvailable:
+            req.body.availability_status === "true" ||
+            req.body.availability_status === true,
+
+          lastUpdated:
+            new Date(),
+        };
+      }
     }
 
-    // Check if there's data to update
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No fields to update",
-      });
-    }
+    console.log("REQ BODY =>", req.body);
 
-    // Update user through service
-    const updatedUser = await userService.updateUser(req.user.id, updateData);
+    console.log(
+      "UPDATE DATA =>",
+      updateData
+    );
 
-    res.status(200).json({
+    const updatedUser =
+      await User.findByIdAndUpdate(
+        req.user.id,
+        {
+          $set: updateData,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      ).select("-password");
+
+    return res.status(200).json({
+
       success: true,
-      message: "Profile updated successfully",
-      user: updatedUser,
+
+      message:
+        "Profile updated successfully",
+
+      data: updatedUser,
     });
+
   } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: Object.values(error.errors).map((e) => e.message),
-      });
-    }
 
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern)[0];
-      return res.status(409).json({
-        success: false,
-        message: `This ${field} is already in use`,
-      });
-    }
+    console.log(
+      "UPDATE PROFILE ERROR =>",
+      error
+    );
 
-    res.status(500).json({
+    return res.status(500).json({
+
       success: false,
-      message: "Server error",
-      error: error.message,
+
+      message: error.message,
+
+      errors:
+        error.errors
+          ? Object.values(
+              error.errors
+            ).map((e) => ({
+              field: e.path,
+              message: e.message,
+            }))
+          : [],
     });
   }
 };
+
 
 const updateUserLocation = async (req, res) => {
   try {
@@ -277,11 +349,13 @@ const getAllTechnicians = async (req, res) => {
 // Get technician by ID
 const getTechnicianById = async (req, res) => {
   try {
-    const technician = await userService.getTechnicianById(req.params.id);
-
+    const user =
+  await userService.getUserPublicProfile(
+    req.params.id
+  );
     res.status(200).json({
       success: true,
-      data: technician,
+      data: user,
     });
   } catch (error) {
     res.status(404).json({

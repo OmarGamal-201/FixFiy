@@ -1,49 +1,105 @@
-const mongoose = require("mongoose");
+const mongoose =
+  require("mongoose");
 
-const transactionSchema = new mongoose.Schema(
-  {
-    type: {
-      type: String,
-      enum: ["EARNING", "WITHDRAW", "REFUND"],
-      required: true,
+/* ================= Transaction ================= */
+
+const transactionSchema =
+  new mongoose.Schema(
+    {
+      type: {
+        type: String,
+
+        enum: [
+          "EARNING",
+          "WITHDRAW",
+          "REFUND",
+          "BONUS",
+        ],
+
+        required: true,
+      },
+
+      amount: {
+        type: Number,
+
+        required: true,
+
+        min: 0,
+      },
+
+      referenceId: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+      },
+
+      referenceType: {
+        type: String,
+
+        enum: [
+          "JOB",
+          "PAYMENT",
+          "WITHDRAW",
+          "REFUND",
+        ],
+
+        default: "JOB",
+      },
+
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
 
-    amount: {
-      type: Number,
-      required: true,
-      min: 0,
+    {
+      timestamps: true,
+    }
+  );
+
+/* ================= Wallet ================= */
+
+const walletSchema =
+  new mongoose.Schema(
+    {
+      workerId: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+
+        ref: "User",
+
+        unique: true,
+
+        required: true,
+      },
+
+      balance: {
+        type: Number,
+
+        default: 0,
+
+        min: 0,
+      },
+
+      transactions: [
+        transactionSchema,
+      ],
     },
 
-    referenceId: {
-      type: mongoose.Schema.Types.ObjectId,
-    },
+    {
+      timestamps: true,
+    }
+  );
 
-    referenceType: {
-      type: String,
-      enum: ["JOB", "PAYMENT", "WITHDRAW"],
-    },
-  },
-  { timestamps: true }
-);
+/* ================= Indexes ================= */
 
-const walletSchema = new mongoose.Schema(
-  {
-    workerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      unique: true,
-      required: true,
-    },
+walletSchema.index({
+  workerId: 1,
+});
 
-    balance: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
+/* ================= Export ================= */
 
-    transactions: [transactionSchema],
-  },
-  { timestamps: true }
-);
-
-module.exports = mongoose.model("Wallet", walletSchema);
+module.exports =
+  mongoose.model(
+    "Wallet",
+    walletSchema
+  );

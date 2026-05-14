@@ -63,12 +63,17 @@ const Chat = () => {
       )
     );
 
-  const displayName =
-    location.state
-      ?.workerName ||
-    location.state
-      ?.clientName ||
-    "Chat";
+ const otherUserId =
+  location.state?.workerId ||
+  location.state?.clientId;
+
+const otherUserRole =
+  location.state?.role;
+
+const displayName =
+  location.state?.workerName ||
+  location.state?.clientName ||
+  "Chat";
 
   // ================= STATES =================
 
@@ -339,8 +344,27 @@ const Chat = () => {
 
         </button>
 
-        <div className="user-info">
+        <div
+  className="user-info"
+  onClick={() => {
 
+    if (!otherUserId) return;
+
+    if (otherUserRole === "technician") {
+
+  navigate(
+    `/worker/${otherUserId}`
+  );
+
+} else {
+
+  navigate(
+    `/client/${otherUserId}`
+  );
+}
+  }}
+  style={{ cursor: "pointer" }}
+>
           <div className="chat-avatar">
 
             <User size={20} />

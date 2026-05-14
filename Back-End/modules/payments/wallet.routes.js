@@ -1,9 +1,23 @@
-const router = require("express").Router();
-const { protect } = require("../../middlewares/auth.middleware");
-const { authorize } = require("../../middlewares/role.middleware");
-const walletController = require("./wallet.controller");
+const router =
+  require("express").Router();
 
-// Worker wallet
+const {
+  protect,
+} = require(
+  "../../middlewares/auth.middleware"
+);
+
+const {
+  authorize,
+} = require(
+  "../../middlewares/role.middleware"
+);
+
+const walletController =
+  require("./wallet.controller");
+
+/* ================= Wallet ================= */
+
 router.get(
   "/",
   protect,
@@ -11,4 +25,14 @@ router.get(
   walletController.getMyWallet
 );
 
-module.exports = router;
+/* ================= Transactions ================= */
+
+router.get(
+  "/transactions",
+  protect,
+  authorize("technician"),
+  walletController.getTransactions
+);
+
+module.exports =
+  router;

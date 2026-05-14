@@ -1,227 +1,566 @@
-import React, { useState, useEffect } from 'react';
+import React, {
+  useState,
+  useEffect,
+} from "react";
+
 import "./App.css";
-import Sidebar from './componants/Sidebar';
-import Navbar from './componants/Navbar';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import WorkerProfile from "./pages/pageN/WorkerProfile";
-import Chat from './pages/pageA/Chat';
-import EditProfilePage from './pages/pageS/EditProfilePage';
-import WorkerPage from './pages/pageS/Workerpage';
-import Client from './pages/pageS/Client';
-import Booking from './pages/pageA/Booking';
+
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+
+/* ================= COMPONENTS ================= */
+
+import Sidebar from "./componants/Sidebar";
+import Navbar from "./componants/Navbar";
+
+/* ================= AUTH ================= */
+
 import Login from "./pages/pageA/Login";
-import Payments from './pages/pageA/Payments';
-import Waallet from "./pages/pageA/Waallet";
-import WithdrawAdmin from './pages/pageA/WithdrawAdmin';
-import Withdrawworker from './pages/pageA/Withdrawworker';
-import RestNewPassword from './pages/pageA/ResetNewPassword';
-import ForgotPassword from './pages/pageA/ForgotPassword';
-import SignInAdmin from './pages/pageA/SignInAdmin';
-import SignInClient from './pages/pageA/SignInClient';
-import SignInWorker from './pages/pageA/SignInWorker';
-import AdminHomePage from './pages/pageN/AdminHomePage';
-import ClientHomePage from './pages/pageN/ClientHomePage';
-import WorkerHomePage from './pages/pageN/WorkerHomePage';
-import ClientManagementPage from './pages/pageN/ClientManagementPage';
-import WorkerManagement from './pages/pageN/WorkerManagement';
-import ServicesManagementPage from './pages/pageN/ServicesManagementPage';
-import WelcomePage from './pages/pageH/WelcomPage';
-import ServiceWorkersPage from './pages/pageH/ServiceWorkers';
-import MyBookings from './pages/pageA/MyBookings';
-import PaymentCallback from './pages/pageA/PaymentCallback';
-// import TechnicianBookings from './pages/pageA/TechnicianBookings';
-//import Chat from './pages/pageA/Chat';
-import OpenJobs from './pages/pageA/OpenJobs';
-import JobProposals from './pages/pageA/JobProposals';
-import MyProposals from './pages/pageA/MyProposals';
+import ForgotPassword from "./pages/pageA/ForgotPassword";
+import RestNewPassword from "./pages/pageA/ResetNewPassword";
+
+import SignInAdmin from "./pages/pageA/SignInAdmin";
+import SignInClient from "./pages/pageA/SignInClient";
+import SignInWorker from "./pages/pageA/SignInWorker";
+
+/* ================= HOME ================= */
+
+import WelcomePage from "./pages/pageH/WelcomPage";
+
+import AdminHomePage from "./pages/pageN/AdminHomePage";
+import ClientHomePage from "./pages/pageN/ClientHomePage";
+import WorkerHomePage from "./pages/pageN/WorkerHomePage";
+
+/* ================= ADMIN ================= */
+
+import ClientManagementPage from "./pages/pageN/ClientManagementPage";
+import WorkerManagement from "./pages/pageN/WorkerManagement";
+import ServicesManagementPage from "./pages/pageN/ServicesManagementPage";
+
+/* ================= PROFILE ================= */
+
+import MyWorkerProfile from "./pages/pageN/MyWorkerProfile";
+import MyClientProfile from "./pages/pageN/MyClientProfile";
+import ClientProfile from "./pages/pageN/ClientProfile";
+import WorkerProfile from "./pages/pageN/WorkerProfile";
+import WorkerPage from "./pages/pageS/Workerpage";
+import Client from "./pages/pageS/Client";
+
+import EditProfilePage from "./pages/pageS/EditProfilePage";
+
+/* ================= JOBS ================= */
+
+import Booking from "./pages/pageA/Booking";
+import MyBookings from "./pages/pageA/MyBookings";
+
+import OpenJobs from "./pages/pageA/OpenJobs";
+import MyProposals from "./pages/pageA/MyProposals";
+import JobProposals from "./pages/pageA/JobProposals";
 import TechnicianJobs from "./pages/pageA/TechnicianJobs";
-import CreateReview from "./pages/CreateReview/CreateReview";
-import WorkerDetails from "./pages/worker/WorkerDetails";
+
+/* ================= PAYMENTS ================= */
+
+import Payments from "./pages/pageA/Payments";
+import PaymentCallback from "./pages/pageA/PaymentCallback";
+
+import Waallet from "./pages/pageA/WorkerWallet";
+import AdminWithdraws
+from "./pages/pageA/AdminWithdraws";
+
+
+/* ================= CHAT ================= */
+
+import Chat from "./pages/pageA/Chat";
 import MessagesPage from "./pages/messages/MessagesPage";
+
+/* ================= SERVICES ================= */
+
+import ServiceWorkersPage from "./pages/pageH/ServiceWorkers";
+
+/* ================= REVIEWS ================= */
+
+import CreateReview from "./pages/CreateReview/CreateReview";
+
 function AppContent() {
 
-  //  نخلي role في state (مش localStorage بس)
-  const [role, setRole] = useState(localStorage.getItem("userRole"));
+  const [role, setRole] =
+    useState(
+      localStorage.getItem(
+        "userRole"
+      )
+    );
 
-  const [currentUser, setCurrentUser] = useState({
+  const [
+    currentUser,
+    setCurrentUser,
+  ] = useState({
     role: "",
     name: "",
-    email: ""
+    email: "",
   });
 
-  const location = useLocation();
+  const location =
+    useLocation();
 
-  //  لما role يتغير → يحدث البيانات
+  /* ================= USER ================= */
+
   useEffect(() => {
+
     if (role) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setCurrentUser({
-        role: role,
-        name: role.charAt(0).toUpperCase() + role.slice(1),
-        email: `${role}@fixfiy.com`
+        role,
+        name:
+          role
+            .charAt(0)
+            .toUpperCase() +
+          role.slice(1),
+
+        email:
+          `${role}@fixfiy.com`,
       });
     }
+
   }, [role]);
 
-  //  عند login
-  const handleLogin = (userType) => {
-    localStorage.setItem('userRole', userType);
-    setRole(userType); 
-  };
+  /* ================= LOGIN ================= */
 
-  // صفحات بدون Navbar / Sidebar
+  const handleLogin =
+    (userType) => {
+
+      localStorage.setItem(
+        "userRole",
+        userType
+      );
+
+      setRole(userType);
+    };
+
+  /* ================= AUTH PAGES ================= */
+
   const authPaths = [
-    '/',
-    '/welcome',
-    '/login',
-    '/signin-client',
-    '/signin-worker',
-    '/signin-admin',
-    '/forgot-password'
+    "/",
+    "/welcome",
+    "/login",
+    "/signin-client",
+    "/signin-worker",
+    "/signin-admin",
+    "/forgot-password",
   ];
 
   const isAuthPage =
-    authPaths.includes(location.pathname) ||
-    location.pathname.startsWith("/reset-password");
+    authPaths.includes(
+      location.pathname
+    ) ||
+    location.pathname.startsWith(
+      "/reset-password"
+    );
 
   return (
-    <div className="app-container" style={{ display: 'flex' }}>
-      
-      {/* Sidebar */}
-      {!isAuthPage && role && (
-        <Sidebar userRole={role} />
-      )}
+
+    <div
+      className="app-container"
+      style={{
+        display: "flex",
+      }}
+    >
+
+      {/* ================= SIDEBAR ================= */}
+
+      {!isAuthPage &&
+        role && (
+
+          <Sidebar
+            userRole={role}
+          />
+        )}
 
       <div
         className="main-wrapper"
         style={{
           flex: 1,
-          marginLeft: (!isAuthPage && role) ? '260px' : '0px',
-          transition: 'margin 0.3s'
+
+          marginLeft:
+            !isAuthPage &&
+            role
+              ? "260px"
+              : "0px",
+
+          transition:
+            "margin .3s",
         }}
       >
-        
-        {/* Navbar */}
-        {!isAuthPage && role && (
-          <Navbar user={currentUser} />
-        )}
+
+        {/* ================= NAVBAR ================= */}
+
+        {!isAuthPage &&
+          role && (
+
+            <Navbar
+              user={
+                currentUser
+              }
+            />
+          )}
 
         <main className="main-content">
+
           <Routes>
 
-            {/* Welcome */}
-            <Route path='/' element={<WelcomePage />} />
-            <Route path='/welcome' element={<WelcomePage />} />
+            {/* ================= WELCOME ================= */}
 
-            {/* Sign up */}
-            <Route path="/signin-client" element={<SignInClient onLogin={handleLogin} />} />
-            <Route path="/signin-worker" element={<SignInWorker onLogin={handleLogin} />} />
-            <Route path="/signin-admin" element={<SignInAdmin onLogin={() => handleLogin('admin')} />} />
-
-            {/* Login */}
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-
-            {/* Forgot + Reset */}
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token" element={<RestNewPassword />} />
-
-            {/*  Home FIXED */}
             <Route
-              path="/home"
+              path="/"
               element={
-                role === "admin" ? <AdminHomePage /> :
-                role === "technician" ? <WorkerHomePage /> :
-                role === "client" ? <ClientHomePage /> :
-                <Navigate to="/welcome" />
+                <WelcomePage />
               }
             />
 
-            {/* Admin */}
-            <Route path="/admin/workers" element={role === 'admin' ? <WorkerManagement /> : <Navigate to="/home" />} />
-            <Route path="/admin/clients" element={role === 'admin' ? <ClientManagementPage /> : <Navigate to="/home" />} />
-            <Route path="/admin/service-management" element={role === 'admin' ? <ServicesManagementPage /> : <Navigate to="/home" />} />
-            {/* <Route path="/system-setting" element={role === 'admin' ? <SystemSetting /> : <Navigate to="/home" />} /> */}
+            <Route
+              path="/welcome"
+              element={
+                <WelcomePage />
+              }
+            />
 
-            {/* Profiles */}
-            <Route path='/client-profile' element={<Client />} />
-            <Route path='/worker-profile' element={<WorkerPage />} />
+            {/* ================= AUTH ================= */}
 
-            {/* General */}
-            {/* <Route path="/profile" element={<ProfilePage userData={currentUser} />} /> */}
-<Route
-  path="/review/:jobId"
-  element={<CreateReview />}
-/>
-            <Route path="/edit-profile" element={<EditProfilePage userData={currentUser} />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/my-bookings" element={<MyBookings />} />
-            <Route path="/payments" element={<Payments />} />
-            <Route path="/payment-callback" element={<PaymentCallback />} />
-            <Route path="/wallet" element={<Waallet />} />
-            <Route path="/withdraw-admin" element={<WithdrawAdmin />} />
-            <Route path="/withdraw-worker" element={<Withdrawworker />} />
-            <Route path="/chat" element={<Chat />} />
-            {/* <Route path='/technicain-bookings'element={<TechnicianBookings />} /> */}
-           {/* <Route path="/chat" element={<Chat />} /> */}
-            <Route path="/chat/:conversationId" element={<Chat />} />
-            {/* <Route path="/setting-home" element={<SettingHome />} /> */}
-            <Route path="/workers/:serviceId" element={<ServiceWorkersPage />} />
-            <Route path="/worker-profile/:id" element={<WorkerPage userData={currentUser} />} />
-            <Route path="/client-profile/:id" element={<Client userData={currentUser} />} />
-<Route
-  path="/open-jobs"
-  element={
-    role === "technician"
-      ? <OpenJobs />
-      : <Navigate to="/home" />
-  }
-/>
+            <Route
+              path="/login"
+              element={
+                <Login
+                  onLogin={
+                    handleLogin
+                  }
+                />
+              }
+            />
+
+            <Route
+              path="/signin-client"
+              element={
+                <SignInClient
+                  onLogin={
+                    handleLogin
+                  }
+                />
+              }
+            />
+
+            <Route
+              path="/signin-worker"
+              element={
+                <SignInWorker
+                  onLogin={
+                    handleLogin
+                  }
+                />
+              }
+            />
+
+            <Route
+              path="/signin-admin"
+              element={
+                <SignInAdmin
+                  onLogin={() =>
+                    handleLogin(
+                      "admin"
+                    )
+                  }
+                />
+              }
+            />
+
+            <Route
+              path="/forgot-password"
+              element={
+                <ForgotPassword />
+              }
+            />
+
+            <Route
+              path="/reset-password/:token"
+              element={
+                <RestNewPassword />
+              }
+            />
+
+            {/* ================= HOME ================= */}
+
+            <Route
+              path="/home"
+              element={
+                role === "admin" ? (
+                  <AdminHomePage />
+                ) : role ===
+                  "technician" ? (
+                  <WorkerHomePage />
+                ) : role ===
+                  "client" ? (
+                  <ClientHomePage />
+                ) : (
+                  <Navigate to="/welcome" />
+                )
+              }
+            />
+
+            {/* ================= ADMIN ================= */}
+
+            <Route
+              path="/admin/workers"
+              element={
+                role ===
+                "admin" ? (
+                  <WorkerManagement />
+                ) : (
+                  <Navigate to="/home" />
+                )
+              }
+            />
+
+            <Route
+              path="/admin/clients"
+              element={
+                role ===
+                "admin" ? (
+                  <ClientManagementPage />
+                ) : (
+                  <Navigate to="/home" />
+                )
+              }
+            />
+
+            <Route
+              path="/admin/service-management"
+              element={
+                role ===
+                "admin" ? (
+                  <ServicesManagementPage />
+                ) : (
+                  <Navigate to="/home" />
+                )
+              }
+            />
+
+            {/* ================= CLIENT PROFILE ================= */}
+
+            <Route
+              path="/client-profile"
+              element={
+                <MyClientProfile />
+              }
+            />
+
+            {/* PUBLIC CLIENT PROFILE */}
 
 <Route
-  path="/my-proposals"
-  element={
-    role === "technician"
-      ? <MyProposals />
-      : <Navigate to="/home" />
-  }
+  path="/client/:id"
+  element={<ClientProfile />}
 />
 
-<Route
-  path="/jobs/:id/proposals"
-  element={
-    role === "client"
-      ? <JobProposals />
-      : <Navigate to="/home" />
-  }
-/>
-<Route
-  path="/technician-jobs"
-  element={<TechnicianJobs />}
-/>
-<Route
-  path="/worker/:id"
-  element={<WorkerProfile />}
-/>
-<Route
-  path="/messages"
-  element={<MessagesPage />}
-/>
-            {/* fallback */}
-            <Route path="*" element={<Navigate to="/" />} />
+            {/* ================= WORKER PROFILE ================= */}
+
+            <Route
+              path="/worker-profile"
+              element={
+                <MyWorkerProfile />
+              }
+            />
+
+            {/* PUBLIC WORKER PROFILE */}
+
+            <Route
+              path="/worker/:id"
+              element={
+                <WorkerProfile />
+              }
+            />
+
+            <Route
+              path="/worker-profile/:id"
+              element={
+                <WorkerPage
+                  userData={
+                    currentUser
+                  }
+                />
+              }
+            />
+
+            {/* ================= BOOKINGS ================= */}
+
+            <Route
+              path="/booking"
+              element={
+                <Booking />
+              }
+            />
+
+            <Route
+              path="/my-bookings"
+              element={
+                <MyBookings />
+              }
+            />
+
+            <Route
+              path="/open-jobs"
+              element={
+                role ===
+                "technician" ? (
+                  <OpenJobs />
+                ) : (
+                  <Navigate to="/home" />
+                )
+              }
+            />
+
+            <Route
+              path="/my-proposals"
+              element={
+                role ===
+                "technician" ? (
+                  <MyProposals />
+                ) : (
+                  <Navigate to="/home" />
+                )
+              }
+            />
+
+            <Route
+              path="/jobs/:id/proposals"
+              element={
+                role ===
+                "client" ? (
+                  <JobProposals />
+                ) : (
+                  <Navigate to="/home" />
+                )
+              }
+            />
+
+            <Route
+              path="/technician-jobs"
+              element={
+                <TechnicianJobs />
+              }
+            />
+
+            {/* ================= PAYMENTS ================= */}
+
+            <Route
+              path="/payments"
+              element={
+                <Payments />
+              }
+            />
+
+            <Route
+              path="/payment-callback"
+              element={
+                <PaymentCallback />
+              }
+            />
+
+            <Route
+              path="/wallet"
+              element={
+                <Waallet />
+              }
+            />
+
+            <Route
+              path="/withdraw-admin"
+              element={
+                <AdminWithdraws />
+              }
+            />
+
+          
+            {/* ================= CHAT ================= */}
+
+            <Route
+              path="/chat"
+              element={<Chat />}
+            />
+
+            <Route
+              path="/chat/:conversationId"
+              element={<Chat />}
+            />
+
+            <Route
+              path="/messages"
+              element={
+                <MessagesPage />
+              }
+            />
+
+            {/* ================= SERVICES ================= */}
+
+            <Route
+              path="/workers/:serviceId"
+              element={
+                <ServiceWorkersPage />
+              }
+            />
+
+            {/* ================= REVIEWS ================= */}
+
+            <Route
+              path="/review/:jobId"
+              element={
+                <CreateReview />
+              }
+            />
+
+            {/* ================= EDIT PROFILE ================= */}
+
+            <Route
+              path="/edit-profile"
+              element={
+                <EditProfilePage
+                  userData={
+                    currentUser
+                  }
+                />
+              }
+            />
+
+            {/* ================= FALLBACK ================= */}
+
+            <Route
+              path="*"
+              element={
+                <Navigate to="/" />
+              }
+            />
 
           </Routes>
+
         </main>
+
       </div>
+
     </div>
   );
 }
 
-
 export default function App() {
+
   return (
+
     <Router>
+
       <AppContent />
+
     </Router>
   );
 }

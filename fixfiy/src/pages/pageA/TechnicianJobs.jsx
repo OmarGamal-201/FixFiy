@@ -11,6 +11,8 @@ import {
   MessageSquare,
   Briefcase,
   AlertCircle,
+  MapPin,
+  User,
 } from "lucide-react";
 
 import {
@@ -77,7 +79,7 @@ const TechnicianJobs = () => {
     }
   };
 
-  // ================= ACCEPT =================
+  // ================= ACTIONS =================
 
   const handleAccept =
     async (id) => {
@@ -99,8 +101,6 @@ const TechnicianJobs = () => {
       }
     };
 
-  // ================= REJECT =================
-
   const handleReject =
     async (id) => {
 
@@ -121,8 +121,6 @@ const TechnicianJobs = () => {
       }
     };
 
-  // ================= START =================
-
   const handleStart =
     async (id) => {
 
@@ -142,8 +140,6 @@ const TechnicianJobs = () => {
         );
       }
     };
-
-  // ================= COMPLETE =================
 
   const handleComplete =
     async (id) => {
@@ -177,6 +173,7 @@ const TechnicianJobs = () => {
         );
 
   return (
+
     <div className="tech-jobs-page">
 
       {/* HEADER */}
@@ -329,25 +326,92 @@ const TechnicianJobs = () => {
 
                   </div>
 
+                  {/* CLIENT PREVIEW */}
+
+                  <div className="client-preview">
+
+                    <div
+                      className="client-avatar"
+                      onClick={() =>
+                        navigate(
+                          `/client/${job.clientId?._id}`
+                        )
+                      }
+                    >
+
+                      {job.clientId
+                        ?.profilePicture?.[0]
+                        ?.url ? (
+
+                        <img
+                          src={
+                            job.clientId
+                              ?.profilePicture?.[0]
+                              ?.url
+                          }
+                          alt="client"
+                        />
+
+                      ) : (
+
+                        <span>
+
+                          {job.clientId?.name
+                            ?.charAt(0)
+                            ?.toUpperCase()}
+
+                        </span>
+
+                      )}
+
+                    </div>
+
+                    <div className="client-info">
+
+                      <h4>
+                        {
+                          job.clientId
+                            ?.name
+                        }
+                      </h4>
+
+                      <p>
+
+                        <MapPin
+                          size={14}
+                        />
+
+                        {
+                          job.clientId
+                            ?.address
+                            ?.city
+                        }
+
+                      </p>
+
+                      <button
+                        className="view-client-btn"
+                        onClick={() =>
+                          navigate(
+                            `/client/${job.clientId?._id}`
+                          )
+                        }
+                      >
+                        <User
+                          size={15}
+                        />
+
+                        View Profile
+
+                      </button>
+
+                    </div>
+
+                  </div>
+
                   {/* BODY */}
 
                   <div className="job-card-body">
-
-                    <div className="job-row">
-
-                      <span>
-                        Client
-                      </span>
-
-                      <strong>
-                        {
-                          job.clientId
-                            ?.name ||
-                          "N/A"
-                        }
-                      </strong>
-
-                    </div>
 
                     <div className="job-row">
 
@@ -382,126 +446,129 @@ const TechnicianJobs = () => {
 
                   {/* ACTIONS */}
 
-                  <div className="job-actions">
 
-                    {/* ACCEPT */}
+{
+  job.status === "PENDING" &&
+  job.paymentStatus !== "DEPOSIT_PAID" && (
 
-                    {job.status ===
-                      "PENDING" && (
+    <div className="deposit-warning">
 
-                      <button
-                        className="job-btn success"
-                        onClick={() =>
-                          handleAccept(
-                            job._id
-                          )
-                        }
-                      >
+      Waiting for client deposit payment
 
-                        <CheckCircle
-                          size={17}
-                        />
+    </div>
+)}
 
-                        Accept
+<div className="job-actions">
 
-                      </button>
-                    )}
+  {
+    job.status === "PENDING" &&
+    job.paymentStatus === "DEPOSIT_PAID" && (
 
-                    {/* REJECT */}
+      <>
+        <button
+          className="job-btn success"
+          onClick={() =>
+            handleAccept(
+              job._id
+            )
+          }
+        >
 
-                    {job.status ===
-                      "PENDING" && (
+          <CheckCircle
+            size={17}
+          />
 
-                      <button
-                        className="job-btn danger"
-                        onClick={() =>
-                          handleReject(
-                            job._id
-                          )
-                        }
-                      >
+          Accept
 
-                        <XCircle
-                          size={17}
-                        />
+        </button>
 
-                        Reject
+        <button
+          className="job-btn danger"
+          onClick={() =>
+            handleReject(
+              job._id
+            )
+          }
+        >
 
-                      </button>
-                    )}
+          <XCircle
+            size={17}
+          />
 
-                    {/* START */}
+          Reject
 
-                    {job.status ===
-                      "ACCEPTED" && (
+        </button>
+      </>
+  )}
 
-                      <button
-                        className="job-btn primary"
-                        onClick={() =>
-                          handleStart(
-                            job._id
-                          )
-                        }
-                      >
+  {
+    job.status === "ACCEPTED" && (
 
-                        <PlayCircle
-                          size={17}
-                        />
+      <button
+        className="job-btn primary"
+        onClick={() =>
+          handleStart(
+            job._id
+          )
+        }
+      >
 
-                        Start Job
+        <PlayCircle
+          size={17}
+        />
 
-                      </button>
-                    )}
+        Start Job
 
-                    {/* COMPLETE */}
+      </button>
+  )}
 
-                    {job.status ===
-                      "ACTIVE" && (
+  {
+    job.status === "ACTIVE" && (
 
-                      <button
-                        className="job-btn dark"
-                        onClick={() =>
-                          handleComplete(
-                            job._id
-                          )
-                        }
-                      >
+      <button
+        className="job-btn dark"
+        onClick={() =>
+          handleComplete(
+            job._id
+          )
+        }
+      >
 
-                        <BadgeCheck
-                          size={17}
-                        />
+        <BadgeCheck
+          size={17}
+        />
 
-                        Complete
+        Complete
 
-                      </button>
-                    )}
+      </button>
+  )}
 
-                    {/* CHAT */}
+  {
+    (
+      job.status === "ACCEPTED" ||
+      job.status === "ACTIVE"
+    ) && (
 
-                    {(job.status ===
-                      "ACCEPTED" ||
-                      job.status ===
-                        "ACTIVE") && (
+      <button
+        className="job-btn light"
+        onClick={() =>
+          navigate(
+            `/chat?jobId=${job._id}&receiverId=${job.clientId?._id}`
+          )
+        }
+      >
 
-                      <button
-                        className="job-btn light"
-                        onClick={() =>
-                          navigate(
-                            `/chat?jobId=${job._id}&receiverId=${job.clientId?._id}`
-                          )
-                        }
-                      >
+        <MessageSquare
+          size={17}
+        />
 
-                        <MessageSquare
-                          size={17}
-                        />
+        Chat
 
-                        Chat
+      </button>
+  )}
 
-                      </button>
-                    )}
+</div>
 
-                  </div>
 
                 </div>
               );

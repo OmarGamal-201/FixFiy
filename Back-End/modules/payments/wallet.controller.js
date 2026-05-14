@@ -1,26 +1,63 @@
-const walletService = require("./wallet.service");
+const walletService =
+  require("./wallet.service");
 
 /**
- * @desc    Get logged-in worker wallet
- * @route   GET /api/wallet
- * @access  Technician
+ * Get wallet
  */
-const getMyWallet = async (req, res) => {
-  try {
-    const wallet = await walletService.getWalletByWorker(req.user.id);
+const getMyWallet =
+  async (req, res) => {
 
-    res.status(200).json({
-      success: true,
-      data: wallet,
-    });
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message,
-    });
-  }
-};
+    try {
+
+      const wallet =
+        await walletService.getWalletByWorker(
+          req.user.id
+        );
+
+      res.status(200).json({
+        success: true,
+        data: wallet,
+      });
+
+    } catch (err) {
+
+      res.status(400).json({
+        success: false,
+        message:
+          err.message,
+      });
+    }
+  };
+
+/**
+ * Get transactions
+ */
+const getTransactions =
+  async (req, res) => {
+
+    try {
+
+      const data =
+        await walletService.getWalletTransactions(
+          req.user.id
+        );
+
+      res.status(200).json({
+        success: true,
+        data,
+      });
+
+    } catch (err) {
+
+      res.status(400).json({
+        success: false,
+        message:
+          err.message,
+      });
+    }
+  };
 
 module.exports = {
   getMyWallet,
+  getTransactions,
 };

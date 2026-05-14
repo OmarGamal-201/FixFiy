@@ -1,37 +1,73 @@
-const mongoose = require("mongoose");
+const mongoose =
+  require("mongoose");
 
-const withdrawRequestSchema = new mongoose.Schema(
-  {
-    workerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+const withdrawRequestSchema =
+  new mongoose.Schema(
+    {
+      workerId: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+
+        ref: "User",
+
+        required: true,
+      },
+
+      amount: {
+        type: Number,
+
+        required: true,
+
+        min: 1,
+      },
+
+      status: {
+        type: String,
+
+        enum: [
+          "PENDING",
+          "APPROVED",
+          "REJECTED",
+        ],
+
+        default:
+          "PENDING",
+      },
+
+      processedBy: {
+        type:
+          mongoose.Schema.Types.ObjectId,
+
+        ref: "User", // admin
+      },
+
+      processedAt:
+        Date,
+
+      note: String,
     },
 
-    amount: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
+    {
+      timestamps: true,
+    }
+  );
 
-    status: {
-      type: String,
-      enum: ["PENDING", "APPROVED", "REJECTED"],
-      default: "PENDING",
-    },
+/* ================= Indexes ================= */
 
-    processedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // admin
-    },
+withdrawRequestSchema.index({
+  status: 1,
 
-    processedAt: Date,
+  createdAt: -1,
+});
 
-    note: String,
-  },
-  { timestamps: true }
-);
+withdrawRequestSchema.index({
+  workerId: 1,
+});
 
-withdrawRequestSchema.index({ status: 1, createdAt: -1 });
+/* ================= Export ================= */
 
-module.exports = mongoose.model("WithdrawRequest", withdrawRequestSchema);
+module.exports =
+  mongoose.model(
+    "WithdrawRequest",
+    withdrawRequestSchema
+  );

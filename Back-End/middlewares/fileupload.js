@@ -53,15 +53,15 @@ const upload = multer({
 const uploadUserPicture = upload.single('profilePicture');
 
 // Middleware to process uploaded files and add to request body
+
 const processUploadedFiles = (req, res, next) => {
+
+    // لو مفيش صورة جديدة متعملش Error
     if (!req.file) {
-        return res.status(400).json({
-            message: 'Validation failed',
-            errors: [{ field: 'picture', message: 'Profile picture is required' }]
-        });
+        return next();
     }
 
-    // Process uploaded files and add to request body
+    // Process uploaded file
     const pictureData = {
         type: 'profile_image',
         filename: req.file.filename,
@@ -72,6 +72,7 @@ const processUploadedFiles = (req, res, next) => {
     };
 
     req.body.profilePicture = [pictureData];
+
     next();
 };
 

@@ -1,4 +1,11 @@
-import React, { useState } from "react";
+
+import React, {
+  useState,
+} from "react";
+
+import {
+  useNavigate,
+} from "react-router-dom";
 
 import API from "../../services/api";
 
@@ -8,9 +15,17 @@ import {
   DollarSign,
   Send,
   X,
+  User,
+  CheckCircle,
+  Eye,
 } from "lucide-react";
 
-const OpenJobCard = ({ job }) => {
+const OpenJobCard = ({
+  job,
+}) => {
+
+  const navigate =
+    useNavigate();
 
   const [showModal, setShowModal] =
     useState(false);
@@ -23,176 +38,282 @@ const OpenJobCard = ({ job }) => {
 
   const [form, setForm] =
     useState({
-
       message: "",
-
       estimatedDuration: "",
     });
+
+  if (!job?.clientId) {
+    return null;
+  }
 
   const handleChange = (e) => {
 
     setForm({
-
       ...form,
-
       [e.target.name]:
         e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit =
+    async (e) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    try {
+      try {
 
-      setLoading(true);
+        setLoading(true);
 
-      setError("");
+        setError("");
 
-      await API.post(
-        "/proposals",
-        {
-
-          jobId: job._id,
-
-          message:
-            form.message,
-
-          estimatedDuration:
-            form.estimatedDuration,
-        }
-      );
-
-      alert(
-        "Proposal sent successfully"
-      );
-
-      setShowModal(false);
-
-      setForm({
-        message: "",
-        estimatedDuration: "",
-      });
-
-    } catch (err) {
-
-      console.log(err);
-
-      if (
-        err.response?.data?.errors
-      ) {
-
-        setError(
-          err.response.data.errors.join(
-            ", "
-          )
+        await API.post(
+          "/proposals",
+          {
+            jobId: job._id,
+            message:
+              form.message,
+            estimatedDuration:
+              form.estimatedDuration,
+          }
         );
 
-      } else {
+        alert(
+          "Proposal sent successfully"
+        );
+
+        setShowModal(false);
+
+        window.location.reload();
+
+      } catch (err) {
+
+        console.log(err);
 
         setError(
           err.response?.data
             ?.message ||
             "Failed to send proposal"
         );
+
+      } finally {
+
+        setLoading(false);
       }
-
-    } finally {
-
-      setLoading(false);
-    }
-  };
+    };
 
   return (
     <>
       <div
         className="card border-0 shadow-sm h-100"
         style={{
-          borderRadius: "20px",
+          borderRadius: "24px",
+          overflow: "hidden",
         }}
       >
 
-        <div className="card-body p-4">
+        {/* TOP */}
 
-          <div className="d-flex justify-content-between align-items-start mb-3">
+        <div
+          style={{
+            background:
+              "linear-gradient(135deg,#6C4DFF,#8B5CF6)",
+            padding: "24px",
+            color: "#fff",
+          }}
+        >
+
+          <div className="d-flex justify-content-between align-items-start">
 
             <div>
-              <h4 className="fw-bold mb-2">
-                {job.title}
-              </h4>
 
-              <span
-                className="badge"
+              <h3 className="fw-bold mb-2">
+                {job.title}
+              </h3>
+
+              <div
+                className="d-inline-flex align-items-center gap-2"
                 style={{
+                  background:
+                    "rgba(255,255,255,.15)",
+                  padding:
+                    "8px 14px",
+                  borderRadius:
+                    "30px",
+                }}
+              >
+
+                <DollarSign size={16} />
+
+                <span>
+                  {job.total_price} EGP
+                </span>
+
+              </div>
+
+            </div>
+
+            <span
+              className="badge"
+              style={{
+                background:
+                  "#fff",
+                color:
+                  "#6C4DFF",
+                padding:
+                  "10px 16px",
+                borderRadius:
+                  "30px",
+                fontWeight:
+                  "700",
+              }}
+            >
+              OPEN
+            </span>
+
+          </div>
+
+        </div>
+
+        <div className="card-body p-4">
+
+          {/* CLIENT */}
+
+          <div
+            className="d-flex align-items-center justify-content-between mb-4"
+          >
+
+            <div className="d-flex align-items-center gap-3">
+
+              <div
+                onClick={() =>
+                  navigate(
+                    `/client/${job.clientId?._id}`
+                  )
+                }
+                style={{
+                  width: "70px",
+                  height: "70px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  cursor: "pointer",
                   background:
                     "#6C4DFF",
                   color: "#fff",
-                  borderRadius:
-                    "20px",
-                  padding:
-                    "8px 14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "24px",
+                  fontWeight: "700",
+                  flexShrink: 0,
                 }}
               >
-                OPEN
-              </span>
-            </div>
 
-            <div className="text-end">
-
-              <h4
-                className="fw-bold"
-                style={{
-                  color:
-                    "#6C4DFF",
-                }}
-              >
-                {job.total_price} EGP
-              </h4>
-
-              <small className="text-muted">
-                Fixed Price
-              </small>
-            </div>
-          </div>
-
-          <p className="text-muted mb-4">
-            {job.description}
-          </p>
-
-          <div className="mb-3">
-
-            <div className="d-flex align-items-center gap-2 mb-2">
-
-              <DollarSign size={18} />
-
-              <span>
-                Service Price:
-                {" "}
-                <strong>
-                  {
-                    job.total_price
-                  }{" "}
-                  EGP
-                </strong>
-              </span>
-            </div>
-
-            <div className="d-flex align-items-center gap-2 mb-2">
-
-              <MapPin size={18} />
-
-              <span>
-                Client:
-                {" "}
                 {
                   job.clientId
-                    ?.name
+                    ?.profilePicture?.[0]
+                    ?.url ? (
+
+                    <img
+                      src={
+                        job.clientId
+                          ?.profilePicture?.[0]
+                          ?.url
+                      }
+                      alt="client"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit:
+                          "cover",
+                      }}
+                    />
+
+                  ) : (
+
+                    job.clientId?.name
+                      ?.charAt(0)
+                      ?.toUpperCase()
+                  )
                 }
-              </span>
+
+              </div>
+
+              <div>
+
+                <h5 className="fw-bold mb-1">
+                  {
+                    job.clientId
+                      ?.name
+                  }
+                </h5>
+
+                <div className="d-flex align-items-center gap-2 text-muted">
+
+                  <MapPin size={15} />
+
+                  <span>
+                    {
+                      job.clientId
+                        ?.address
+                        ?.city
+                    }
+                  </span>
+
+                </div>
+
+              </div>
+
             </div>
 
-            <div className="d-flex align-items-center gap-2">
+            <button
+              className="btn btn-light border"
+              onClick={() =>
+                navigate(
+                  `/client/${job.clientId?._id}`
+                )
+              }
+            >
+
+              <Eye size={17} />
+
+            </button>
+
+          </div>
+
+          {/* DESCRIPTION */}
+
+          <div
+            className="mb-4"
+            style={{
+              background:
+                "#f8fafc",
+              borderRadius:
+                "18px",
+              padding: "18px",
+            }}
+          >
+
+            <h6 className="fw-bold mb-3">
+              Job Description
+            </h6>
+
+            <p
+              className="text-muted mb-0"
+              style={{
+                lineHeight:
+                  "1.8",
+              }}
+            >
+              {job.description}
+            </p>
+
+          </div>
+
+          {/* INFO */}
+
+          <div className="mb-4">
+
+            <div className="d-flex align-items-center gap-2 mb-3">
 
               <Clock size={18} />
 
@@ -203,30 +324,86 @@ const OpenJobCard = ({ job }) => {
                   job.createdAt
                 ).toLocaleDateString()}
               </span>
+
             </div>
+
+            <div className="d-flex align-items-center gap-2">
+
+              <User size={18} />
+
+              <span>
+                Booking:
+                {" "}
+                {
+                  job.bookingType
+                }
+              </span>
+
+            </div>
+
           </div>
 
-          <button
-            className="btn w-100 fw-semibold"
-            style={{
-              background:
-                "#6C4DFF",
-              color: "#fff",
-              borderRadius:
-                "14px",
-              padding:
-                "12px",
-            }}
-            onClick={() =>
-              setShowModal(true)
-            }
-          >
-            Send Proposal
-          </button>
+          {/* ACTION */}
+
+          {
+            job.alreadyApplied ? (
+
+              <div
+                className="d-flex align-items-center justify-content-center gap-2"
+                style={{
+                  background:
+                    "#ecfdf3",
+                  color:
+                    "#15803d",
+                  padding:
+                    "14px",
+                  borderRadius:
+                    "14px",
+                  fontWeight:
+                    "700",
+                }}
+              >
+
+                <CheckCircle
+                  size={18}
+                />
+
+                Proposal already submitted
+
+              </div>
+
+            ) : (
+
+              <button
+                className="btn w-100 fw-semibold"
+                style={{
+                  background:
+                    "#6C4DFF",
+                  color:
+                    "#fff",
+                  borderRadius:
+                    "14px",
+                  padding:
+                    "14px",
+                }}
+                onClick={() =>
+                  setShowModal(true)
+                }
+              >
+
+                <Send size={18} />
+
+                <span className="ms-2">
+                  Send Proposal
+                </span>
+
+              </button>
+          )}
+
         </div>
       </div>
 
-      {/* ================= MODAL ================= */}
+      {/* MODAL */}
 
       {showModal && (
 
@@ -234,7 +411,7 @@ const OpenJobCard = ({ job }) => {
           className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
           style={{
             background:
-              "rgba(0,0,0,0.45)",
+              "rgba(0,0,0,.45)",
             zIndex: 9999,
           }}
         >
@@ -244,7 +421,7 @@ const OpenJobCard = ({ job }) => {
             style={{
               width: "500px",
               borderRadius:
-                "20px",
+                "24px",
               overflow:
                 "hidden",
             }}
@@ -259,13 +436,12 @@ const OpenJobCard = ({ job }) => {
               <button
                 className="btn"
                 onClick={() =>
-                  setShowModal(
-                    false
-                  )
+                  setShowModal(false)
                 }
               >
                 <X />
               </button>
+
             </div>
 
             <form
@@ -292,7 +468,6 @@ const OpenJobCard = ({ job }) => {
                     name="message"
                     rows="5"
                     className="form-control"
-                    placeholder="Describe your experience and how you can help..."
                     value={
                       form.message
                     }
@@ -301,19 +476,19 @@ const OpenJobCard = ({ job }) => {
                     }
                     required
                   />
+
                 </div>
 
                 <div className="mb-4">
 
                   <label className="fw-semibold mb-2">
-                    Estimated Duration (hours)
+                    Estimated Duration
                   </label>
 
                   <input
                     type="number"
                     name="estimatedDuration"
                     className="form-control"
-                    placeholder="Example: 3"
                     value={
                       form.estimatedDuration
                     }
@@ -322,37 +497,7 @@ const OpenJobCard = ({ job }) => {
                     }
                     required
                   />
-                </div>
 
-                <div
-                  className="p-3 mb-4"
-                  style={{
-                    background:
-                      "#F4F1FF",
-                    borderRadius:
-                      "14px",
-                  }}
-                >
-
-                  <p className="mb-1 fw-semibold">
-                    Fixed Service Price
-                  </p>
-
-                  <h4
-                    style={{
-                      color:
-                        "#6C4DFF",
-                    }}
-                  >
-                    {
-                      job.total_price
-                    }{" "}
-                    EGP
-                  </h4>
-
-                  <small className="text-muted">
-                    The technician cannot change the service price.
-                  </small>
                 </div>
 
               </div>
@@ -363,9 +508,7 @@ const OpenJobCard = ({ job }) => {
                   type="button"
                   className="btn btn-light w-50"
                   onClick={() =>
-                    setShowModal(
-                      false
-                    )
+                    setShowModal(false)
                   }
                 >
                   Cancel
@@ -378,17 +521,23 @@ const OpenJobCard = ({ job }) => {
                   style={{
                     background:
                       "#6C4DFF",
-                    color: "#fff",
+                    color:
+                      "#fff",
                   }}
                 >
-                  {loading
-                    ? "Sending..."
-                    : "Send Proposal"}
+                  {
+                    loading
+                      ? "Sending..."
+                      : "Send Proposal"
+                  }
                 </button>
 
               </div>
+
             </form>
+
           </div>
+
         </div>
       )}
     </>

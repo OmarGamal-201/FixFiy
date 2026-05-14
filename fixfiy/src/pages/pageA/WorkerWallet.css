@@ -1,0 +1,153 @@
+.wallet-page{
+  padding:24px;
+}
+
+.wallet-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+}
+
+.wallet-header h1{
+  font-size:32px;
+  font-weight:700;
+}
+
+.wallet-header p{
+  color:#777;
+  margin-top:4px;
+}
+
+.wallet-icon{
+  width:70px;
+  height:70px;
+  border-radius:20px;
+  background:#6d28d9;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.balance-card{
+  background:linear-gradient(
+    135deg,
+    #6d28d9,
+    #9333ea
+  );
+
+  padding:30px;
+  border-radius:24px;
+  color:#fff;
+  margin-bottom:24px;
+}
+
+.balance-card p{
+  opacity:.8;
+  margin-bottom:10px;
+}
+
+.balance-card h2{
+  font-size:42px;
+  font-weight:700;
+}
+
+.withdraw-card,
+.transactions-card{
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  margin-bottom:24px;
+  box-shadow:0 4px 20px rgba(0,0,0,.05);
+}
+
+.withdraw-form{
+  display:flex;
+  gap:14px;
+  margin-top:18px;
+}
+
+.withdraw-form input{
+  flex:1;
+  border:1px solid #ddd;
+  border-radius:14px;
+  padding:14px;
+  outline:none;
+}
+
+.withdraw-form button{
+  border:none;
+  background:#6d28d9;
+  color:#fff;
+  padding:14px 24px;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.transactions-list{
+  margin-top:20px;
+}
+
+.transaction-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 0;
+  border-bottom:1px solid #eee;
+}
+
+.tx-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.tx-icon{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.tx-icon.earning{
+  background:#dcfce7;
+  color:#16a34a;
+}
+
+.tx-icon.withdraw{
+  background:#fee2e2;
+  color:#dc2626;
+}
+
+.tx-left h4{
+  margin:0;
+  font-size:15px;
+}
+
+.tx-left p{
+  margin:4px 0 0;
+  color:#888;
+  font-size:13px;
+}
+
+.tx-amount{
+  font-weight:700;
+}
+
+.tx-amount.plus{
+  color:#16a34a;
+}
+
+.tx-amount.minus{
+  color:#dc2626;
+}
+
+.empty-transactions{
+  padding:30px 0;
+  text-align:center;
+  color:#777;
+}

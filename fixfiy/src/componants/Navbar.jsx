@@ -390,29 +390,40 @@ const handleSearchSubmit = () => {
                 {currentUser?.name}
               </span>
 
-              <div 
-                className="user-avatar-mini"
-                style={{
-                  backgroundImage: profileImageUrl ? `url(${profileImageUrl})` : "none",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundColor: profileImageUrl ? "transparent" : "#3b82f6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "50%",
-                  width: "40px",
-                  height: "40px",
-                  border: "1px solid #ddd",
-                  flexShrink: 0,
-                  color: "#fff",
-                  fontSize: "15px",
-                  fontWeight: "bold",
-                  overflow: 'hidden' // عشان الصورة متطلعش برا الدايرة
-                }}
-              >
-                {!profileImageUrl && currentUser?.name?.charAt(0).toUpperCase()}
-              </div>
+              
+<div
+  className="user-avatar-mini"
+  style={{
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+    overflow: "hidden",
+    border: "1px solid #ddd",
+    flexShrink: 0,
+    background: "#3b82f6",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#fff",
+    fontWeight: "bold",
+  }}
+>
+  {profileImageUrl ? (
+    <img
+      src={profileImageUrl}
+      alt=""
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+      }}
+    />
+  ) : (
+    currentUser?.name?.charAt(0).toUpperCase()
+  )}
+</div>
+
+
             </Link>
           )}
         </div>

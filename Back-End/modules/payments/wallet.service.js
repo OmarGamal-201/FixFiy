@@ -1,24 +1,42 @@
 const Wallet = require("./wallet.model");
+const WithdrawRequest = require("./withdrawRequest.model");
 
 /**
  * Get or create wallet for worker
  */
-const getWalletByWorker = async (workerId, options = {}) => {
-  const { session } = options;
-  
-  let wallet = await Wallet.findOne({ workerId });
+const getWalletByWorker = async (
+  workerId,
+  options = {}
+) => {
+
+  const { session } =
+    options;
+
+  let wallet =
+    await Wallet.findOne({
+      workerId,
+    });
 
   if (!wallet) {
-    wallet = await Wallet.create([{ workerId }], { session });
-    wallet = Array.isArray(wallet) ? wallet[0] : wallet;
+
+    wallet =
+      await Wallet.create(
+        [{ workerId }],
+        { session }
+      );
+
+    wallet = Array.isArray(
+      wallet
+    )
+      ? wallet[0]
+      : wallet;
   }
 
   return wallet;
 };
 
 /**
- * Add to wallet with MongoDB session support
- * Supports: EARNING, REFUND, BONUS, etc.
+ * Add money to wallet
  */
 const addToWallet = async (
   {
@@ -30,17 +48,30 @@ const addToWallet = async (
   },
   options = {}
 ) => {
-  if (!workerId || !amount) {
-    throw new Error("workerId and amount are required");
+
+  if (
+    !workerId ||
+    !amount
+  ) {
+    throw new Error(
+      "workerId and amount are required"
+    );
   }
 
   if (amount <= 0) {
-    throw new Error("Amount must be positive");
+    throw new Error(
+      "Amount must be positive"
+    );
   }
 
-  const { session } = options;
+  const { session } =
+    options;
 
-  const wallet = await getWalletByWorker(workerId, { session });
+  const wallet =
+    await getWalletByWorker(
+      workerId,
+      { session }
+    );
 
   wallet.balance += amount;
 
@@ -51,73 +82,125 @@ const addToWallet = async (
     referenceType,
   });
 
-  await wallet.save({ session });
+  await wallet.save({
+    session,
+  });
+
   return wallet;
 };
 
 /**
- * Withdraw from wallet with MongoDB session support
+ * Withdraw from wallet
  */
-const withdrawFromWallet = async (
-  {
-    workerId,
-    amount,
-    referenceId,
-  },
-  options = {}
-) => {
-  if (!workerId || !amount) {
-    throw new Error("workerId and amount are required");
-  }
+const withdrawFromWallet =
+  async (
+    {
+      workerId,
+      amount,
+      referenceId,
+    },
+    options = {}
+  ) => {
 
-  if (amount <= 0) {
-    throw new Error("Amount must be positive");
-  }
+    if (
+      !workerId ||
+      !amount
+    ) {
+      throw new Error(
+        "workerId and amount are required"
+      );
+    }
 
-  const { session } = options;
+    if (amount <= 0) {
+      throw new Error(
+        "Amount must be positive"
+      );
+    }
 
-  const wallet = await getWalletByWorker(workerId, { session });
+    const { session } =
+      options;
 
-  if (wallet.balance < amount) {
-    throw new Error("Insufficient balance");
-  }
+    const wallet =
+      await getWalletByWorker(
+        workerId,
+        { session }
+      );
 
-  wallet.balance -= amount;
+    if (
+      wallet.balance <
+      amount
+    ) {
+      throw new Error(
+        "Insufficient balance"
+      );
+    }
 
-  wallet.transactions.push({
-    type: "WITHDRAW",
-    amount,
-    referenceId,
-    referenceType: "WITHDRAW",
-  });
+    wallet.balance -= amount;
 
-  await wallet.save({ session });
-  return wallet;
-};
+    wallet.transactions.push({
+      type: "WITHDRAW",
+      amount,
+      referenceId,
+      referenceType:
+        "WITHDRAW",
+    });
+
+    await wallet.save({
+      session,
+    });
+
+    return wallet;
+  };
 
 /**
  * Get wallet balance
  */
-const getWalletBalance = async (workerId) => {
-  const wallet = await Wallet.findOne({ workerId });
-  return wallet?.balance || 0;
-};
+const getWalletBalance =
+  async (workerId) => {
+
+    const wallet =
+      await Wallet.findOne({
+        workerId,
+      });
+
+    return (
+      wallet?.balance || 0
+    );
+  };
 
 /**
  * Get wallet transactions
  */
-const getWalletTransactions = async (workerId, limit = 50) => {
-  const wallet = await Wallet.findOne({ workerId }).select("transactions balance");
-  
-  if (!wallet) {
-    return { transactions: [], balance: 0 };
-  }
+const getWalletTransactions =
+  async (
+    workerId,
+    limit = 20
+  ) => {
 
-  return {
-    transactions: wallet.transactions.slice(-limit),
-    balance: wallet.balance,
+    const wallet =
+      await Wallet.findOne({
+        workerId,
+      }).select(
+        "transactions balance"
+      );
+
+    if (!wallet) {
+      return {
+        transactions: [],
+        balance: 0,
+      };
+    }
+
+    return {
+      transactions:
+        wallet.transactions
+          .reverse()
+          .slice(0, limit),
+
+      balance:
+        wallet.balance,
+    };
   };
-};
 
 module.exports = {
   getWalletByWorker,

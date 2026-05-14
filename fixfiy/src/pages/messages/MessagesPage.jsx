@@ -78,50 +78,65 @@ export default function MessagesPage() {
       }
     };
 
-  const openChat =
-    (conversation) => {
+ const openChat =
+  (conversation) => {
 
-      // JOB CHAT
+    const otherUser =
+      getOtherUser(
+        conversation.participants,
+        currentUserId
+      );
 
-      if (
-        conversation.conversationType ===
-        "JOB"
-      ) {
+    // JOB CHAT
 
-        navigate(
-          `/chat?jobId=${conversation.jobId?._id}`,
-          {
-            state: {
-              workerName:
-                getOtherUser(
-                  conversation.participants,
-                  currentUserId
-                )?.name,
-            },
-          }
-        );
-
-        return;
-      }
-
-      // INQUIRY CHAT
+    if (
+      conversation.conversationType ===
+      "JOB"
+    ) {
 
       const otherUser =
-        getOtherUser(
-          conversation.participants,
-          currentUserId
-        );
+  getOtherUser(
+    conversation.participants,
+    currentUserId
+  );
 
-      navigate(
-        `/chat?workerId=${otherUser?._id}`,
-        {
-          state: {
-            workerName:
-              otherUser?.name,
-          },
-        }
-      );
-    };
+navigate(
+  `/chat?jobId=${conversation.jobId?._id}`,
+  {
+    state: {
+      workerName:
+        otherUser?.name,
+
+      workerId:
+        otherUser?._id,
+
+      role:
+        otherUser?.role,
+    },
+  }
+);
+
+      return;
+    }
+
+    // INQUIRY CHAT
+
+   navigate(
+  `/chat?workerId=${otherUser?._id}`,
+  {
+    state: {
+      workerName:
+        otherUser?.name,
+
+      workerId:
+        otherUser?._id,
+
+      role:
+        otherUser?.role,
+    },
+  }
+);
+  };
 
   return (
 

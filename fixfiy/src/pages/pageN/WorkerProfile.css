@@ -151,6 +151,16 @@
   font-size:1rem;
 }
 
+.worker-profile-image{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  border:4px solid #e0e7ff;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+
 @media(max-width:768px){
 
   .worker-header{

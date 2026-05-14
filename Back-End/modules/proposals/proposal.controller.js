@@ -148,7 +148,7 @@ exports.acceptProposal = async (req, res) => {
  */
 exports.rejectProposal = async (req, res) => {
   try {
-    const { reason } = req.body;
+    const { reason } =  req.body || {};
 
     const validation = validateRejectProposal({ proposalId: req.params.id });
 

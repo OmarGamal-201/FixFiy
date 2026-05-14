@@ -3,7 +3,13 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import {
+  Star,
+} from "lucide-react";
 
+import {
+  useNavigate,
+} from "react-router-dom";
 import API from "../../services/api";
 
 import "./MyWorkerProfile.css";
@@ -49,7 +55,8 @@ const specialties = [
 ];
 
 export default function MyWorkerProfile() {
-
+const navigate =
+  useNavigate();
   const [loading, setLoading] =
     useState(true);
 
@@ -471,7 +478,20 @@ export default function MyWorkerProfile() {
           </span>
 
         </div>
+<button
+  className="reviews-profile-btn"
+  onClick={() =>
+    navigate(
+      `/worker-reviews/${localStorage.getItem("userId")}`
+    )
+  }
+>
 
+  <Star size={18} />
+
+  View My Reviews
+
+</button>
         <button
           className="save-btn"
           onClick={handleSave}

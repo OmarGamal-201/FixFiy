@@ -15,7 +15,8 @@ import {
   LogOut,
   ClipboardList,
   ShieldCheck,
-  MessageCircle
+  MessageCircle,
+  Star
 } from 'lucide-react';
 
 const Sidebar = ({
@@ -179,8 +180,6 @@ const Sidebar = ({
 
             </div>
 
-           
-
           </>
         )}
 
@@ -301,6 +300,8 @@ const Sidebar = ({
           'admin' && (
           <>
 
+            {/* CLIENTS */}
+
             <div
               className={`menu-item ${isActive('/admin/clients')}`}
               onClick={() =>
@@ -315,6 +316,8 @@ const Sidebar = ({
               </span>
 
             </div>
+
+            {/* WORKERS */}
 
             <div
               className={`menu-item ${isActive('/admin/workers')}`}
@@ -331,6 +334,8 @@ const Sidebar = ({
 
             </div>
 
+            {/* SERVICES */}
+
             <div
               className={`menu-item ${isActive('/admin/service-management')}`}
               onClick={() =>
@@ -346,6 +351,25 @@ const Sidebar = ({
 
             </div>
 
+            {/* REVIEWS */}
+
+            <div
+              className={`menu-item ${isActive('/admin/reviews')}`}
+              onClick={() =>
+                navigate('/admin/reviews')
+              }
+            >
+
+              <Star size={20} />
+
+              <span>
+                Reviews
+              </span>
+
+            </div>
+
+            {/* WITHDRAW REQUESTS */}
+
             <div
               className={`menu-item ${isActive('/withdraw-admin')}`}
               onClick={() =>
@@ -356,7 +380,7 @@ const Sidebar = ({
               <CreditCard size={20} />
 
               <span>
-                Wallet
+                Withdrawal Requests
               </span>
 
             </div>

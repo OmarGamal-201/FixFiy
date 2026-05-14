@@ -87,6 +87,8 @@ import ServiceWorkersPage from "./pages/pageH/ServiceWorkers";
 /* ================= REVIEWS ================= */
 
 import CreateReview from "./pages/CreateReview/CreateReview";
+import WorkerReviews from "./pages/CreateReview/WorkerReviews";
+import AdminReviews from "./pages/CreateReview/AdminReviews";
 
 function AppContent() {
 
@@ -520,7 +522,18 @@ function AppContent() {
                 <CreateReview />
               }
             />
-
+<Route
+  path="/worker/:id/reviews"
+  element={<WorkerReviews />}
+/>
+<Route
+  path="/admin/reviews"
+  element={<AdminReviews />}
+/>
+<Route
+  path="/worker-reviews/:id"
+  element={<WorkerReviews />}
+/>
             {/* ================= EDIT PROFILE ================= */}
 
             <Route

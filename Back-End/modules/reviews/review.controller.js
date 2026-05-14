@@ -15,7 +15,27 @@ exports.createReview = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+exports.adminGetAllReviews =
+  async (req, res) => {
 
+    try {
+
+      const reviews =
+        await reviewService.adminGetAllReviews();
+
+      res.json({
+        success: true,
+        data: reviews,
+      });
+
+    } catch (err) {
+
+      res.status(400).json({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
 /* PUBLIC */
 exports.getWorkerReviews = async (req, res) => {
   try {

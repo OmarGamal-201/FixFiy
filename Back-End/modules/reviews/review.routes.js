@@ -18,6 +18,12 @@ router.get(
 );
 
 /* ADMIN */
+router.get(
+  "/admin/reviews",
+  protect,
+  authorize("admin"),
+  controller.adminGetAllReviews
+);
 router.patch(
   "/admin/reviews/:id",
   protect,

@@ -179,22 +179,7 @@ const Sidebar = ({
 
             </div>
 
-            {/* PAYMENTS */}
-
-            <div
-              className={`menu-item ${isActive('/payments')}`}
-              onClick={() =>
-                navigate('/payments')
-              }
-            >
-
-              <CreditCard size={20} />
-
-              <span>
-                Payments
-              </span>
-
-            </div>
+           
 
           </>
         )}

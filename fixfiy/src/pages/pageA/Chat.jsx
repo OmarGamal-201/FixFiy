@@ -63,17 +63,17 @@ const Chat = () => {
       )
     );
 
- const otherUserId =
-  location.state?.workerId ||
-  location.state?.clientId;
+  const otherUserId =
+    location.state?.workerId ||
+    location.state?.clientId;
 
-const otherUserRole =
-  location.state?.role;
+  const otherUserRole =
+    location.state?.role;
 
-const displayName =
-  location.state?.workerName ||
-  location.state?.clientName ||
-  "Chat";
+  const displayName =
+    location.state?.workerName ||
+    location.state?.clientName ||
+    "Chat";
 
   // ================= STATES =================
 
@@ -82,23 +82,38 @@ const displayName =
     setConversationId,
   ] = useState(null);
 
-  const [messages,
-    setMessages] =
-    useState([]);
+  const [
+    messages,
+    setMessages,
+  ] = useState([]);
 
-  const [newMessage,
-    setNewMessage] =
-    useState("");
+  const [
+    newMessage,
+    setNewMessage,
+  ] = useState("");
 
-  const [loading,
-    setLoading] =
-    useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
   const socketRef =
     useRef(null);
 
   const endRef =
     useRef(null);
+
+  // ================= SCROLL =================
+
+  const scrollToBottom =
+    () => {
+
+      endRef.current
+        ?.scrollIntoView({
+          behavior:
+            "smooth",
+        });
+    };
 
   // ================= SOCKET =================
 
@@ -116,6 +131,8 @@ const displayName =
           },
         }
       );
+
+    // RECEIVE NEW MESSAGE
 
     socketRef.current.on(
       "newMessage",
@@ -141,12 +158,16 @@ const displayName =
           }
         );
 
-        scrollToBottom();
+        setTimeout(
+          scrollToBottom,
+          100
+        );
       }
     );
 
     return () => {
-      socketRef.current.disconnect();
+
+      socketRef.current?.disconnect();
     };
 
   }, []);
@@ -170,6 +191,7 @@ const displayName =
           // JOB CHAT
 
           if (jobId) {
+
             body.jobId =
               jobId;
           }
@@ -177,6 +199,7 @@ const displayName =
           // INQUIRY CHAT
 
           if (workerId) {
+
             body.workerId =
               workerId;
           }
@@ -196,7 +219,7 @@ const displayName =
             conv._id
           );
 
-          // GET MESSAGES
+          // GET OLD MESSAGES
 
           const msgRes =
             await API.get(
@@ -257,18 +280,6 @@ const displayName =
 
   }, [setupChat]);
 
-  // ================= SCROLL =================
-
-  const scrollToBottom =
-    () => {
-
-      endRef.current
-        ?.scrollIntoView({
-          behavior:
-            "smooth",
-        });
-    };
-
   // ================= SEND =================
 
   const handleSend =
@@ -285,44 +296,19 @@ const displayName =
       const content =
         newMessage.trim();
 
+      // CLEAR INPUT
+
       setNewMessage("");
 
-      try {
+      // SEND USING SOCKET ONLY
 
-        const res =
-          await API.post(
-            `/messages/${conversationId}`,
-            {
-              content,
-            }
-          );
-
-        const savedMessage =
-          res.data.data;
-
-        setMessages(
-          (prev) => [
-            ...prev,
-            savedMessage,
-          ]
-        );
-
-        socketRef.current.emit(
-          "sendMessage",
-          savedMessage
-        );
-
-        scrollToBottom();
-
-      } catch (err) {
-
-        alert(
-          err.response
-            ?.data
-            ?.message ||
-            "Failed to send message"
-        );
-      }
+      socketRef.current.emit(
+        "sendMessage",
+        {
+          conversationId,
+          content,
+        }
+      );
     };
 
   return (
@@ -345,26 +331,34 @@ const displayName =
         </button>
 
         <div
-  className="user-info"
-  onClick={() => {
+          className="user-info"
+          onClick={() => {
 
-    if (!otherUserId) return;
+            if (!otherUserId)
+              return;
 
-    if (otherUserRole === "technician") {
+            if (
+              otherUserRole ===
+              "technician"
+            ) {
 
-  navigate(
-    `/worker/${otherUserId}`
-  );
+              navigate(
+                `/worker/${otherUserId}`
+              );
 
-} else {
+            } else {
 
-  navigate(
-    `/client/${otherUserId}`
-  );
-}
-  }}
-  style={{ cursor: "pointer" }}
->
+              navigate(
+                `/client/${otherUserId}`
+              );
+            }
+          }}
+          style={{
+            cursor:
+              "pointer",
+          }}
+        >
+
           <div className="chat-avatar">
 
             <User size={20} />
@@ -378,10 +372,12 @@ const displayName =
             </h4>
 
             <span>
+
               {conversationType ===
               "INQUIRY"
                 ? "Inquiry Chat"
                 : "Job Chat"}
+
             </span>
 
           </div>
@@ -426,13 +422,10 @@ const displayName =
             ) => {
 
               const senderId =
-
                 String(
                   typeof msg.senderId ===
                   "object"
-
                     ? msg.senderId?._id
-
                     : msg.senderId
                 );
 

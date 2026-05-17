@@ -117,7 +117,7 @@ function AdminHomePage() {
                   <th>Technician</th>
                   <th>Service</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  {/* <th>Action</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -145,11 +145,11 @@ function AdminHomePage() {
                         {job.status}
                       </span>
                     </td>
-                    <td>
+                    {/* <td>
                         <button className="action-btn btn-edit">
                             <ChevronRight size={14} /> Details
                         </button>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>

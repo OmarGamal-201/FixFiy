@@ -1,82 +1,250 @@
-.welcome-hero-container {
-  height: 100vh;
-  width: 100vw;
-  background-image: url("src/assets/Thee Handyman.jpeg"); 
-  background-size: cover;
-  background-position: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
+
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
 }
 
-.hero-overlay {
-  background: rgba(0, 0, 0, 0.6); 
-  height: 100%;
+.welcome-page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #0f172a, #1d4ed8, #7c3aed);
+  color: white;
+}
+
+.hero-section-modern {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 0 8%;
+  overflow: hidden;
+}
+
+.hero-background-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,0.12), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(255,255,255,0.08), transparent 25%);
+}
+
+.hero-main-content {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+}
+
+.hero-tagline {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.14);
+  backdrop-filter: blur(10px);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.hero-main-content h1 {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.hero-main-content h1 span {
+  color: #facc15;
+}
+
+.hero-main-content p {
+  margin-top: 24px;
+  font-size: 20px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.88);
+  max-width: 650px;
+}
+
+.hero-action-buttons {
+  display: flex;
+  gap: 18px;
+  margin-top: 36px;
+  flex-wrap: wrap;
+}
+
+.primary-cta-btn,
+.secondary-cta-btn {
+  padding: 16px 28px;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.primary-cta-btn {
+  background: linear-gradient(135deg, #f97316, #fb923c);
+  color: white;
+  box-shadow: 0 12px 28px rgba(249,115,22,0.35);
+}
+
+.secondary-cta-btn {
+  background: rgba(255,255,255,0.14);
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+.primary-cta-btn:hover,
+.secondary-cta-btn:hover {
+  transform: translateY(-4px);
+}
+
+.hero-stats-grid {
+  display: flex;
+  gap: 42px;
+  margin-top: 50px;
+  flex-wrap: wrap;
+}
+
+.hero-stats-grid div {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-stats-grid strong {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.hero-stats-grid span {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  margin-top: 4px;
+}
+
+/* Modal */
+.role-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.72);
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  color: white;
-}
-
-.hero-content h1 { font-size: 3rem; font-weight: bold; margin-bottom: 10px; }
-.hero-content h3 { font-size: 1.5rem; margin-bottom: 15px; }
-.hero-content p { max-width: 600px; margin: 0 auto 30px; line-height: 1.6; }
-
-.buttons{
-  display: flex;
-  justify-content: center;
-  gap: 50px;
-}
-.get-start-btn,.get-start-btn-2 {
-  background-color: #007bff;
-  color: white;
-  padding: 12px 40px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: 0.3s;
-  
-}
-
-.selection-modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.8);
-  display: flex; justify-content: center; align-items: center;
   z-index: 1000;
 }
 
-.selection-card {
+.role-selection-modal {
   background: white;
+  color: #0f172a;
   padding: 40px;
-  border-radius: 20px;
+  border-radius: 28px;
+  width: 90%;
+  max-width: 780px;
   text-align: center;
-  width: 400px;
-  color: #333;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
 
-.selection-options {
-  display: flex;
-  gap: 20px;
-  margin: 30px 0;
+.role-selection-modal h2 {
+  margin: 0;
+  font-size: 34px;
 }
 
-.option-box {
-  flex: 1;
-  padding: 20px;
-  border: 2px solid #f0f0f0;
-  border-radius: 15px;
+.role-selection-modal p {
+  color: #64748b;
+  margin-top: 12px;
+}
+
+.role-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.role-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 30px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  background: #f8fafc;
 }
 
-.option-box:hover {
-  border-color: #007bff;
-  background-color: #f0f7ff;
+.role-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.08);
 }
 
-.icon-circle { font-size: 2rem; margin-bottom: 10px; }
-.close-modal { background: none; border: none; color: #999; cursor: pointer; }
+.role-icon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 18px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.client-icon {
+  background: rgba(37,99,235,0.12);
+  color: #2563eb;
+}
+
+.worker-icon {
+  background: rgba(249,115,22,0.12);
+  color: #f97316;
+}
+
+.role-card h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.role-card p {
+  margin-top: 12px;
+  color: #64748b;
+}
+
+.close-role-modal {
+  margin-top: 28px;
+  padding: 14px 26px;
+  border: none;
+  border-radius: 14px;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .hero-main-content h1 {
+    font-size: 42px;
+  }
+
+  .hero-main-content p {
+    font-size: 17px;
+  }
+
+  .hero-action-buttons {
+    flex-direction: column;
+  }
+
+  .primary-cta-btn,
+  .secondary-cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-stats-grid {
+    justify-content: center;
+    gap: 24px;
+  }
+
+  .role-selection-modal {
+    padding: 28px 20px;
+  }
+}

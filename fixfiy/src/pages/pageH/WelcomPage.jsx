@@ -1,63 +1,110 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './welcomepage.css';
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { User, Wrench, ArrowRight } from "lucide-react";
+import "./welcomepage.css";
 
 const WelcomePage = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
-  
-
   const handleSelection = (role) => {
-  if (role === 'client') {
-    navigate('/signin-client'); 
-  } else {
-    navigate('/signin-worker'); 
-  }
-};
+    if (role === "client") {
+      navigate("/signin-client");
+    } else {
+      navigate("/signin-worker");
+    }
+  };
 
   return (
-    <div className="welcome-hero-container">
-   
-      <div className="hero-overlay">
-        <div className="hero-content">
-          <h1>WELCOME TO FIXFIY</h1>
-          <h3>Best Home Services</h3>
+    <div className="welcome-page">
+      {/* Hero Section */}
+      <section className="hero-section-modern">
+        <div className="hero-background-overlay"></div>
+
+        <div className="hero-main-content">
+          <span className="hero-tagline">Trusted Home Services Platform</span>
+
+          <h1>
+            FIXIFY Makes Home Services
+            <span> Fast, Reliable & Professional</span>
+          </h1>
+
           <p>
-            Home maintenance and repairs made simple. We connect you with 
-            top-tier professionals to keep your living space running perfectly
-           </p>
-          <div className='buttons'>
-          <button className="get-start-btn" onClick={() => setShowModal(true)}>
-          Sign in
-          </button>
-          <button className="get-start-btn-2" onClick={() => navigate("/login")}>
-        Log in
-          </button>
+            Whether you need expert repairs or want to offer your skills,
+            FIXIFY connects clients with verified workers seamlessly.
+          </p>
+
+          <div className="hero-action-buttons">
+            <button
+              className="primary-cta-btn"
+              onClick={() => setShowModal(true)}
+            >
+              Get Started <ArrowRight size={18} />
+            </button>
+
+            <button
+              className="secondary-cta-btn"
+              onClick={() => navigate("/login")}
+            >
+              Log In
+            </button>
+          </div>
+
+          <div className="hero-stats-grid">
+            <div>
+              <strong>10K+</strong>
+              <span>Completed Services</span>
+            </div>
+            <div>
+              <strong>500+</strong>
+              <span>Verified Technicians</span>
+            </div>
+            <div>
+              <strong>4.9★</strong>
+              <span>Customer Satisfaction</span>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
- 
+      {/* Modal */}
       {showModal && (
-        <div className="selection-modal-overlay">
-          <div className="selection-card">
-            <h2>Join Us As</h2>
-            <p>Please select your account type to continue</p>
-            
-            <div className="selection-options">
-              <div className="option-box" onClick={() => handleSelection('client')}>
-                <div className="icon-circle">👤</div>
-                <span>Client</span>
+        <div className="role-modal-overlay">
+          <div className="role-selection-modal">
+            <h2>Choose Your Account Type</h2>
+            <p>Select how you’d like to use FIXIFY</p>
+
+            <div className="role-cards-grid">
+              <div
+                className="role-card"
+                onClick={() => handleSelection("client")}
+              >
+                <div className="role-icon client-icon">
+                  <User size={34} />
+                </div>
+                <h3>Client</h3>
+                <p>Book trusted professionals for your home services.</p>
               </div>
-              
-              <div className="option-box" onClick={() => handleSelection('worker')}>
-                <div className="icon-circle">🛠️</div>
-                <span>Worker</span>
+
+              <div
+                className="role-card"
+                onClick={() => handleSelection("worker")}
+              >
+                <div className="role-icon worker-icon">
+                  <Wrench size={34} />
+                </div>
+                <h3>Worker</h3>
+                <p>Offer your services and grow your client base.</p>
               </div>
             </div>
-            
-            <button className="close-modal" onClick={() => setShowModal(false)}>Cancel</button>
+
+            <button
+              className="close-role-modal"
+              onClick={() => setShowModal(false)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}

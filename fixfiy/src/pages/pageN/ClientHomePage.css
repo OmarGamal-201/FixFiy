@@ -25,7 +25,7 @@ body{
 
 .client-home-container{
   min-height:100vh;
-
+  
   background:
     radial-gradient(circle at top right,#dbeafe 0%,transparent 25%),
     radial-gradient(circle at bottom left,#ede9fe 0%,transparent 20%),
@@ -35,12 +35,8 @@ body{
 /* HERO */
 
 .welcome-banner{
-  background:
-    linear-gradient(
-      135deg,
-      #2563eb,
-      #4f46e5
-    );
+ 
+     background: linear-gradient(135deg, #0f172a, #1d4ed8, #7c3aed) !important;
 
   color:white;
 
@@ -118,6 +114,7 @@ body{
   width:min(1200px,92%);
   margin:auto;
   margin-top:45px;
+ 
 }
 
 /* SECTION */
@@ -147,7 +144,7 @@ body{
   border:none;
 
   background:#e0e7ff;
-  color:#4338ca;
+  color:#2563eb;
 
   padding:10px 16px;
 
@@ -171,7 +168,7 @@ body{
   display:flex;
   flex-wrap:wrap;
   gap:18px;
-
+  min-width: 100vh;
   margin-top:30px;
 }
 
@@ -236,7 +233,7 @@ body{
     linear-gradient(
       135deg,
       #2563eb,
-      #7c3aed
+      #2563eb
     );
 
   color:white;
@@ -263,6 +260,7 @@ body{
   gap:28px;
 
   margin-top:50px;
+  
 }
 
 /* PANELS */
@@ -299,6 +297,7 @@ body{
     );
 
   gap:18px;
+  
 }
 
 .worker-card{
@@ -347,7 +346,7 @@ body{
     linear-gradient(
       135deg,
       #2563eb,
-      #4f46e5
+      #2563eb
     );
 
   color:white;
@@ -454,7 +453,7 @@ body{
   align-items:center;
   justify-content:center;
 
-  color:#4338ca;
+  color:#2563eb;
 
   flex-shrink:0;
 }
@@ -482,7 +481,7 @@ body{
     linear-gradient(
       135deg,
       #1e3a8a,
-      #4f46e5
+      #2563eb
     );
 
   color:white;
@@ -515,7 +514,7 @@ body{
   border:none;
 
   background:white;
-  color:#4338ca;
+  color:#2563eb;
 
   padding:14px;
 
@@ -653,3 +652,11 @@ body{
   }
 
 }
+
+
+
+
+
+
+
+

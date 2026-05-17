@@ -159,16 +159,16 @@ const MyProposals = () => {
             style={{
               background:
                 status === item
-                  ? "#6C4DFF"
+                  ? "#2563eb"
                   : "#fff",
 
               color:
                 status === item
                   ? "#fff"
-                  : "#6C4DFF",
+                  : "#2563eb",
 
               border:
-                "1px solid #6C4DFF",
+                "1px solid #2563eb",
 
               borderRadius:
                 "14px",

@@ -37,7 +37,7 @@
 }
 
 .upload-btn{
-  background:#6d28d9;
+  background:#2563eb;
   color:white;
   padding:10px 18px;
   border-radius:12px;
@@ -88,7 +88,7 @@
 .input-group input:focus,
 .input-group select:focus,
 .input-group textarea:focus{
-  border-color:#7c3aed;
+  border-color:#2563eb;
 }
 
 .full{
@@ -108,8 +108,8 @@
   border:none;
   background:linear-gradient(
     135deg,
-    #6d28d9,
-    #4f46e5
+    #2563eb,
+    #1d4ed8
   );
   color:white;
   padding:16px;

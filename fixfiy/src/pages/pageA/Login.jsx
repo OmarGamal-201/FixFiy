@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { User, Wrench, ArrowRight } from "lucide-react";
 import "./Login.css";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -242,85 +243,43 @@ function Login({ onLogin }) {
       </form>
 
       {/* MODAL */}
+{showModal && (
+        <div className="role-modal-overlay">
+          <div className="role-selection-modal">
+            <h2>Choose Your Account Type</h2>
+            <p>Select how you’d like to use FIXIFY</p>
 
-      {showModal && (
-
-        <div className="selection-modal-overlay">
-
-          <div className="selection-card">
-
-            <h2>
-              Join Us As
-            </h2>
-
-            <p>
-              Please select your
-              account type to continue
-            </p>
-
-            <div className="selection-options">
-
-              {/* CLIENT */}
-
+            <div className="role-cards-grid">
               <div
-                className="option-box"
-                onClick={() =>
-                  handleSelection(
-                    "client"
-                  )
-                }
+                className="role-card"
+                onClick={() => handleSelection("client")}
               >
-
-                <div className="icon-circle">
-
-                  👤
-
+                <div className="role-icon client-icon">
+                  <User size={34} />
                 </div>
-
-                <span>
-                  Client
-                </span>
-
+                <h3>Client</h3>
+                <p>Book trusted professionals for your home services.</p>
               </div>
 
-              {/* WORKER */}
-
               <div
-                className="option-box"
-                onClick={() =>
-                  handleSelection(
-                    "worker"
-                  )
-                }
+                className="role-card"
+                onClick={() => handleSelection("worker")}
               >
-
-                <div className="icon-circle">
-
-                  🛠️
-
+                <div className="role-icon worker-icon">
+                  <Wrench size={34} />
                 </div>
-
-                <span>
-                  Worker
-                </span>
-
+                <h3>Worker</h3>
+                <p>Offer your services and grow your client base.</p>
               </div>
-
             </div>
 
             <button
-              className="close-modal"
-              onClick={() =>
-                setShowModal(false)
-              }
+              className="close-role-modal"
+              onClick={() => setShowModal(false)}
             >
-
               Cancel
-
             </button>
-
           </div>
-
         </div>
       )}
 

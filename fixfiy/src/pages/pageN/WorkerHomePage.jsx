@@ -258,13 +258,13 @@ const fetchLatestReview = async () => {
     <div className="review-content">
       <div className="review-header">
         <img
-          src={
-            latestReview.clientId?.profilePicture ||
-            "/default-avatar.png"
-          }
-          alt="client"
-          className="review-avatar"
-        />
+  src={
+    latestReview.clientId?.profilePicture?.[0]?.url ||
+    "/default-avatar.png"
+  }
+  alt="client"
+  className="review-avatar"
+/>
 
         <div>
           <h5>{latestReview.clientId?.name || "Client"}</h5>

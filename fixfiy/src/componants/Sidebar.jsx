@@ -1,5 +1,5 @@
-import React from 'react';
-
+import React, { useState } from 'react';
+import "./Sidebar.css";
 import {
   useLocation,
   useNavigate
@@ -16,12 +16,17 @@ import {
   ClipboardList,
   ShieldCheck,
   MessageCircle,
-  Star
+  Star,
+  Menu,
+  X
 } from 'lucide-react';
 
 const Sidebar = ({
   userRole
 }) => {
+
+  const [isOpen, setIsOpen] =
+    useState(false);
 
   const location =
     useLocation();
@@ -38,380 +43,398 @@ const Sidebar = ({
 
   // ================= LOGOUT =================
 
-  const handleLogout =
-    () => {
+const handleLogout = () => {
 
-      localStorage.removeItem(
-        'userRole'
-      );
+  localStorage.removeItem("userRole");
 
-      localStorage.removeItem(
-        'token'
-      );
+  localStorage.removeItem("token");
 
-      localStorage.removeItem(
-        'userId'
-      );
+  localStorage.removeItem("userId");
 
-      window.location.href =
-        '/welcome';
-    };
+  setIsOpen(false);
+
+  navigate("/welcome");
+
+  window.location.reload();
+
+};
 
   return (
+    <>
 
-    <div className="sidebar-container">
+      {/* MOBILE MENU BUTTON */}
 
-      {/* LOGO */}
-
-      <div
-        className="sidebar-logo"
+      <button
+        className="mobile-menu-btn"
         onClick={() =>
-          navigate('/home')
+          setIsOpen(true)
         }
-        style={{
-          cursor:
-            "pointer"
-        }}
       >
+        <Menu size={25} />
+      </button>
 
-        <ShieldCheck
-          size={50}
-          color="#2563eb"
-        />
+      {/* OVERLAY */}
 
-        <span className="logo-text">
-          fixfiy
-        </span>
+      {isOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() =>
+            setIsOpen(false)
+          }
+        ></div>
+      )}
 
-      </div>
+      <div className={`sidebar-container ${isOpen ? 'show-sidebar' : ''}`}>
 
-      {/* MENU */}
+        {/* CLOSE BUTTON */}
 
-      <div className="sidebar-menu">
+        <button
+          className="close-sidebar-btn"
+          onClick={() =>
+            setIsOpen(false)
+          }
+        >
+          <X size={24} />
+        </button>
 
-        {/* HOME */}
+        {/* LOGO */}
 
         <div
-          className={`menu-item ${isActive('/home')}`}
+          className="sidebar-logo"
           onClick={() =>
             navigate('/home')
           }
+          style={{
+            cursor:
+              "pointer"
+          }}
         >
 
-          <Home size={20} />
+          <ShieldCheck
+            size={50}
+            color="#2563eb"
+          />
 
-          <span>
-            Home
+          <span className="logo-text">
+            fixfiy
           </span>
 
         </div>
 
-        {/* ================= CLIENT ================= */}
+        {/* MENU */}
 
-        {userRole ===
-          'client' && (
-          <>
+        <div className="sidebar-menu">
 
-            {/* CREATE JOB */}
+          {/* HOME */}
 
-            <div
-              className={`menu-item ${isActive('/booking')}`}
-              onClick={() =>
-                navigate('/booking')
-              }
-            >
+          <div
+            className={`menu-item ${isActive('/home')}`}
+            onClick={() => {
+              navigate('/home');
+              setIsOpen(false);
+            }}
+          >
 
-              <ClipboardList size={20} />
+            <Home size={20} />
 
-              <span>
-                Create Job
-              </span>
+            <span>
+              Home
+            </span>
 
-            </div>
+          </div>
 
-            {/* MY JOBS */}
+          {/* ================= CLIENT ================= */}
 
-            <div
-              className={`menu-item ${isActive('/my-bookings')}`}
-              onClick={() =>
-                navigate('/my-bookings')
-              }
-            >
+          {userRole ===
+            'client' && (
+              <>
 
-              <FileText size={20} />
+                <div
+                  className={`menu-item ${isActive('/booking')}`}
+                  onClick={() => {
+                    navigate('/booking');
+                    setIsOpen(false);
+                  }}
+                >
 
-              <span>
-                My Jobs
-              </span>
+                  <ClipboardList size={20} />
 
-            </div>
+                  <span>
+                    Create Job
+                  </span>
 
-            {/* MESSAGES */}
+                </div>
 
-            <div
-              className={`menu-item ${isActive('/messages')}`}
-              onClick={() =>
-                navigate('/messages')
-              }
-            >
+                <div
+                  className={`menu-item ${isActive('/my-bookings')}`}
+                  onClick={() => {
+                    navigate('/my-bookings');
+                    setIsOpen(false);
+                  }}
+                >
 
-              <MessageCircle size={20} />
+                  <FileText size={20} />
 
-              <span>
-                Messages
-              </span>
+                  <span>
+                    My Jobs
+                  </span>
 
-            </div>
+                </div>
 
-            {/* PROFILE */}
+                <div
+                  className={`menu-item ${isActive('/messages')}`}
+                  onClick={() => {
+                    navigate('/messages');
+                    setIsOpen(false);
+                  }}
+                >
 
-            <div
-              className={`menu-item ${isActive('/client-profile')}`}
-              onClick={() =>
-                navigate('/client-profile')
-              }
-            >
+                  <MessageCircle size={20} />
 
-              <User size={20} />
+                  <span>
+                    Messages
+                  </span>
 
-              <span>
-                Profile
-              </span>
+                </div>
 
-            </div>
+                <div
+                  className={`menu-item ${isActive('/client-profile')}`}
+                  onClick={() => {
+                    navigate('/client-profile');
+                    setIsOpen(false);
+                  }}
+                >
 
-          </>
-        )}
+                  <User size={20} />
 
-        {/* ================= TECHNICIAN ================= */}
+                  <span>
+                    Profile
+                  </span>
 
-        {userRole ===
-          'technician' && (
-          <>
+                </div>
 
-            {/* OPEN JOBS */}
+              </>
+            )}
 
-            <div
-              className={`menu-item ${isActive('/open-jobs')}`}
-              onClick={() =>
-                navigate('/open-jobs')
-              }
-            >
+          {/* ================= TECHNICIAN ================= */}
 
-              <Briefcase size={20} />
+          {userRole ===
+            'technician' && (
+              <>
 
-              <span>
-                Open Jobs
-              </span>
+                <div
+                  className={`menu-item ${isActive('/open-jobs')}`}
+                  onClick={() => {
+                    navigate('/open-jobs');
+                    setIsOpen(false);
+                  }}
+                >
 
-            </div>
+                  <Briefcase size={20} />
 
-            {/* PROPOSALS */}
+                  <span>
+                    Open Jobs
+                  </span>
 
-            <div
-              className={`menu-item ${isActive('/my-proposals')}`}
-              onClick={() =>
-                navigate('/my-proposals')
-              }
-            >
+                </div>
 
-              <FileText size={20} />
+                <div
+                  className={`menu-item ${isActive('/my-proposals')}`}
+                  onClick={() => {
+                    navigate('/my-proposals');
+                    setIsOpen(false);
+                  }}
+                >
 
-              <span>
-                My Proposals
-              </span>
+                  <FileText size={20} />
 
-            </div>
+                  <span>
+                    My Proposals
+                  </span>
 
-            {/* MY JOBS */}
+                </div>
 
-            <div
-              className={`menu-item ${isActive('/technician-jobs')}`}
-              onClick={() =>
-                navigate('/technician-jobs')
-              }
-            >
+                <div
+                  className={`menu-item ${isActive('/technician-jobs')}`}
+                  onClick={() => {
+                    navigate('/technician-jobs');
+                    setIsOpen(false);
+                  }}
+                >
 
-              <ClipboardList size={20} />
+                  <ClipboardList size={20} />
 
-              <span>
-                My Jobs
-              </span>
+                  <span>
+                    My Jobs
+                  </span>
 
-            </div>
+                </div>
 
-            {/* MESSAGES */}
+                <div
+                  className={`menu-item ${isActive('/messages')}`}
+                  onClick={() => {
+                    navigate('/messages');
+                    setIsOpen(false);
+                  }}
+                >
 
-            <div
-              className={`menu-item ${isActive('/messages')}`}
-              onClick={() =>
-                navigate('/messages')
-              }
-            >
+                  <MessageCircle size={20} />
 
-              <MessageCircle size={20} />
+                  <span>
+                    Messages
+                  </span>
 
-              <span>
-                Messages
-              </span>
+                </div>
 
-            </div>
+                <div
+                  className={`menu-item ${isActive('/worker-profile')}`}
+                  onClick={() => {
+                    navigate('/worker-profile');
+                    setIsOpen(false);
+                  }}
+                >
 
-            {/* PROFILE */}
+                  <User size={20} />
 
-            <div
-              className={`menu-item ${isActive('/worker-profile')}`}
-              onClick={() =>
-                navigate('/worker-profile')
-              }
-            >
+                  <span>
+                    Profile
+                  </span>
 
-              <User size={20} />
+                </div>
 
-              <span>
-                Profile
-              </span>
+                <div
+                  className={`menu-item ${isActive('/wallet')}`}
+                  onClick={() => {
+                    navigate('/wallet');
+                    setIsOpen(false);
+                  }}
+                >
 
-            </div>
+                  <CreditCard size={20} />
 
-            {/* WALLET */}
+                  <span>
+                    Wallet
+                  </span>
 
-            <div
-              className={`menu-item ${isActive('/wallet')}`}
-              onClick={() =>
-                navigate('/wallet')
-              }
-            >
+                </div>
 
-              <CreditCard size={20} />
+              </>
+            )}
 
-              <span>
-                Wallet
-              </span>
+          {/* ================= ADMIN ================= */}
 
-            </div>
+          {userRole ===
+            'admin' && (
+              <>
 
-          </>
-        )}
+                <div
+                  className={`menu-item ${isActive('/admin/clients')}`}
+                  onClick={() => {
+                    navigate('/admin/clients');
+                    setIsOpen(false);
+                  }}
+                >
 
-        {/* ================= ADMIN ================= */}
+                  <Users size={20} />
 
-        {userRole ===
-          'admin' && (
-          <>
+                  <span>
+                    Clients
+                  </span>
 
-            {/* CLIENTS */}
+                </div>
 
-            <div
-              className={`menu-item ${isActive('/admin/clients')}`}
-              onClick={() =>
-                navigate('/admin/clients')
-              }
-            >
+                <div
+                  className={`menu-item ${isActive('/admin/workers')}`}
+                  onClick={() => {
+                    navigate('/admin/workers');
+                    setIsOpen(false);
+                  }}
+                >
 
-              <Users size={20} />
+                  <Briefcase size={20} />
 
-              <span>
-                Clients
-              </span>
+                  <span>
+                    Workers
+                  </span>
 
-            </div>
+                </div>
 
-            {/* WORKERS */}
+                <div
+                  className={`menu-item ${isActive('/admin/service-management')}`}
+                  onClick={() => {
+                    navigate('/admin/service-management');
+                    setIsOpen(false);
+                  }}
+                >
 
-            <div
-              className={`menu-item ${isActive('/admin/workers')}`}
-              onClick={() =>
-                navigate('/admin/workers')
-              }
-            >
+                  <FileText size={20} />
 
-              <Briefcase size={20} />
+                  <span>
+                    Services
+                  </span>
 
-              <span>
-                Workers
-              </span>
+                </div>
 
-            </div>
+                <div
+                  className={`menu-item ${isActive('/admin/reviews')}`}
+                  onClick={() => {
+                    navigate('/admin/reviews');
+                    setIsOpen(false);
+                  }}
+                >
 
-            {/* SERVICES */}
+                  <Star size={20} />
 
-            <div
-              className={`menu-item ${isActive('/admin/service-management')}`}
-              onClick={() =>
-                navigate('/admin/service-management')
-              }
-            >
+                  <span>
+                    Reviews
+                  </span>
 
-              <FileText size={20} />
+                </div>
 
-              <span>
-                Services
-              </span>
+                <div
+                  className={`menu-item ${isActive('/withdraw-admin')}`}
+                  onClick={() => {
+                    navigate('/withdraw-admin');
+                    setIsOpen(false);
+                  }}
+                >
 
-            </div>
+                  <CreditCard size={20} />
 
-            {/* REVIEWS */}
+                  <span>
+                    Withdrawal Requests
+                  </span>
 
-            <div
-              className={`menu-item ${isActive('/admin/reviews')}`}
-              onClick={() =>
-                navigate('/admin/reviews')
-              }
-            >
+                </div>
 
-              <Star size={20} />
+              </>
+            )}
 
-              <span>
-                Reviews
-              </span>
+        </div>
 
-            </div>
+        {/* FOOTER */}
 
-            {/* WITHDRAW REQUESTS */}
+        <div className="sidebar-footer">
 
-            <div
-              className={`menu-item ${isActive('/withdraw-admin')}`}
-              onClick={() =>
-                navigate('/withdraw-admin')
-              }
-            >
+          <div
+            className="menu-item logout"
+            onClick={
+              handleLogout
+            }
+          >
 
-              <CreditCard size={20} />
+            <LogOut size={20} />
 
-              <span>
-                Withdrawal Requests
-              </span>
+            <span>
+              Log out
+            </span>
 
-            </div>
-
-          </>
-        )}
-
-      </div>
-
-      {/* FOOTER */}
-
-      <div className="sidebar-footer">
-
-        <div
-          className="menu-item logout"
-          onClick={
-            handleLogout
-          }
-        >
-
-          <LogOut size={20} />
-
-          <span>
-            Log out
-          </span>
+          </div>
 
         </div>
 
       </div>
-
-    </div>
+    </>
   );
 };
 

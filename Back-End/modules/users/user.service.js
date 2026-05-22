@@ -148,19 +148,43 @@ async updateUserLocation(userId, lng, lat) {
 }
 
   // Update technician availability
-  async updateTechnicianAvailability(userId, availability_status) {
-    const technician = await Technician.findByIdAndUpdate(
+async updateTechnicianAvailability(
+  userId,
+  availability_status
+) {
+
+  const technician =
+    await Technician.findByIdAndUpdate(
+
       userId,
-      { availability_status },
-      { new: true, runValidators: true }
+
+      {
+        $set: {
+
+          "availability.isAvailable":
+            availability_status,
+
+          "availability.lastUpdated":
+            new Date(),
+        },
+      },
+
+      {
+        new: true,
+        runValidators: true,
+      }
+
     ).select("-password");
 
-    if (!technician) {
-      throw new Error("Technician not found");
-    }
+  if (!technician) {
 
-    return technician;
+    throw new Error(
+      "Technician not found"
+    );
   }
+
+  return technician;
+}
 
   // Get nearest 10 available technician for user 
   async getNearestTechnicians(userId) {
@@ -177,7 +201,7 @@ async updateUserLocation(userId, lng, lat) {
         $maxDistance: 20000, // 20km
       }
       },
-    availability_status :true
+    "availability.isAvailable": true
     }).limit(20);
     
     return nearTechnicians

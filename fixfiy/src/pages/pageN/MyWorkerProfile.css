@@ -151,6 +151,18 @@
 .reviews-profile-btn:hover{
   transform:translateY(-2px);
 }
+.clickable-user{
+  cursor:pointer;
+  transition:.2s;
+}
+
+.clickable-user:hover{
+  background:#f8fafc;
+}
+
+.clickable-user:hover .name-text{
+  color:#2563eb;
+}
 @media(max-width:768px){
 
   .profile-grid{

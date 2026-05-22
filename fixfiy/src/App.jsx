@@ -185,20 +185,12 @@ function AppContent() {
         )}
 
       <div
-        className="main-wrapper"
-        style={{
-          flex: 1,
-
-          marginLeft:
-            !isAuthPage &&
-            role
-              ? "260px"
-              : "0px",
-
-          transition:
-            "margin .3s",
-        }}
-      >
+  className={`main-wrapper ${
+    isAuthPage
+      ? "full-width"
+      : ""
+  }`}
+>
 
         {/* ================= NAVBAR ================= */}
 

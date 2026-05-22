@@ -1,15 +1,18 @@
-
 import React, {
   useEffect,
   useState,
 } from "react";
+
 import {
   Star,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 
 import {
   useNavigate,
 } from "react-router-dom";
+
 import API from "../../services/api";
 
 import "./MyWorkerProfile.css";
@@ -55,13 +58,20 @@ const specialties = [
 ];
 
 export default function MyWorkerProfile() {
-const navigate =
-  useNavigate();
+
+  const navigate =
+    useNavigate();
+
   const [loading, setLoading] =
     useState(true);
 
   const [saving, setSaving] =
     useState(false);
+
+  const [
+    availabilityLoading,
+    setAvailabilityLoading,
+  ] = useState(false);
 
   const [preview, setPreview] =
     useState("");
@@ -73,9 +83,11 @@ const navigate =
     useState({
 
       name: "",
+
       phone: "",
 
       city: "",
+
       governorate: "",
 
       specialty: "",
@@ -88,7 +100,9 @@ const navigate =
     });
 
   useEffect(() => {
+
     fetchProfile();
+
   }, []);
 
   const fetchProfile = async () => {
@@ -96,7 +110,9 @@ const navigate =
     try {
 
       const res =
-        await API.get("/profile/me");
+        await API.get(
+          "/profile/me"
+        );
 
       const user =
         res.data.data;
@@ -152,18 +168,13 @@ const navigate =
     const {
       name,
       value,
-      type,
-      checked,
     } = e.target;
 
     setFormData({
 
       ...formData,
 
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
+      [name]: value,
     });
   };
 
@@ -181,6 +192,8 @@ const navigate =
     );
   };
 
+  /* ================= SAVE PROFILE ================= */
+
   const handleSave = async () => {
 
     try {
@@ -190,14 +203,39 @@ const navigate =
       const data =
         new FormData();
 
-      Object.keys(formData).forEach(
-        (key) => {
+      data.append(
+        "name",
+        formData.name
+      );
 
-          data.append(
-            key,
-            formData[key]
-          );
-        }
+      data.append(
+        "phone",
+        formData.phone
+      );
+
+      data.append(
+        "city",
+        formData.city
+      );
+
+      data.append(
+        "governorate",
+        formData.governorate
+      );
+
+      data.append(
+        "specialty",
+        formData.specialty
+      );
+
+      data.append(
+        "experience_years",
+        formData.experience_years
+      );
+
+      data.append(
+        "bio",
+        formData.bio
       );
 
       if (imageFile) {
@@ -223,6 +261,8 @@ const navigate =
         "Profile updated successfully"
       );
 
+      fetchProfile();
+
     } catch (err) {
 
       console.log(err);
@@ -238,11 +278,60 @@ const navigate =
     }
   };
 
+  /* ================= TOGGLE AVAILABILITY ================= */
+
+  const toggleAvailability =
+    async () => {
+
+      try {
+
+        setAvailabilityLoading(
+          true
+        );
+
+        const newValue =
+          !formData.availability_status;
+
+        await API.put(
+          "/profile/availability",
+          {
+            availability_status:
+              newValue,
+          }
+        );
+
+        setFormData({
+
+          ...formData,
+
+          availability_status:
+            newValue,
+        });
+
+      } catch (err) {
+
+        console.log(err);
+
+        alert(
+          "Failed to update availability"
+        );
+
+      } finally {
+
+        setAvailabilityLoading(
+          false
+        );
+      }
+    };
+
   if (loading) {
 
     return (
+
       <div className="worker-profile-page">
+
         Loading...
+
       </div>
     );
   }
@@ -252,6 +341,8 @@ const navigate =
     <div className="worker-profile-page">
 
       <div className="worker-profile-card">
+
+        {/* TOP */}
 
         <div className="profile-top">
 
@@ -278,6 +369,7 @@ const navigate =
                   handleImageChange
                 }
               />
+
             </label>
 
           </div>
@@ -289,13 +381,64 @@ const navigate =
             </h2>
 
             <p>
-              Manage your profile
-              information
+              Manage your account and work status
             </p>
 
           </div>
 
         </div>
+
+        {/* AVAILABILITY */}
+<div className="availability-box">
+
+  <div className="availability-content">
+
+    <div>
+
+      <p className="availability-title">
+
+        {formData.availability_status
+          ? "Available for work"
+          : "Unavailable"}
+
+      </p>
+
+      <span className="availability-subtitle">
+
+        {formData.availability_status
+          ? "Clients can book you now"
+          : "You are hidden from nearby workers"}
+
+      </span>
+
+    </div>
+
+    <button
+      className={`availability-btn ${
+        formData.availability_status
+          ? "on"
+          : "off"
+      }`}
+      onClick={
+        toggleAvailability
+      }
+      disabled={
+        availabilityLoading
+      }
+    >
+
+      {availabilityLoading
+        ? "Updating..."
+        : formData.availability_status
+        ? "Turn Off"
+        : "Turn On"}
+
+    </button>
+
+  </div>
+
+</div>
+        {/* FORM */}
 
         <div className="profile-grid">
 
@@ -308,7 +451,9 @@ const navigate =
             <input
               type="text"
               name="name"
-              value={formData.name}
+              value={
+                formData.name
+              }
               onChange={
                 handleChange
               }
@@ -325,7 +470,9 @@ const navigate =
             <input
               type="text"
               name="phone"
-              value={formData.phone}
+              value={
+                formData.phone
+              }
               onChange={
                 handleChange
               }
@@ -342,7 +489,9 @@ const navigate =
             <input
               type="text"
               name="city"
-              value={formData.city}
+              value={
+                formData.city
+              }
               onChange={
                 handleChange
               }
@@ -443,6 +592,8 @@ const navigate =
 
         </div>
 
+        {/* BIO */}
+
         <div className="input-group full">
 
           <label>
@@ -452,7 +603,9 @@ const navigate =
           <textarea
             rows="5"
             name="bio"
-            value={formData.bio}
+            value={
+              formData.bio
+            }
             onChange={
               handleChange
             }
@@ -460,55 +613,45 @@ const navigate =
 
         </div>
 
-        <div className="availability-box">
+        {/* BUTTONS */}
 
-          <input
-            type="checkbox"
-            name="availability_status"
-            checked={
-              formData.availability_status
-            }
-            onChange={
-              handleChange
-            }
-          />
+        <div className="profile-actions">
 
-          <span>
-            Available for work
-          </span>
+          <button
+            className="reviews-profile-btn"
+            onClick={() =>
+              navigate(
+                `/worker-reviews/${localStorage.getItem("userId")}`
+              )
+            }
+          >
+
+            <Star size={18} />
+
+            View My Reviews
+
+          </button>
+
+          <button
+            className="save-btn"
+            onClick={
+              handleSave
+            }
+            disabled={saving}
+          >
+
+            {
+              saving
+                ? "Saving..."
+                : "Save Changes"
+            }
+
+          </button>
 
         </div>
-<button
-  className="reviews-profile-btn"
-  onClick={() =>
-    navigate(
-      `/worker-reviews/${localStorage.getItem("userId")}`
-    )
-  }
->
-
-  <Star size={18} />
-
-  View My Reviews
-
-</button>
-        <button
-          className="save-btn"
-          onClick={handleSave}
-          disabled={saving}
-        >
-
-          {
-            saving
-              ? "Saving..."
-              : "Save Changes"
-          }
-
-        </button>
 
       </div>
 
     </div>
   );
 }
-

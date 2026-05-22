@@ -60,99 +60,143 @@ function Login({ onLogin }) {
 
   // ================= LOGIN =================
 
-  const handleSubmit =
-    async (e) => {
+  const handleSubmit = async (e) => {
 
-      e.preventDefault();
+  e.preventDefault();
 
-      if (
-        !form.email ||
-        !form.password
-      ) {
+  if (
+    !form.email ||
+    !form.password
+  ) {
 
-        alert(
-          "Please fill in all fields"
-        );
+    alert(
+      "Please fill in all fields"
+    );
 
-        return;
-      }
+    return;
+  }
 
-      try {
+  try {
 
-        const res =
-          await API.post(
-            "/auth/login",
-            form
-          );
+    const res =
+      await API.post(
+        "/auth/login",
+        form
+      );
 
-        console.log(
-          "LOGIN SUCCESS:",
-          res.data
-        );
+    console.log(
+      "LOGIN SUCCESS:",
+      res.data
+    );
 
-        // ================= BACKEND RESPONSE =================
+    // ================= USER DATA =================
 
-        const token =
-          res.data.token;
+    const token =
+      res.data.token;
 
-        const user =
-          res.data.user;
+    const user =
+      res.data.user;
 
-        // ================= SAVE DATA =================
+    // ================= SAVE =================
 
-        localStorage.setItem(
-          "token",
-          token
-        );
+    localStorage.setItem(
+      "token",
+      token
+    );
 
-        localStorage.setItem(
-          "userRole",
-          user.role
-        );
+    localStorage.setItem(
+      "userRole",
+      user.role
+    );
 
-        // IMPORTANT FIX FOR CHAT
+    localStorage.setItem(
+      "userId",
+      user.id || user._id
+    );
 
-        localStorage.setItem(
-  "userId",
-  user.id || user._id
+    localStorage.setItem(
+      "userName",
+      user.name || ""
+    );
+
+    console.log(
+      "USER ID SAVED:",
+      user._id
+    );
+
+    // ================= UPDATE LOCATION =================
+
+    if (
+      user.role ===
+      "technician"
+    ) {
+
+      navigator.geolocation.getCurrentPosition(
+
+        async (position) => {
+
+          try {
+
+            await API.put(
+  "/profile/update-location",
+  {
+    coordinates: [
+      position.coords.longitude,
+      position.coords.latitude,
+    ],
+  }
 );
 
-        localStorage.setItem(
-          "userName",
-          user.name || ""
-        );
+            console.log(
+              "Location updated successfully"
+            );
 
-        console.log(
-          "USER ID SAVED:",
-          user._id
-        );
+          } catch (err) {
 
-        // ================= REDIRECT =================
+            console.log(
+              "Location update failed",
+              err
+            );
+          }
+        },
 
-        navigate("/home");
+        (error) => {
 
-        // ================= UPDATE APP STATE =================
-
-        if (onLogin) {
-
-          onLogin(
-            user.role
+          console.log(
+            "Location permission denied",
+            error
           );
         }
 
-      } catch (error) {
+      );
+    }
 
-        console.log(
-          "LOGIN ERROR:",
-          error.response?.data
-        );
+    // ================= APP STATE =================
 
-        alert(
-          error.response?.data?.message ||
-          "Login failed"
-        );
-      }
-    };
+    if (onLogin) {
+
+      onLogin(
+        user.role
+      );
+    }
+
+    // ================= REDIRECT =================
+
+    navigate("/home");
+
+  } catch (error) {
+
+    console.log(
+      "LOGIN ERROR:",
+      error.response?.data
+    );
+
+    alert(
+      error.response?.data?.message ||
+      "Login failed"
+    );
+  }
+};
 
   return (
 

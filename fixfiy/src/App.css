@@ -484,3 +484,27 @@ body {
   color: #999;
 }
 
+.main-wrapper {
+  flex: 1;
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: 0.3s;
+}
+
+.main-wrapper.full-width {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+
+  .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+
+}
